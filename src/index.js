@@ -1,20 +1,33 @@
 const { parse, html } = require('./parse')
-const { collate } = require('./collate')
-const { bind } = require('./bind')
 
 module.exports = {
-  parse,
-  html,
-  collate,
-  bind,
-  getPlatform,
-  getLanguages,
-  getImportSpecs,
-  getShapeOf,
-  getTypeOf,
-  scalarType: sh => typeof sh === 'string' && sh,
-  arrayType: sh => typeof sh === 'object' && sh['array'] || false,
-  recordType: sh => typeof sh === 'object' && sh['record'] || false
+    config,
+    parse,
+    html,
+    getPlatform,
+    getLanguages,
+    getImportSpecs,
+    getShapeOf,
+    getTypeOf,
+    scalarType: sh => typeof sh === 'string' && sh,
+    arrayType: sh => typeof sh === 'object' && sh['array'] || false,
+    recordType: sh => typeof sh === 'object' && sh['record'] || false
+}
+
+function config ( front, pkg ) {
+    const { platform } = front
+
+    const krammer = require(`./platforms/${platform}.js`)
+
+    return {
+        collate: function ( code, lang) {
+            return krammer.collate(pkg, front, code, lang)
+        },
+
+        bind: function ( moduleName ) {
+            return krammer.bind( moduleName )
+        }
+    }
 }
 
 function getLanguages ( doc ) {

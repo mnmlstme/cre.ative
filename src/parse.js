@@ -9,7 +9,7 @@ module.exports = {
 function parse( md ) {
     const { body, attributes } = frontMatter(md)
     const { platform } = attributes
-    const defaultLang = platform.replace(/-.*$/, '')
+    const defaultLang = 'text'
 
     const doc = marked.lexer(body).map( function (token, index) {
       if ( token.type === "code" ) {
