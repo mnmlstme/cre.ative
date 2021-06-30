@@ -5,7 +5,7 @@ module.exports = {
     bind
 }
 
-function bind (module) {
+function bind (pkg, module) {
   return `function(node, initial) {
     let Jsx= require('${module}');
     Jsx.mount(node, initial)

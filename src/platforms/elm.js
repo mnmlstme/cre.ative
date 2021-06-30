@@ -1,28 +1,25 @@
-const Kr = require('../kram.js')
+const Kr = require('../index.js')
 
 module.exports = {
-    generate,
-    embed
+    collate,
+    bind
 }
 
-function embed (module) {
-  // generates vanilla JS
-
+function bind (pkg, module) {
   return `function(node, initial){
-    let Elm = require('${module}')
-    let app = Elm.Main.init({node})
+    let { Elm } = require('${module}')
+    let app = Elm.${pkg}.init({node})
   }`
 }
 
-function generate (pkg, front, code) {
+function collate (pkg, front, code) {
   // generates Elm module
 
-  const module = `Kram_${pkg}`
   const imports = Kr.getImportSpecs(front.imports)
   const shape = Kr.getShapeOf(front.model)
   const chunks = code.filter( t => t.lang === 'elm')
 
-  return `port module ${module} exposing (main)
+  return `port module ${pkg} exposing (main)
 import Browser
 import Html
 import Html.Attributes as Attr
@@ -38,14 +35,18 @@ main =
     , subscriptions = subscriptions
     }
 
-port kram_input : (String -> msg) -> Sub Msg
+port kram_input : (String -> msg) -> Sub msg
 
 type alias Model =
   ${ genModel( shape ) }
 
-init : String -> ( Model, Cmd msg )
+init : () -> ( Model, Cmd msg )
 init json =
-  ( Json.decode decoder json, Cmd.none )
+  let
+    initial =
+      ${ genInitModel( front.model )}
+  in
+  ( initial, Cmd.none )
 
 type Msg
   = Incoming String
@@ -53,8 +54,8 @@ type Msg
 update : Msg -> Model -> ( Model, Cmd msg )
 update msg model =
   case msg of
-    Incoming x ->
-      ( { model | html = x }, Cmd.none )
+    Incoming json ->
+      ( Result.withDefault model <| Json.decodeString decoder json, Cmd.none )
 
 decoder : Json.Decoder Model
 decoder =
@@ -64,7 +65,7 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
   kram_input Incoming
 
-view : Model -> Html Msg
+view : Model -> Html.Html Msg
 view model =
   ${ genExposeModel( shape ) }
   Html.ul []
@@ -102,15 +103,25 @@ function genModel( shape ) {
   return typemap[ Kr.scalarType( shape ) ] || 't'
 }
 
+function genInitModel( model ) {
+    const field = (k, val) => `${k} = ${JSON.stringify(val)}`
+
+    return `{ ${ Object.entries( model )
+        .map( ([k, val] ) => field(k, val))
+        .join("\n      , ")
+      }
+      }`
+}
+
 const decodermap = {
-  string: 'string',
-  int: 'int',
-  float: 'float',
-  boolean: 'bool'
+  string: 'Json.string',
+  int: 'Json.int',
+  float: 'Json.float',
+  boolean: 'Json.bool'
 }
 
 function genDecoder( shape ) {
-  const field = (k, sh) => `(field "${k}" <| ${genDecoder(sh)})`
+  const field = (k, sh) => `(Json.field "${k}" <| ${genDecoder(sh)})`
 
   let t = Kr.arrayType( shape )
   if ( t )
@@ -142,7 +153,7 @@ function genExposeModel( shape ) {
 }
 
 function genView( chunk ) {
-  return `li [Attr.id ${chunk.id}]
+  return `Html.li [Attr.id "${chunk.id}"]
       [ ${chunk.text.split("\n").join("\n        ")}
       ]`
 }

@@ -1,4 +1,5 @@
 const { parse, html } = require('./parse')
+const hash = require('object-hash')
 
 module.exports = {
     config,
@@ -9,6 +10,7 @@ module.exports = {
     getImportSpecs,
     getShapeOf,
     getTypeOf,
+    hashcode,
     scalarType: sh => typeof sh === 'string' && sh,
     arrayType: sh => typeof sh === 'object' && sh['array'] || false,
     recordType: sh => typeof sh === 'object' && sh['record'] || false
@@ -25,7 +27,7 @@ function config ( front, pkg ) {
         },
 
         bind: function ( moduleName ) {
-            return krammer.bind( moduleName )
+            return krammer.bind(pkg, moduleName)
         }
     }
 }
@@ -95,4 +97,12 @@ function getTypeOf( value ) {
     default:
       return type
   }
+}
+
+function hashcode( {front, doc}, lang ) {
+    const code = doc
+        .filter( t => t.type === "code" && (!lang || t.lang === lang ))
+    const { platform, imports, model } = front
+
+    return hash({platform, imports, model, code}).substr(-8)
 }
