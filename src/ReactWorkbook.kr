@@ -1,0 +1,21 @@
+---
+platform: react-redux
+imports:
+model:
+  count: 0
+  tenth: 0.1
+  hello: Hello, world
+---
+# React Workbook
+
+We can write JSX expressions and have them rendered
+
+```jsx
+<p>{ hello }</p>
+```
+
+We can put lots of examples in the same file like this...
+
+```jsx
+<input type="number" value={count}/>
+```

@@ -1,0 +1,26 @@
+---
+platform: elm
+imports:
+model:
+  count: 999
+  tenth: 0.1
+  hello: Hello, world
+---
+# Elm Workbook
+
+We can write Html expressions in Elm and have them rendered.
+
+```elm
+Html.p []
+  [Html.text hello]
+```
+
+We can put lots of examples in the same file like this...
+
+```elm
+Html.input
+  [ Attr.type_ "number"
+  , Attr.value <| String.fromInt count
+  ]
+  []
+```
