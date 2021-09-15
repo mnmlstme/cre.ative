@@ -1,108 +1,33 @@
-const { parse, html } = require('./parse')
-const hash = require('object-hash')
+const { parse } = require('./parse')
+const { format } = require('./format')
+const { extract } = require('./extract')
+const { recordType, scalarType, arrayType } = require('./utils')
 
 module.exports = {
-    config,
-    parse,
-    html,
-    getPlatform,
-    getLanguages,
-    getImportSpecs,
-    getShapeOf,
-    getTypeOf,
-    hashcode,
-    scalarType: sh => typeof sh === 'string' && sh,
-    arrayType: sh => typeof sh === 'object' && sh['array'] || false,
-    recordType: sh => typeof sh === 'object' && sh['record'] || false
+  parse,
+  format,
+  extract,
+  embed,
+  render,
+  recordType,
+  scalarType,
+  arrayType
 }
 
-function config ( front, pkg ) {
-    const { platform } = front
-
-    const krammer = require(`./platforms/${platform}.js`)
+function render ({code, model, imports}, renderer, moduleName) {
+    // const krammer = require(`./platforms/${platform}.js`)
 
     return {
         collate: function ( code, lang) {
-            return krammer.collate(pkg, front, code, lang)
+            return renderer.collate(front, code, lang)
         },
 
-        bind: function ( moduleName ) {
-            return krammer.bind(pkg, moduleName)
+        bind: function ( node ) {
+            return renderer.bind(pkg, node)
         }
     }
 }
 
-function getLanguages ( doc ) {
-    return doc.filter( t => t.type === "code")
-        .map( t => t.lang )
-        .reduce(
-            (accum, next) => accum.includes(next) ?
-                accum : accum.concat([next]),
-            []
-        )
-}
-
-function getPlatform ( front ) {
-    return front.platform
-}
-
-function getImportSpecs( imports ) {
-  switch( getTypeOf(imports) ) {
-    case 'array':
-      return imports.map( importSpec )
-    case 'record':
-      return Object.entries( imports || {} )
-        .map( ([k, v]) => importSpec(k, v) )
-    case 'string':
-      return [importSpec(imports)]
-    default:
-      return []
-  }
-}
-
-function importSpec( pkg, spec ) {
-  switch( getTypeOf(spec) ) {
-    case 'record':
-      return Object.assign( spec, { as: pkg } )
-    case 'string':
-      return { from: spec, as: pkg }
-    default:
-      return { from: pkg, as: pkg }
-  }
-}
-
-function getShapeOf( model ) {
-  const type = getTypeOf(model)
-
-  switch( type ) {
-    case 'array':
-      return { [type]: getShapeOf(model[1]) }
-    case 'record':
-      fields = Object.entries(model)
-        .map( ([k, v]) => [k, getShapeOf(v)] )
-      return { [type]: Object.fromEntries(fields) }
-    default:
-      return type
-  }
-}
-
-function getTypeOf( value ) {
-  const type = typeof value
-
-  switch ( type ) {
-    case 'object':
-      return Array.isArray( value ) ? 'array' : 'record'
-    case 'number':
-      return Number.isInteger( value ) ? 'int' : 'float'
-    default:
-      return type
-  }
-}
-
-function hashcode( {front, doc}, lang ) {
-    const code = doc
-        .filter( t => t.type === "code" && (!lang || t.lang === lang ))
-    const { platform, imports, model } = front
-
-    return hash({platform, imports, model, code}).substr(-8)
+function embed (kramule, node) {
+  kramule.bind(node)
 }
