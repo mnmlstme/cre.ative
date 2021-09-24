@@ -14,7 +14,7 @@ We can write Html expressions in Elm and have them rendered.
 Html.p []
   [Html.text hello]
 ```
-
+---
 We can put lots of examples in the same file like this...
 
 ```elm

@@ -1,69 +1,25 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-const Redux = require('redux')
-import { Provider, connect } from 'react-redux'
-import Im from 'immutable'
-import Creative from './Creative/app.js'
-import workbook from './ReactWorkbook.kr'
+import { createStore, applyMiddleware } from 'redux'
+import thunk from 'redux-thunk'
+import { Provider } from 'react-redux'
+import { update } from './Creative/update'
+import App from './Creative/views/app'
 
-const mountpoint = document.getElementById('lets-be-cre-at-ive')
-const initial = {
-  workbook: Im.Map({
-    filepath: 'ElmWorkbook.kr',
-    isLoaded: false,
-  }),
-}
-const init = Im.Map(initial)
-const model = Redux.createStore(update)
-const App = connect(mapStateToProps, mapDispatchToProps)(Creative)
+// Redux store
 
-function Main({ model }) {
+const store = createStore(update, applyMiddleware(thunk))
+
+// React-Redux main
+
+function Main({ store }) {
   return (
-    <Provider store={model}>
+    <Provider store={store}>
       <App />
     </Provider>
   )
 }
 
-ReactDOM.render(React.createElement(Main, { model }), mountpoint)
+const mountpoint = document.getElementById('lets-be-cre-at-ive')
 
-function mapStateToProps(state) {
-  const workbook = state.get('workbook')
-  return {
-    filepath: workbook.get('filepath'),
-    workbook: workbook.get('isLoaded') ? workbook.get('data') : false,
-  }
-}
-
-function mapDispatchToProps(dispatch) {
-  return {
-    changeFile: (filepath) => dispatch({ type: 'ChangeFile', filepath }),
-    loadFile: () => dispatch({ type: 'LoadFile' }),
-  }
-}
-
-function update(state = init, action = {}) {
-  let workbook = state.get('workbook')
-
-  switch (action.type) {
-    case 'LoadFile':
-      console.log('LoadFile', workbook.get('filepath'))
-      return state.set(
-        'workbook',
-        workbook
-          .set('data', load_workbook(workbook.get('filepath')))
-          .set('isLoaded', true)
-      )
-    case 'ChangeFile':
-      return state.set(
-        'workbook',
-        In.Map({ filepath: action.filepath, isLoaded: false })
-      )
-    default:
-      return state
-  }
-}
-
-function load_workbook(filename) {
-  return import(`./${filename}`)
-}
+ReactDOM.render(React.createElement(Main, { store }), mountpoint)

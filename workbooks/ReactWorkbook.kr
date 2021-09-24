@@ -14,8 +14,12 @@ We can write JSX expressions and have them rendered
 <p>{ hello }</p>
 ```
 
+We can put more documentation after.
+Kram supports Markdown; it just turns it inside out.
+
+---
 We can put lots of examples in the same file like this...
 
 ```jsx
-<input type="number" value={count}/>
+<input type="number" defaultValue={count}/>
 ```

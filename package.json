@@ -3,9 +3,15 @@
   "version": "1.0.0",
   "description": "A framework-agnostic creative programming environment",
   "main": "src/index.js",
+  "alias": {
+    "DOCROOT": "./workbooks"
+  },
   "scripts": {
-    "build": "parcel build --log-level verbose --no-cache --dist-dir ./dist src/index.html",
-    "parcel": "parcel --log-level verbose src/index.html",
+    "parcel-build": "parcel build --log-level verbose --no-cache --dist-dir ./dist src/index.html",
+    "parcel-run": "parcel --log-level verbose src/index.html",
+    "build": "webpack",
+    "server": "webpack serve",
+    "webpack-hot": "webpack-dev-server --hot --progress",
     "test": "echo \"Error: no test specified\" && exit 1",
     "clean": "rm -rf node_modules dist .parcel-cache package-lock.json"
   },
@@ -16,19 +22,27 @@
   "author": "ken@mnmlst.me",
   "license": "BSD-3-Clause",
   "dependencies": {
+    "elm-css-modules-plugin": "^1.0.2",
+    "elm-webpack-loader": "^8.0.0",
     "immutable": "^4.0.0-rc.12",
     "kram": "file:../kram",
-    "parcel": "^2.0.0-rc.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-redux": "^7.2.4",
     "redux": "^4.1.0",
-    "webpack": "^5.42.0"
+    "redux-thunk": "^2.3.0"
   },
   "devDependencies": {
-    "@parcel/transformer-elm": "^2.0.0-rc.0",
+    "@babel/core": "^7.15.0",
+    "@babel/plugin-syntax-dynamic-import": "^7.8.3",
+    "@babel/preset-env": "^7.15.0",
+    "@babel/preset-react": "^7.14.5",
+    "babel-loader": "^8.2.2",
+    "css-loader": "^5.2.6",
     "elm": "^0.19.1-5",
-    "parcel-resolver-kram": "file:../parcel-resolver-kram",
-    "parcel-transformer-kram": "file:../parcel-transformer-kram"
+    "style-loader": "^2.0.0",
+    "webpack": "^4.16.1",
+    "webpack-cli": "^4.8.0",
+    "webpack-dev-server": "^4.0.0-rc.1"
   }
 }

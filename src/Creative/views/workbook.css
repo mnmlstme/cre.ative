@@ -1,0 +1,28 @@
+.workbook {
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: [doc] 1fr [view] 1fr;
+  grid-auto-rows: 50vh;
+  grid-auto-flow: column;
+  justify-items: start;
+}
+
+.layout > *,
+.layout > div > ol {
+  /* each <ol> is a column of the grid */
+  display: contents;
+}
+
+.layout > ol:first-child > * {
+  grid-column-start: doc;
+  overflow-x: visible;
+  overflow-y: auto;
+}
+
+.layout > ol:nth-child(2) > * {
+  grid-column-start: view;
+  place-self: center;
+  overflow: hidden;
+}
