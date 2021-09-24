@@ -4,7 +4,7 @@ module.exports = {
     format
 }
 
-function format( workbook ) {
-  const tokens = workbook.doc
-  return marked.parser(tokens)
+function format( wb ) {
+  return wb.scenes
+    .map( tokens => marked.parser(tokens) )
 }

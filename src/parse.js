@@ -32,8 +32,10 @@ function parse( md, basename ) {
       init: model,
       shape: getShapeOf(model),
       imports: getImportSpecs(imports),
-      doc: tokens
+      scenes: paginate(tokens)
     }
+
+    console.log("Workbook:", result)
 
     const hashkey = hashcode(result)
     const moduleName = `Kram_${hashkey}_${basename}`
@@ -42,8 +44,23 @@ function parse( md, basename ) {
 }
 
 
+function paginate( tokens ) {
+  // For now, put it all in one page
+  console.log("Paginating: ", tokens)
+
+  let breaks = tokens
+    .map((t, i) => t.type === 'hr' ? i : false)
+    .filter(i => !!i)
+
+  breaks.unshift(-1)
+
+  return breaks.map((b, i) =>
+    tokens.slice(b+1, breaks[i+1])
+  )
+}
+
 function getLanguages ( tokens ) {
-    return tokens.filter( t => t.type === "code")
+    return tokens.filter( t => t.type === 'code')
         .map( t => t.lang )
         .reduce(
             (accum, next) => accum.includes(next) ?
@@ -105,9 +122,11 @@ function getTypeOf( value ) {
   }
 }
 
-function hashcode( {platform, imports, shape, doc}, lang ) {
-    const code = doc
+function hashcode( {platform, imports, shape, scenes}, lang ) {
+    const code = scenes
+      .map( doc => doc
         .filter( t => t.type === "code" && (!lang || t.lang === lang ))
+      )
 
     return hash({platform, imports, shape, code}).substr(-8)
 }
