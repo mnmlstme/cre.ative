@@ -4,15 +4,19 @@ const path = require('path')
 const Kr = require('../index.js')
 
 function loader(content) {
-    const basename = path.basename(this.resourcePath, ".kr")
-    const dir = path.dirname(this.resourcePath)
-    const subdir = path.join(dir, basename)
-
     const options = getOptions(this) || {}
     const defaults = options.defaults || {}
+    const root = options.root || this.rootContext
+    const output = options.output
+
+    const relpath = path.relative(root, this.resourcePath)
+    const basename = path.basename(relpath, ".kr")
+    const dir = path.join(path.dirname(relpath), basename)
+    const outdir = output ? path.join(output, dir) : dir
+
     const callback = this.async()
 
-    console.log("Kram loader options: ", options)
+    console.log("Kram resource: ", this.resourcePath)
 
     const getConfig = platform =>
       getPlatformByName(platform, options.platforms)
@@ -36,8 +40,8 @@ function loader(content) {
     }
 
     const emit = (name, code) => {
-      const filename = path.join(subdir, name)
-      fs.mkdirSync(subdir, {recursive: true})
+      const filename = path.join(outdir, name)
+      fs.mkdirSync(outdir, {recursive: true})
       fs.writeFileSync(filename, code)
       return filename
     }
