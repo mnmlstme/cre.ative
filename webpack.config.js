@@ -15,12 +15,10 @@ module.exports = {
         exclude: [path.resolve(__dirname, './node_modules')],
         use: {
           loader: 'babel-loader',
-          /*
           query: {
-            presets: ['react', 'env'],
-            plugins: ['@babel/plugin-syntax-dynamic-import'],
+            presets: ['@babel/preset-react'],
+            // plugins: ['@babel/plugin-syntax-dynamic-import'],
           },
-          */
         },
       },
       {
@@ -71,7 +69,8 @@ module.exports = {
         use: {
           loader: 'kram',
           options: {
-            root: 'Workbooks',
+            root: path.resolve(__dirname, 'workbooks'),
+            output: path.resolve(__dirname, 'kram_modules'),
             defaults: {
               platform: 'elm',
               language: 'elm',
@@ -83,7 +82,7 @@ module.exports = {
                 modules: [
                   {
                     language: 'jsx',
-                    use: 'babel-loader',
+                    use: 'babel-loader?{presets:["@babel/preset-react"]}',
                   },
                   {
                     language: 'svg',
