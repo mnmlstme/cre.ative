@@ -32,7 +32,7 @@ function parse( md, basename ) {
       init: model,
       shape: getShapeOf(model),
       imports: getImportSpecs(imports),
-      scenes: paginate(tokens)
+      scenes: paginate(tokens).map(toScene)
     }
 
     console.log("Workbook:", result)
@@ -45,9 +45,6 @@ function parse( md, basename ) {
 
 
 function paginate( tokens ) {
-  // For now, put it all in one page
-  console.log("Paginating: ", tokens)
-
   let breaks = tokens
     .map((t, i) => t.type === 'hr' ? i : false)
     .filter(i => !!i)
@@ -57,6 +54,19 @@ function paginate( tokens ) {
   return breaks.map((b, i) =>
     tokens.slice(b+1, breaks[i+1])
   )
+}
+
+function toScene( tokens ) {
+  // The view is the first token, as long as code
+  const code = tokens.filter( t => t.type === 'code')
+  const view = tokens[0] === code[0] ? code[0] : undefined
+
+  return {
+    view,
+    // exclude the view from the doc and the code
+    doc: view ? tokens.slice(1) : tokens,
+    code: view ? code.slice(1) : code
+  }
 }
 
 function getLanguages ( tokens ) {
@@ -123,10 +133,9 @@ function getTypeOf( value ) {
 }
 
 function hashcode( {platform, imports, shape, scenes}, lang ) {
-    const code = scenes
-      .map( doc => doc
-        .filter( t => t.type === "code" && (!lang || t.lang === lang ))
-      )
+    const code = scenes.map( scn => scn.code )
+    const views = scenes.map( scn => scn.view || {})
 
-    return hash({platform, imports, shape, code}).substr(-8)
+
+    return hash({platform, imports, shape, code, views}).substr(-8)
 }

@@ -3,9 +3,10 @@ module.exports = {
 }
 
 function extract( { scenes }, language ) {
-  return scenes.map(tokens =>
-      tokens.filter(token =>
-        token.type === 'code'
-        && (!language || token.lang === language ))
+  return scenes
+    .map( scn => scn.view )
+    .map( token => token
+      && token.type === 'code'
+      && (!language || token.lang === language ) ? token : null
     )
 }

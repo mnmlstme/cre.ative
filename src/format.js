@@ -6,5 +6,5 @@ module.exports = {
 
 function format( wb ) {
   return wb.scenes
-    .map( tokens => marked.parser(tokens) )
+    .map( scene => marked.parser(scene.doc) )
 }
