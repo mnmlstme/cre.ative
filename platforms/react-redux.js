@@ -16,6 +16,7 @@ function collate(workbook, lang) {
 
   const { imports, moduleName, shape } = workbook
   const scenes = Kr.extract(workbook, lang)
+  const defns = Kr.definitions(workbook, lang)
 
   const code = `// module ${moduleName} (JSX)
 import React from 'react'
@@ -24,6 +25,8 @@ const Redux = require('redux')
 import Im from 'immutable'
 import { Provider, connect } from 'react-redux'
 ${imports.map(genImport).join('\n')}
+
+${defns.map(genDefn).join('\n')}
 
 const View = (${genProps(shape)}) =>
   (<ol>
@@ -108,4 +111,8 @@ function genView(token) {
      </li>
     `
     : '<li></li>'
+}
+
+function genDefn(token) {
+  return token.text
 }

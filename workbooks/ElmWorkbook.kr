@@ -18,9 +18,21 @@ We can write Html expressions in Elm and have them rendered.
 ```elm
 Html.input
   [ Attr.type_ "number"
-  , Attr.value <| String.fromInt count
+  , Attr.value <| asString count
   ]
   []
 ```
 
 We can put lots of examples in the same file like this.
+
+We can also define "helper" functions to make the view more
+concise.
+
+```elm
+asString: Int -> String
+asString n =
+  String.fromInt n
+```
+
+Alternatively, we can use views to test or demo the functions
+that we define in the same file.

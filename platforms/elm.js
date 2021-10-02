@@ -12,10 +12,11 @@ function bind(moduleName, lang = 'elm') {
   }`
 }
 
-function collate(workbook, lang) {
+function collate(workbook, lang = 'elm') {
   // generates Elm module
   const { imports, moduleName, shape, init } = workbook
   const scenes = Kr.extract(workbook, lang)
+  const defns = Kr.definitions(workbook, lang)
 
   const code = `port module ${moduleName} exposing (main)
 import Browser
@@ -69,6 +70,8 @@ view model =
   Html.ol []
     [ ${scenes.map(genView).join('\n    , ')}
     ]
+
+${defns.map(genDefn).join('\n')}
 `
 
   return {
@@ -158,4 +161,8 @@ function genView(token) {
         ]
     `
     : 'Html.li [] []'
+}
+
+function genDefn(token) {
+  return token.text
 }

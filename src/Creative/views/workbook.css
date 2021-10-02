@@ -26,3 +26,12 @@
   place-self: center;
   overflow: hidden;
 }
+
+.doc {
+  font-family: sans-serif
+}
+
+.code {
+  font-family: monospace;
+  background: #a8a0a8;
+}
