@@ -3,12 +3,16 @@ import Kr from 'kram'
 
 export function Document({ workbook }) {
   console.log('Document:', workbook)
-  const scenes = Kr.format(workbook)
+  const docs = Kr.format(workbook)
+  const views = Kr.extract(workbook)
 
   return (
     <ol>
-      {scenes.map((html) => (
-        <li dangerouslySetInnerHTML={{ __html: html }} />
+      {docs.map((html, i) => (
+        <li key={i}>
+          <section dangerouslySetInnerHTML={{ __html: html }} />
+          <pre>{views[i].text}</pre>
+        </li>
       ))}
     </ol>
   )

@@ -151,13 +151,11 @@ function genExposeModel(shape) {
   return ''
 }
 
-function genView(list) {
-  return list
-    .map(
-      (chunk) =>
-        `Html.li [Attr.id "${chunk.id}"]
-          [ ${chunk.text.split('\n').join('\n        ')}
-        ]`
-    )
-    .join('\n        ,')
+function genView(token) {
+  return token
+    ? `Html.li [Attr.id "${token.id}"]
+        [ ${token.text.split('\n').join('\n        ')}
+        ]
+    `
+    : 'Html.li [] []'
 }

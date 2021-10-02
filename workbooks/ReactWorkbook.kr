@@ -6,20 +6,21 @@ model:
   tenth: 0.1
   hello: Hello, world
 ---
+```jsx
+<p>{ hello }</p>
+```
+
 # React Workbook
 
 We can write JSX expressions and have them rendered
 
-```jsx
-<p>{ hello }</p>
-```
 
 We can put more documentation after.
 Kram supports Markdown; it just turns it inside out.
 
 ---
-We can put lots of examples in the same file like this...
-
 ```jsx
 <input type="number" defaultValue={count}/>
 ```
+
+We can put lots of views in the same file like this...

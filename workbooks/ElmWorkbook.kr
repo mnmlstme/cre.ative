@@ -6,17 +6,15 @@ model:
   tenth: 0.1
   hello: Hello, world
 ---
-# Elm Workbook
-
-We can write Html expressions in Elm and have them rendered.
-
 ```elm
 Html.p []
   [Html.text hello]
 ```
----
-We can put lots of examples in the same file like this...
+# Elm Workbook
 
+We can write Html expressions in Elm and have them rendered.
+
+---
 ```elm
 Html.input
   [ Attr.type_ "number"
@@ -24,3 +22,5 @@ Html.input
   ]
   []
 ```
+
+We can put lots of examples in the same file like this.

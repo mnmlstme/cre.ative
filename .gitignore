@@ -1,7 +1,7 @@
 package-lock.json
 elm-stuff/
 dist/
-kram-Modules/
+kram_modules/
 node_modules/
 .cache/
 .parcel-cache/

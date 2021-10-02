@@ -101,14 +101,11 @@ function genExposeModel(shape) {
   return '{}'
 }
 
-function genView(list) {
-  return list
-    .map(
-      (chunk) =>
-        `<li key="${chunk.id}" id="${chunk.id}">
-       ${chunk.text.split('\n').join('\n        ')}
+function genView(token) {
+  return token
+    ? `<li key="${token.id}" id="${token.id}">
+       ${token.text.split('\n').join('\n        ')}
      </li>
     `
-    )
-    .join('\n')
+    : '<li></li>'
 }
