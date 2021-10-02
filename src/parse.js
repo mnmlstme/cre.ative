@@ -65,7 +65,7 @@ function toScene( tokens ) {
     view,
     // exclude the view from the doc and the code
     doc: view ? tokens.slice(1) : tokens,
-    code: view ? code.slice(1) : code
+    definitions: view ? code.slice(1) : code
   }
 }
 
