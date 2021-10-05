@@ -7,6 +7,15 @@ export function changeFile(filepath) {
   }
 }
 
+const ChangeScene = 'ChangeScene'
+
+export function changeScene(number) {
+  return {
+    type: ChangeScene,
+    number,
+  }
+}
+
 const LoadWorkbook = 'LoadWorkbook'
 const WorkbookError = 'WorkbookError'
 const LoadResource = 'LoadResource'
@@ -61,6 +70,7 @@ export function loadResource(filepath, loader, lang = 'js') {
 
 export default {
   ChangeFile,
+  ChangeScene,
   LoadWorkbook,
   WorkbookError,
   LoadResource,

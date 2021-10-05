@@ -6,4 +6,5 @@ export const initial = Im.Map({
     isLoaded: false,
   },
   resources: Im.Map(),
+  current: 1,
 })

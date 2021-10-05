@@ -11,6 +11,10 @@ export function update(state = initial, action = {}) {
         isLoaded: false,
       })
 
+    case Actions.ChangeScene:
+      console.log('update ChangeScene', action.number)
+      return state.set('current', Number.parseInt(action.number))
+
     case Actions.LoadWorkbook:
       console.log('update LoadWorkbook', action.data)
       return state.set('workbook', {

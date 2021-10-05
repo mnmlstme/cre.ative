@@ -1,4 +1,5 @@
 ---
+title: React Workbook
 platform: react-redux
 imports:
 model:
@@ -10,7 +11,7 @@ model:
 <p>{ hello }</p>
 ```
 
-# React Workbook
+# JSX Workbook
 
 We can write JSX expressions and have them rendered
 

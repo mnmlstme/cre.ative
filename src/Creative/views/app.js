@@ -3,16 +3,25 @@ import ReactDOM from 'react-dom'
 import { connect } from 'react-redux'
 import { Document } from './document'
 import { Render } from './render'
-import { changeFile, loadWorkbook, loadResource } from '../actions'
+import { changeFile, changeScene, loadWorkbook, loadResource } from '../actions'
 import styles from './workbook.css'
 
-const Workbook = ({ workbook, resources, doLoadResource }) => {
-  const { title } = workbook
+const Workbook = ({
+  workbook,
+  filepath,
+  scene,
+  resources,
+  doChangeScene,
+  doLoadResource,
+}) => {
+  const { title, scenes } = workbook
 
   return (
     <article className={styles.workbook}>
-      <header>{title}</header>
-      <section className={styles.layout}>
+      <section
+        className={styles.layout}
+        style={{ top: -100 * (scene - 1) + 'vh' }}
+      >
         <Document workbook={workbook} />
         <Render
           workbook={workbook}
@@ -20,6 +29,18 @@ const Workbook = ({ workbook, resources, doLoadResource }) => {
           doLoadResource={doLoadResource}
         />
       </section>
+      <footer>
+        {title || filepath}, scene{' '}
+        <input
+          type="number"
+          size="5"
+          min={1}
+          max={scenes.length}
+          value={scene}
+          onChange={doChangeScene}
+        />{' '}
+        of {scenes.length}
+      </footer>
     </article>
   )
 }
@@ -45,28 +66,28 @@ const Finder = ({ filepath, doChangeFile, doLoadWorkbook }) => {
   )
 }
 
-const Creative = ({ workbook, resources, filepath, dispatch }) => {
+const Creative = ({ workbook, resources, filepath, scene, dispatch }) => {
   const doLoadWorkbook = (event) => dispatch(loadWorkbook(filepath))
   const doChangeFile = (event) => dispatch(changeFile(event.target.value))
+  const doChangeScene = (event) => dispatch(changeScene(event.target.value))
   const doLoadResource = (loader, lang) =>
     dispatch(loadResource(filepath, loader, lang))
 
   if (workbook) {
     return (
       <Workbook
-        workbook={workbook}
-        resources={resources}
-        doLoadResource={doLoadResource}
+        {...{
+          workbook,
+          filepath,
+          scene,
+          resources,
+          doChangeScene,
+          doLoadResource,
+        }}
       />
     )
   } else {
-    return (
-      <Finder
-        filepath={filepath}
-        doChangeFile={doChangeFile}
-        doLoadWorkbook={doLoadWorkbook}
-      />
-    )
+    return <Finder {...{ filepath, doChangeFile, doLoadWorkbook }} />
   }
 }
 
@@ -77,6 +98,7 @@ function mapStateToProps(state) {
     filepath: workbook.filepath,
     workbook: workbook.isLoaded ? workbook.module : undefined,
     resources: state.get('resources'),
+    scene: state.get('current'),
   }
 }
 

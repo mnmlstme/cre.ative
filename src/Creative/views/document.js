@@ -10,12 +10,22 @@ export function Document({ workbook }) {
   return (
     <ol>
       {docs.map((html, i) => (
-        <li key={i}>
+        <li key={i} className={styles.scene}>
           <section
             className={styles.doc}
             dangerouslySetInnerHTML={{ __html: html }}
           />
-          <pre className={styles.code}>{views[i].text}</pre>
+          {views[i] && (
+            <figure className={styles.view}>
+              <caption>
+                <dl className={styles.specs}>
+                  <dt>Language</dt>
+                  <dd>{views[i].lang}</dd>
+                </dl>
+              </caption>
+              <pre className={styles.code}>{views[i].text}</pre>
+            </figure>
+          )}
         </li>
       ))}
     </ol>
