@@ -30,16 +30,14 @@ const Workbook = ({
         />
       </section>
       <footer>
-        {title || filepath}, scene{' '}
-        <input
-          type="number"
-          size="5"
-          min={1}
-          max={scenes.length}
-          value={scene}
-          onChange={doChangeScene}
-        />{' '}
-        of {scenes.length}
+        <h6>{title || filepath}</h6>
+        <select value={scene} onChange={doChangeScene}>
+          {scenes.map((scn, i) => (
+            <option value={i + 1}>
+              {(scn && scn.title) || 'Scene ' + (i + 1)}
+            </option>
+          ))}
+        </select>
       </footer>
     </article>
   )

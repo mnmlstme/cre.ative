@@ -17,13 +17,17 @@ export function Document({ workbook }) {
           />
           {views[i] && (
             <figure className={styles.view}>
-              <caption>
+              <figcaption>
                 <dl className={styles.specs}>
                   <dt>Language</dt>
                   <dd>{views[i].lang}</dd>
                 </dl>
-              </caption>
-              <pre className={styles.code}>{views[i].text}</pre>
+              </figcaption>
+              <pre className={styles.code}>
+                {views[i].text.split('\n').map((s) => (
+                  <span>{s + '\n'}</span>
+                ))}
+              </pre>
             </figure>
           )}
         </li>
