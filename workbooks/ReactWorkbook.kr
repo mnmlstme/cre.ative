@@ -11,7 +11,7 @@ model:
 <p>{ hello }</p>
 ```
 
-# JSX Workbook
+# Hello, World
 
 We can write JSX expressions and have them rendered
 
@@ -23,6 +23,8 @@ Kram supports Markdown; it just turns it inside out.
 ```jsx
 <input type="number" defaultValue={asString(count)}/>
 ```
+
+# Functions
 
 We can put lots of views in the same file like this. We
 can also define helper functions. All helper functions in the

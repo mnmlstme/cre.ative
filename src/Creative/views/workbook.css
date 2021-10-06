@@ -8,6 +8,7 @@
   position: fixed;
   width: 100vw;
   height: 100vh;
+  background: radial-gradient(circle at right, #fff, #fff 45vw, #203f48 100vw);
 }
 
 .workbook > header {
@@ -61,22 +62,21 @@
   grid-auto-rows: 100vh;
   grid-auto-flow: column;
   justify-items: start;
-  background: linear-gradient(to left, transparent, transparent 25%, #d4f8ee80);
 }
 
-.layout > div {
-  /* React sticks an extra div in here, which we want to ignore for grid layout */
+.layout > .container {
   display: contents;
 }
 
 .layout > ol,
-.layout > div > ol {
+.container > ol {
   /* each <ol> is a column of the grid */
   display: contents;
   list-style: none;
 }
 
-.layout > ol:first-child > * {
+.layout > ol > li {
+  /* document view */
   grid-column-start: doc;
   place-self: end;
   width: 100%;
@@ -85,16 +85,33 @@
   margin-bottom: 1.5rem;
 }
 
-.layout > ol:nth-child(2) > *,
-.layout > div:nth-child(2) > ol > * {
+.container > ol > li {
+  /* rendered view*/
   grid-column-start: view;
   place-self: center;
-  overflow: hidden;
+  overflow: visible;
+  position: relative;
+  z-index: 0;
+}
+
+.container > ol > li::before {
+  /* backdrop for rendered view */
+  content: "";
+  height: 100vh;
+  width: 60vw;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  background: radial-gradient(circle at 30vw, #fff, #fff 50vh, transparent 30vw);
+  transform: translate(-30vw,-50vh);
+  z-index: -1;
 }
 
 .doc {
   font-family: sans-serif;
   margin: 0 .5em;
+  color: #f2f2e0;
+  width: 80%;
 }
 
 .doc > * + * {
@@ -103,6 +120,22 @@
 
 .doc > h1 + * {
   margin-top: 2em;
+}
+
+.doc > pre {
+  margin: 1rem 0;
+  padding: 0 .5rem;
+  border-left: 2px solid #686863;
+}
+
+.doc > pre > code::after {
+  content: attr(class);
+  display: block;
+  font-family: sans-serif;
+  font-size: .75rem;
+  color: #a8a8a1;
+  font-style: italic;
+  margin-top: .5rem;
 }
 
 .view {
@@ -115,14 +148,14 @@
   height: 1rem;
 }
 
+
 .specs {
   font-family: sans-serif;
   font-size: .75rem;
   line-height: inherit;
   display: inline-block;
   padding: 0 0.25rem;
-  background: #bbbbb97d;
-  color: #686863;
+  color: #a8a8a1;
   font-style: italic;
 }
 

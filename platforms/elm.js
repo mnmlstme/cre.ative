@@ -6,9 +6,11 @@ module.exports = {
 }
 
 function bind(moduleName, lang = 'elm') {
-  return `function(module, node, initial){
+  return `function(module, container, initial){
     let { Elm } = module
-    let app = Elm.${moduleName}.init({node})
+    let dummy = document.createElement('div')
+    container.appendChild(dummy)
+    let app = Elm.${moduleName}.init({node: dummy})
   }`
 }
 

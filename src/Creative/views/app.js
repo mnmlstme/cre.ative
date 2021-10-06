@@ -34,7 +34,7 @@ const Workbook = ({
         <select value={scene} onChange={doChangeScene}>
           {scenes.map((scn, i) => (
             <option value={i + 1}>
-              {(scn && scn.title) || 'Scene ' + (i + 1)}
+              {`Scene ${i + 1}` + [scn && scn.title].map((s) => s && `: ${s}`)}
             </option>
           ))}
         </select>

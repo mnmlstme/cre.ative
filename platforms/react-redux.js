@@ -6,8 +6,8 @@ module.exports = {
 }
 
 function bind(moduleName, lang = 'jsx') {
-  return `function(module, node, initial) {
-    module.mount(node, initial)
+  return `function(module, container, initial) {
+    module.mount(container, initial)
   }`
 }
 
@@ -28,7 +28,7 @@ ${imports.map(genImport).join('\n')}
 
 ${defns.map(genDefn).join('\n')}
 
-const View = (${genProps(shape)}) =>
+const Program = (${genProps(shape)}) =>
   (<ol>
       ${scenes.map(genView).join('\n')}
   </ol>)
@@ -36,20 +36,17 @@ const View = (${genProps(shape)}) =>
 const mapStateToProps = state =>
   ( ${genExposeModel(shape)} )
 
-const Component = connect(mapStateToProps)(View)
-
-const Program = ({ model }) =>
-  (<Provider store={model}>
-    <Component />
-  </Provider>)
-
 function mount (mountpoint, initial) {
 
   const init = Im.Map(initial)
-  const model = Redux.createStore(update)
+  const store = Redux.createStore(update)
+  const props = Object.assign(
+    mapStateToProps(store.getState()),
+    {dispatch: store.dispatch}
+  )
 
   ReactDOM.render(
-    React.createElement(Program, { model } ),
+    React.createElement(Program, props),
     mountpoint
   )
 

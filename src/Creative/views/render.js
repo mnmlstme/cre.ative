@@ -1,6 +1,7 @@
 import React from 'react'
 import Kr from 'kram'
 const path = require('path')
+import styles from './workbook.css'
 
 export class Render extends React.Component {
   constructor(props) {
@@ -9,7 +10,7 @@ export class Render extends React.Component {
   }
 
   render() {
-    return <div ref={this.node} />
+    return <div className={styles.container} ref={this.node} />
   }
 
   componentDidMount() {

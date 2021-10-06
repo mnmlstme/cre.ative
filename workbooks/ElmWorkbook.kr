@@ -11,7 +11,7 @@ Html.p []
   [Html.text hello]
 ```
 
-# Elm Workbook
+# Introduction
 
 We can write Html expressions in Elm and have them rendered.
 
@@ -23,6 +23,8 @@ Html.input
   ]
   []
 ```
+
+# Functions
 
 We can put lots of examples in the same file like this.
 
