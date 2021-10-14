@@ -86,7 +86,7 @@
 }
 
 .container > ol > li {
-  /* rendered view*/
+  /* rendered view */
   grid-column-start: view;
   place-self: center;
   overflow: visible;
