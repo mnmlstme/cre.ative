@@ -9,6 +9,8 @@ import styles from './workbook.css'
 const Workbook = ({ workbook, filepath, resources, scene, dispatch }) => {
   const { title, scenes } = workbook
   const doChangeScene = (event) => dispatch(changeScene(event.target.value))
+  const doNextScene = () => dispatch(changeScene(scene + 1))
+  const doPrevScene = () => dispatch(changeScene(scene - 1))
   const doLoadResource = (loader, lang) =>
     dispatch(loadResource(filepath, loader, lang))
 
@@ -16,7 +18,7 @@ const Workbook = ({ workbook, filepath, resources, scene, dispatch }) => {
     <article className={styles.workbook}>
       <section
         className={styles.layout}
-        style={{ top: -100 * (scene - 1) + 'vh' }}
+        style={{ left: -100 * (scene - 1) + 'vw' }}
       >
         <Document workbook={workbook} />
         <Render
@@ -27,13 +29,23 @@ const Workbook = ({ workbook, filepath, resources, scene, dispatch }) => {
       </section>
       <footer>
         <h6>{title || filepath}</h6>
-        <select value={scene} onChange={doChangeScene}>
-          {scenes.map((scn, i) => (
-            <option value={i + 1}>
-              {`Scene ${i + 1}` + [scn && scn.title].map((s) => s && `: ${s}`)}
-            </option>
-          ))}
-        </select>
+        <span>
+          <button disabled={scene - 1 < 1} onClick={doPrevScene}>
+            &lt;
+          </button>
+          <select value={scene} onChange={doChangeScene}>
+            {scenes.map((scn, i) => (
+              <option value={i + 1}>
+                {`Scene ${i + 1}` +
+                  [scn && scn.title].map((s) => s && `: ${s}`)}
+              </option>
+            ))}
+          </select>
+          <button disabled={scene + 1 > scenes.length} onClick={doNextScene}>
+            &gt;
+          </button>
+        </span>
+        <h6></h6>
       </footer>
     </article>
   )

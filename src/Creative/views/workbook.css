@@ -8,7 +8,7 @@
   position: fixed;
   width: 100vw;
   height: 100vh;
-  background: radial-gradient(circle at right, #fff, #fff 45vw, #203f48 100vw);
+  background: radial-gradient(circle at right, #fff, #fff 50vw, #203f48 100vw);
 }
 
 .workbook > header {
@@ -23,6 +23,9 @@
 
 .workbook > footer {
   position: absolute;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
   font-family: monospace;
   bottom: 0;
   height: 1.5rem;
@@ -37,31 +40,46 @@
 
 .workbook > footer > * {
   display: inline-block;
-  color: inherit;
-  background: transparent;
   font-size: inherit;
+  flex-grow: 0;
 }
 
-.workbook > footer > * + * {
-  margin-left: .5rem;
+.workbook > footer > h6 {
+  flex-basis: 0;
+  flex-grow: 1;
+}
+
+.workbook > footer select,
+.workbook > footer button {
+  border: 1px solid #666;
+  background: transparent;
+  font-size: inherit;
+  font-family: inherit;
+  color: inherit;
+  padding: 0 0.5em;
+  text-align: center;
 }
 
 .workbook > footer select {
-  border: 1px solid #666;
-  font-family: inherit;
+  width: 25em;
 }
 
 .workbook > footer select > option {
   color: #282426;
 }
 
+.workbook > footer button:disabled {
+  opacity: 0.5;
+}
+
 .layout {
   display: grid;
   position: relative; /* inline style to set top */
-  grid-template-columns: [doc] 1fr [view] 1fr;
-  grid-auto-rows: 100vh;
-  grid-auto-flow: column;
+  grid-template-rows: [doc] 1fr [view] 1fr;
+  grid-auto-columns: 100vw;
+  grid-auto-flow: row;
   justify-items: start;
+  transition: left 0.5s ease-in-out;
 }
 
 .layout > .container {
@@ -77,34 +95,24 @@
 
 .layout > ol > li {
   /* document view */
-  grid-column-start: doc;
-  place-self: end;
-  width: 100%;
-  overflow-x: visible;
+  grid-row-start: doc;
+  align-self: end;
+  overflow-x: hidden;
   overflow-y: auto;
   margin-bottom: 1.5rem;
 }
 
 .container > ol > li {
   /* rendered view */
-  grid-column-start: view;
+  grid-row-start: view;
   place-self: center;
   overflow: visible;
   position: relative;
-  z-index: 0;
-}
-
-.container > ol > li::before {
-  /* backdrop for rendered view */
-  content: "";
+  top: -50%;
+  right: -50%;
   height: 100vh;
-  width: 60vw;
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  background: radial-gradient(circle at 30vw, #fff, #fff 50vh, transparent 30vw);
-  transform: translate(-30vw,-50vh);
-  z-index: -1;
+  width: 50vw;
+  z-index: 0;
 }
 
 .doc {
