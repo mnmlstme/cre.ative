@@ -1,23 +1,44 @@
 import React from 'react'
-import { connect } from 'react-redux'
+import {
+  BrowserRouter,
+  Switch,
+  Route,
+  Redirect,
+  useLocation,
+} from 'react-router-dom'
 
 import Workbook from './workbook'
 import Finder from './finder'
 
-const App = ({ maybeWorkbook }) => {
-  if (maybeWorkbook) {
-    return <Workbook />
-  } else {
-    return <Finder />
-  }
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Switch>
+        <Route path="/workbook/:filepath">
+          <Workbook />
+        </Route>
+        <Route path="/finder">
+          <Finder />
+        </Route>
+        <Route exact path="/">
+          <Redirect to="/finder" />
+        </Route>
+        <Route path="*">
+          <NoMatch />
+        </Route>
+      </Switch>
+    </BrowserRouter>
+  )
 }
 
-function mapStateToProps(state) {
-  const workbook = state.get('workbook')
+function NoMatch() {
+  let location = useLocation()
 
-  return {
-    maybeWorkbook: workbook.isLoaded ? workbook.module : null,
-  }
+  return (
+    <div>
+      <h3>
+        No match for <code>{location.pathname}</code>
+      </h3>
+    </div>
+  )
 }
-
-export default connect(mapStateToProps)(App)

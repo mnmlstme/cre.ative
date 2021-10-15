@@ -1,5 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import { useHistory } from 'react-router-dom'
 
 import { changeFile, loadWorkbook } from '../actions'
 
@@ -9,8 +10,14 @@ const workbooks = [
   { path: 'ReactWorkbook.kr', name: 'React Workbook' },
 ]
 
-const Finder = ({ filepath, dispatch }) => {
-  const doLoadWorkbook = (event) => dispatch(loadWorkbook(filepath))
+function Finder({ filepath, dispatch }) {
+  let history = useHistory()
+
+  const doLoadWorkbook = (event) => {
+    dispatch(loadWorkbook(filepath))
+    history.push(`/workbook/${filepath}`)
+  }
+
   const doChangeFile = (event) => dispatch(changeFile(event.target.value))
 
   return (

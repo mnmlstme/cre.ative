@@ -7,6 +7,10 @@ import { changeScene, loadResource } from '../actions'
 import styles from './workbook.css'
 
 const Workbook = ({ workbook, filepath, resources, scene, dispatch }) => {
+  if (!workbook) {
+    return <h1>Loading {filepath} ...</h1>
+  }
+
   const { title, scenes } = workbook
   const doChangeScene = (event) => dispatch(changeScene(event.target.value))
   const doNextScene = () => dispatch(changeScene(scene + 1))
