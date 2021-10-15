@@ -7,11 +7,12 @@ import { changeScene, loadResource, loadWorkbook } from '../actions'
 import styles from './workbook.css'
 
 function Workbook({ workbook, filepath, resources, scene, urlpath, dispatch }) {
+  if (!filepath || filepath.replace(/\.\w+$/, '') !== urlpath) {
+    filepath = urlpath + '.kr'
+    dispatch(loadWorkbook(filepath))
+  }
+
   if (!workbook) {
-    if (!filepath) {
-      filepath = urlpath + '.kr'
-      dispatch(loadWorkbook(filepath))
-    }
     return <h1>Loading {filepath} ...</h1>
   }
 

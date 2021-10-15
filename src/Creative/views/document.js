@@ -16,7 +16,13 @@ export function Document({ workbook }) {
               <Chunk key={i} {...chunk} />
             ))}
           </section>
-          {scn.view && <Editor lang={scn.view.lang} code={scn.view.text} />}
+          {scn.view && (
+            <Editor
+              className={styles.view}
+              lang={scn.view.lang}
+              code={scn.view.text}
+            />
+          )}
         </li>
       ))}
     </ol>
@@ -32,7 +38,7 @@ function Chunk({ type, text, depth, lang }) {
     case 'space':
       return <Space />
     case 'code':
-      return <Editor {...{ lang, code: text }} />
+      return <Editor className={styles.defn} {...{ lang, code: text }} />
     default:
       return <pre>{text}</pre>
   }
@@ -40,12 +46,12 @@ function Chunk({ type, text, depth, lang }) {
 
 function Heading({ depth, text }) {
   const h = [
-    (s) => <h6>{s}</h6>,
-    (s) => <h1>{s}</h1>,
-    (s) => <h2>{s}</h2>,
-    (s) => <h3>{s}</h3>,
-    (s) => <h4>{s}</h4>,
-    (s) => <h5>{s}</h5>,
+    (s) => <h6 className={styles.heading}>{s}</h6>,
+    (s) => <h1 className={styles.heading}>{s}</h1>,
+    (s) => <h2 className={styles.heading}>{s}</h2>,
+    (s) => <h3 className={styles.heading}>{s}</h3>,
+    (s) => <h4 className={styles.heading}>{s}</h4>,
+    (s) => <h5 className={styles.heading}>{s}</h5>,
   ]
 
   return h[depth % 6](text)

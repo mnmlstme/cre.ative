@@ -100,6 +100,7 @@
   overflow-x: hidden;
   overflow-y: auto;
   margin-bottom: 1.5rem;
+  max-width: 50vw;
 }
 
 .container > ol > li {
@@ -116,13 +117,24 @@
 }
 
 .doc {
-  font-family: sans-serif;
+  font-family: Georgia, serif;
+  font-weight: 300;
   color: #f2f2e0;
-  width: 80%;
 }
 
 .doc > * {
   margin: 0 .5em;
+  width: 80%;
+}
+
+.doc > .defn {
+  width: 100%;
+}
+
+.doc > .heading {
+  font-family: Verdana, sans-serif;
+  font-weight: 800;
+  color: #74ec70;
 }
 
 .doc > * + * {
@@ -138,33 +150,19 @@
   line-height: 0;
 }
 
-.doc > pre {
-  margin: 1rem 0;
-  padding: 0 .5rem;
+.view,
+.defn {
+  margin: 1rem 0 1rem .5rem;
   border-left: 2px solid #686863;
 }
 
-.doc > pre > code::after {
-  content: attr(class);
-  display: block;
-  font-family: sans-serif;
-  font-size: .75rem;
-  color: #a8a8a1;
-  font-style: italic;
-  margin-top: .5rem;
-}
-
-.view {
-  margin: 1rem .5rem;
-  border-left: 2px solid #686863;
-}
-
-.view > figcaption {
+.view > figcaption,
+.defn > figcaption {
   line-height: 1rem;
   height: 1rem;
 }
 
-
+.view
 .specs {
   font-family: sans-serif;
   font-size: .75rem;
@@ -197,14 +195,15 @@ dl.specs > dt + dd {
 
 .code {
   font-family: monospace;
-  padding: .5em;
   line-height: 1.5em;
-  //min-height: calc(5 * 1.5em + 1rem);
+  box-shadow: none !important;
 }
 
-.code > span {
-  background: #d4f8ee;
-  color: #484248;
-  box-shadow: 2px 2px 2px rgba(0,0,0,0.2);
+.view .code {
+  min-height: calc(5 * 1.5em + 1rem);
+}
+
+.code > .line {
+  background: inherit;
   padding: 0.25em;
 }

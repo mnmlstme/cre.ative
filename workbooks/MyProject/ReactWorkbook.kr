@@ -31,5 +31,7 @@ can also define helper functions. All helper functions in the
 workbook are available to every view.
 
 ```jsx
-const asString = (n) => String(n)
+function asString(n) {
+  return String(n)
+}
 ```

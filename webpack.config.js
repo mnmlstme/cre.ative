@@ -17,7 +17,25 @@ module.exports = {
           loader: 'babel-loader',
           query: {
             presets: ['@babel/preset-react'],
-            // plugins: ['@babel/plugin-syntax-dynamic-import'],
+            plugins: [
+              [
+                'prismjs',
+                {
+                  languages: [
+                    'javascript',
+                    'css',
+                    'markup',
+                    'html',
+                    'jsx',
+                    'tsx',
+                    'elm',
+                  ],
+                  plugins: ['line-numbers'],
+                  theme: 'funky',
+                  css: false,
+                },
+              ],
+            ],
           },
         },
       },
@@ -38,7 +56,6 @@ module.exports = {
       },
       {
         test: /\.css$/i,
-        exclude: /node_modules/,
         use: [
           'style-loader',
           {
