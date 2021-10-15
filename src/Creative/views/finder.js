@@ -4,42 +4,46 @@ import { useHistory } from 'react-router-dom'
 
 import { changeFile, loadWorkbook } from '../actions'
 
-const workbooks = [
-  // TODO: store these somewhere in db or fs
-  { path: 'ElmWorkbook.kr', name: 'Elm Workbook' },
-  { path: 'ReactWorkbook.kr', name: 'React Workbook' },
-]
-
-function Finder({ filepath, dispatch }) {
+function Finder({ project, workbooks, selected, dispatch }) {
   let history = useHistory()
 
   const doLoadWorkbook = (event) => {
-    dispatch(loadWorkbook(filepath))
-    history.push(`/workbook/${filepath}`)
+    dispatch(loadWorkbook(selected))
+    history.push(`/workbook/${selected}`)
   }
 
   const doChangeFile = (event) => dispatch(changeFile(event.target.value))
 
   return (
     <section>
-      <select value={filepath} onChange={doChangeFile}>
-        {workbooks.map(({ path, name }) => (
-          <option key={path} value={path}>
-            {name}
-          </option>
+      <ul>
+        {workbooks.map(({ file, title }) => (
+          <li key={file}>
+            <label>
+              <input
+                type="radio"
+                name="workbook"
+                value={file}
+                onChange={doChangeFile}
+              />{' '}
+              {title}
+            </label>
+          </li>
         ))}
-      </select>
-      <button onClick={doLoadWorkbook}>Open</button>
+      </ul>
+      <button disabled={!selected} onClick={doLoadWorkbook}>
+        Open
+      </button>{' '}
+      File: {selected}
     </section>
   )
 }
 
 function mapStateToProps(state) {
-  const workbook = state.get('workbook')
+  console.log('Finder state:', state.get('finder').toObject())
+  const { project, workbooks, selected } = state.get('finder').toObject()
 
-  return {
-    filepath: workbook.filepath,
-  }
+  return { project, workbooks, selected }
 }
 
 export default connect(mapStateToProps)(Finder)

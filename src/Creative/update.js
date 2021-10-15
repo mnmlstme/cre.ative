@@ -5,11 +5,14 @@ import Actions from './actions'
 export function update(state = initial, action = {}) {
   switch (action.type) {
     case Actions.ChangeFile:
-      console.log('update ChangeFile', action.filepath)
-      return state.set('workbook', {
-        filepath: action.filepath,
-        isLoaded: false,
-      })
+      console.log(
+        'update ChangeFile',
+        action.filepath,
+        state.get('finder').toObject()
+      )
+      const finder = state.get('finder') || Im.Map()
+
+      return state.set('finder', finder.set('selected', action.filepath))
 
     case Actions.ChangeScene:
       console.log('update ChangeScene', action.number)
