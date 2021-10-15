@@ -2,14 +2,18 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { useHistory } from 'react-router-dom'
 
-import { changeFile, loadWorkbook } from '../actions'
+import { changeFile, loadWorkbook, loadProject } from '../actions'
 
 function Finder({ project, workbooks, selected, dispatch }) {
+  if (!workbooks) {
+    dispatch(loadProject(project))
+    return <h1>Loading Project {project} ...</h1>
+  }
+
   let history = useHistory()
 
   const doLoadWorkbook = (event) => {
-    dispatch(loadWorkbook(selected))
-    history.push(`/workbook/${selected}`)
+    history.push(`/workbook/${project}/${selected.replace(/\.\w+$/, '')}`)
   }
 
   const doChangeFile = (event) => dispatch(changeFile(event.target.value))

@@ -5,13 +5,7 @@ export const initial = Im.Map({
     isLoaded: false,
   },
   finder: Im.Map({
-    project: './Workbooks',
-    selected: '',
-    workbooks: [
-      // TODO: store these in project.yaml
-      { file: 'ElmWorkbook.kr', title: 'Elm Workbook' },
-      { file: 'ReactWorkbook.kr', title: 'React Workbook' },
-    ],
+    project: 'MyProject',
   }),
   resources: Im.Map(),
   current: 1,

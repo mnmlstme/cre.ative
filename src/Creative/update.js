@@ -18,6 +18,18 @@ export function update(state = initial, action = {}) {
       console.log('update ChangeScene', action.number)
       return state.set('current', Number.parseInt(action.number))
 
+    case Actions.LoadProject: {
+      console.log('update LoadProject', action.data)
+      const finder = state.get('finder') || Im.Map()
+      return state.set('finder', finder.set('workbooks', action.data.workbooks))
+    }
+
+    case Actions.ProjectError: {
+      console.log('update ProjectError', action.error)
+      const finder = state.get('finder') || Im.Map()
+      return state.set('finder', finder.set('workbooks', []))
+    }
+
     case Actions.LoadWorkbook:
       console.log('update LoadWorkbook', action.data)
       return state.set('workbook', {
@@ -61,6 +73,7 @@ export function update(state = initial, action = {}) {
     }
 
     default:
+      console.log('**** Unhandled action:', action)
       return state
   }
 }

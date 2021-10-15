@@ -5,6 +5,7 @@ import {
   Route,
   Redirect,
   useLocation,
+  useParams,
 } from 'react-router-dom'
 
 import Workbook from './workbook'
@@ -14,8 +15,8 @@ export default function App() {
   return (
     <BrowserRouter>
       <Switch>
-        <Route path="/workbook/:filepath">
-          <Workbook />
+        <Route path="/workbook/:path*">
+          <WorkbookWithParams />
         </Route>
         <Route path="/finder">
           <Finder />
@@ -29,6 +30,12 @@ export default function App() {
       </Switch>
     </BrowserRouter>
   )
+}
+
+function WorkbookWithParams() {
+  let { path } = useParams()
+
+  return <Workbook urlpath={path} />
 }
 
 function NoMatch() {

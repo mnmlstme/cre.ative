@@ -16,10 +16,34 @@ export function changeScene(number) {
   }
 }
 
+const LoadProject = 'LoadProject'
+const ProjectError = 'ProjectError'
+
+export function loadProject(filepath) {
+  return (dispatch) => {
+    console.log('loadProject', filepath)
+    import(`Workbooks/${filepath}/project.yaml`)
+      .then((mod) => {
+        console.log('Action: LoadProject ', JSON.stringify(mod.default))
+        return dispatch({
+          type: LoadProject,
+          filepath,
+          data: mod.default,
+        })
+      })
+      .catch((error) => {
+        console.log('Action: ProjectError ', error)
+        return dispatch({
+          type: ProjectError,
+          filepath,
+          error,
+        })
+      })
+  }
+}
+
 const LoadWorkbook = 'LoadWorkbook'
 const WorkbookError = 'WorkbookError'
-const LoadResource = 'LoadResource'
-const ResourceError = 'ResourceError'
 
 export function loadWorkbook(filepath) {
   return (dispatch) => {
@@ -43,6 +67,9 @@ export function loadWorkbook(filepath) {
       })
   }
 }
+
+const LoadResource = 'LoadResource'
+const ResourceError = 'ResourceError'
 
 export function loadResource(filepath, loader, lang = 'js') {
   return (dispatch) => {
@@ -71,6 +98,8 @@ export function loadResource(filepath, loader, lang = 'js') {
 export default {
   ChangeFile,
   ChangeScene,
+  LoadProject,
+  ProjectError,
   LoadWorkbook,
   WorkbookError,
   LoadResource,

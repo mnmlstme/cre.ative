@@ -18,8 +18,8 @@ export function Document({ workbook }) {
           {views[i] && (
             <figure className={styles.view}>
               <pre className={styles.code}>
-                {views[i].text.split('\n').map((s) => (
-                  <span>{s + '\n'}</span>
+                {views[i].text.split('\n').map((s, line) => (
+                  <span key={line}>{s + '\n'}</span>
                 ))}
               </pre>
               <figcaption>

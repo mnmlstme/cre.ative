@@ -64,6 +64,12 @@ module.exports = {
         },
       },
       {
+        test: /\.yaml$/,
+        include: [path.resolve(__dirname, 'workbooks')],
+        type: 'json', // Required by Webpack v4
+        use: 'yaml-loader',
+      },
+      {
         test: /\.kr$/,
         include: [path.resolve(__dirname, 'workbooks')],
         use: {

@@ -3,11 +3,15 @@ import { connect } from 'react-redux'
 
 import { Document } from './document'
 import { Render } from './render'
-import { changeScene, loadResource } from '../actions'
+import { changeScene, loadResource, loadWorkbook } from '../actions'
 import styles from './workbook.css'
 
-const Workbook = ({ workbook, filepath, resources, scene, dispatch }) => {
+function Workbook({ workbook, filepath, resources, scene, urlpath, dispatch }) {
   if (!workbook) {
+    if (!filepath) {
+      filepath = urlpath + '.kr'
+      dispatch(loadWorkbook(filepath))
+    }
     return <h1>Loading {filepath} ...</h1>
   }
 
@@ -39,7 +43,7 @@ const Workbook = ({ workbook, filepath, resources, scene, dispatch }) => {
           </button>
           <select value={scene} onChange={doChangeScene}>
             {scenes.map((scn, i) => (
-              <option value={i + 1}>
+              <option key={i} value={i + 1}>
                 {`Scene ${i + 1}` +
                   [scn && scn.title].map((s) => s && `: ${s}`)}
               </option>
