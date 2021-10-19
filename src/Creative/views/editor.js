@@ -2,17 +2,23 @@ import React from 'react'
 import Kr from 'kram'
 import Prism from 'prismjs'
 import theme from 'prismjs/themes/prism-funky.css'
+import ContentEditable from 'react-contenteditable'
 
 import styles from './workbook.css'
 
 Prism.manual = true
 
-export function Editor({ code, lang, className }) {
+export function Editor({ code, lang, className, changeCode, saveCode }) {
   console.log('Editor:', code, lang)
 
   return (
     <figure className={className}>
-      <PrismCode code={code} language={lang} />
+      <PrismCode
+        code={code}
+        language={lang}
+        changeCode={changeCode}
+        saveCode={saveCode}
+      />
       <figcaption>
         <dl className={styles.specs}>
           <dt>Language</dt>
@@ -23,20 +29,21 @@ export function Editor({ code, lang, className }) {
   )
 }
 
-function PrismCode({ code, plugins, language }) {
-  const verbatim = {
-    __html: Prism.highlight(code, Prism.languages[language], language)
-      .replace(/\<span class="([\sa-z-]+)"\>/g, replacePrismClasses)
-      .split('\n')
-      .map((line) => `<span class="${styles.line}">${line}</span>`)
-      .join('\n'),
-  }
+function PrismCode({ code, plugins, language, changeCode, saveCode }) {
+  const verbatim = Prism.highlight(code, Prism.languages[language], language)
+    .replace(/\<span class="([\sa-z-]+)"\>/g, replacePrismClasses)
+    .split('\n')
+    .map((line) => `<div class="${styles.line}">${line}</div>`)
+    .join('')
 
   return (
     <pre className={`language-${language}`}>
-      <code
+      <ContentEditable
         className={`language-${language} ${styles.code}`}
-        dangerouslySetInnerHTML={verbatim}
+        tagName="code"
+        html={verbatim}
+        onChange={changeCode}
+        onBlur={saveCode}
       />
     </pre>
   )
