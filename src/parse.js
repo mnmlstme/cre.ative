@@ -60,12 +60,15 @@ function toScene( tokens ) {
   // The view is the first token, as long as code
   const code = tokens.filter( t => t.type === 'code')
   const view = tokens[0] === code[0] ? code[0] : undefined
+  // exclude the view from the doc and the definitions
+  const doc = view ? tokens.slice(1) : tokens
+  const definitions = view ? code.slice(1) : code
 
   return {
+    title: doc[0] && doc[0].type === 'heading' && doc[0].text,
     view,
-    // exclude the view from the doc and the code
-    doc: view ? tokens.slice(1) : tokens,
-    definitions: view ? code.slice(1) : code
+    doc,
+    definitions
   }
 }
 
