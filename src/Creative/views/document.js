@@ -4,9 +4,9 @@ import styles from './workbook.css'
 import ContentEditable from 'react-contenteditable'
 import { Editor } from './editor'
 
-export function Document({ workbook, changeContent, saveContent }) {
-  console.log('Document:', workbook)
-  const scenes = workbook.scenes
+export function Document({ workbook, doUpdate, doSave }) {
+  console.log('Document:', workbook.toObject())
+  const scenes = workbook.get('scenes')
 
   return (
     <ol>
@@ -17,8 +17,8 @@ export function Document({ workbook, changeContent, saveContent }) {
               <Chunk
                 key={i}
                 {...chunk}
-                changeContent={changeContent}
-                saveContent={saveContent}
+                onChange={(s) => doUpdate(i, s)}
+                onBlur={doSave}
               />
             ))}
           </section>
@@ -27,6 +27,8 @@ export function Document({ workbook, changeContent, saveContent }) {
               className={styles.view}
               lang={scn.view.lang}
               code={scn.view.text}
+              onChange={(s) => doUpdate('lead', s)}
+              onBlur={doSave}
             />
           )}
         </li>
@@ -35,7 +37,7 @@ export function Document({ workbook, changeContent, saveContent }) {
   )
 }
 
-function Chunk({ type, text, depth, lang, changeContent, saveContent }) {
+function Chunk({ type, text, depth, lang, onChange, onBlur }) {
   const [tag, cls] = {
     heading: [`h${depth}`, styles.heading],
     paragraph: ['p', ''],
@@ -49,8 +51,8 @@ function Chunk({ type, text, depth, lang, changeContent, saveContent }) {
       className={cls}
       tagName={tag}
       html={text || ''}
-      changeCode={changeContent}
-      saveCode={saveContent}
+      onChange={(e) => onChange(e.target.value)}
+      onBlur={onBlur}
     />
   )
 }

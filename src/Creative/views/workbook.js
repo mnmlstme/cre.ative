@@ -3,7 +3,13 @@ import { connect } from 'react-redux'
 
 import { Document } from './document'
 import { Render } from './render'
-import { changeScene, loadResource, loadWorkbook } from '../actions'
+import {
+  changeScene,
+  loadWorkbook,
+  loadResource,
+  updateScene,
+  saveWorkbook,
+} from '../actions'
 import styles from './workbook.css'
 
 function Workbook({ workbook, filepath, resources, scene, urlpath, dispatch }) {
@@ -16,10 +22,14 @@ function Workbook({ workbook, filepath, resources, scene, urlpath, dispatch }) {
     return <h1>Loading {filepath} ...</h1>
   }
 
-  const { title, scenes } = workbook
+  const title = workbook.get('title')
+  const scenes = workbook.get('scenes')
   const doChangeScene = (event) => dispatch(changeScene(event.target.value))
   const doNextScene = () => dispatch(changeScene(scene + 1))
   const doPrevScene = () => dispatch(changeScene(scene - 1))
+  const doUpdateDocument = (chunk, content) =>
+    dispatch(updateScene(scene, chunk, content))
+  const doSaveDocument = () => dispatch(saveWorkbook())
   const doLoadResource = (loader, lang) =>
     dispatch(loadResource(filepath, loader, lang))
 
@@ -29,7 +39,11 @@ function Workbook({ workbook, filepath, resources, scene, urlpath, dispatch }) {
         className={styles.layout}
         style={{ left: -100 * (scene - 1) + 'vw' }}
       >
-        <Document workbook={workbook} />
+        <Document
+          workbook={workbook}
+          doUpdate={doUpdateDocument}
+          doSave={doSaveDocument}
+        />
         <Render
           workbook={workbook}
           resources={resources}
@@ -64,8 +78,8 @@ function mapStateToProps(state) {
   const workbook = state.get('workbook')
 
   return {
-    filepath: workbook.filepath,
-    workbook: workbook.isLoaded ? workbook.module : undefined,
+    filepath: workbook.get('filepath'),
+    workbook: workbook.get('isLoaded') ? workbook : undefined,
     resources: state.get('resources'),
     scene: state.get('current'),
   }

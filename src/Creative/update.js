@@ -4,7 +4,7 @@ import Actions from './actions'
 
 export function update(state = initial, action = {}) {
   switch (action.type) {
-    case Actions.ChangeFile:
+    case Actions.ChangeFile: {
       console.log(
         'update ChangeFile',
         action.filepath,
@@ -13,6 +13,7 @@ export function update(state = initial, action = {}) {
       const finder = state.get('finder') || Im.Map()
 
       return state.set('finder', finder.set('selected', action.filepath))
+    }
 
     case Actions.ChangeScene:
       console.log('update ChangeScene', action.number)
@@ -21,30 +22,61 @@ export function update(state = initial, action = {}) {
     case Actions.LoadProject: {
       console.log('update LoadProject', action.data)
       const finder = state.get('finder') || Im.Map()
+
       return state.set('finder', finder.set('workbooks', action.data.workbooks))
     }
 
     case Actions.ProjectError: {
       console.log('update ProjectError', action.error)
       const finder = state.get('finder') || Im.Map()
+
       return state.set('finder', finder.set('workbooks', []))
     }
 
-    case Actions.LoadWorkbook:
+    case Actions.LoadWorkbook: {
       console.log('update LoadWorkbook', action.data)
-      return state.set('workbook', {
-        filepath: action.filepath,
-        isLoaded: true,
-        module: action.data,
-      })
+      const { title, scenes, modules, init } = action.data
+
+      return state.set(
+        'workbook',
+        Im.Map({
+          filepath: action.filepath,
+          isLoaded: true,
+          title,
+          scenes: Im.List(scenes),
+          modules,
+          init,
+        })
+      )
+    }
 
     case Actions.WorkbookError:
       console.log('update WorkbookError', action.error)
-      return state.set('workbook', {
-        filepath: action.filepath,
-        isLoaded: false,
-        error: action.error,
-      })
+      return state.set(
+        'workbook',
+        Im.Map({
+          filepath: action.filepath,
+          isLoaded: false,
+          error: action.error,
+        })
+      )
+
+    case Actions.UpdateScene: {
+      console.log('update UpdateScene', action.data)
+      const workbook = state.get('workbook') || Im.Map()
+      const { number, chunk, data } = action
+      const updateFn = (scn) =>
+        Object.assign(scn, {
+          doc: data,
+        })
+
+      debugger
+      return state.updateIn(['workbook', 'scenes', number], updateFn)
+    }
+
+    case Actions.SaveWorkbook:
+      console.log('update SaveWorkbook (UNIMPLEMENTED)')
+      return state
 
     case Actions.LoadResource: {
       console.log('update LoadResource', action.data)

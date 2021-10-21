@@ -8,7 +8,7 @@ import styles from './workbook.css'
 
 Prism.manual = true
 
-export function Editor({ code, lang, className, changeCode, saveCode }) {
+export function Editor({ code, lang, className, onChange, onBlur }) {
   console.log('Editor:', code, lang)
 
   return (
@@ -16,8 +16,8 @@ export function Editor({ code, lang, className, changeCode, saveCode }) {
       <PrismCode
         code={code}
         language={lang}
-        changeCode={changeCode}
-        saveCode={saveCode}
+        onChange={onChange}
+        onBlur={onBlur}
       />
       <figcaption>
         <dl className={styles.specs}>
@@ -29,7 +29,7 @@ export function Editor({ code, lang, className, changeCode, saveCode }) {
   )
 }
 
-function PrismCode({ code, plugins, language, changeCode, saveCode }) {
+function PrismCode({ code, plugins, language, onChange, onBlur }) {
   const verbatim = Prism.highlight(code, Prism.languages[language], language)
     .replace(/\<span class="([\sa-z-]+)"\>/g, replacePrismClasses)
     .split('\n')
@@ -42,8 +42,8 @@ function PrismCode({ code, plugins, language, changeCode, saveCode }) {
         className={`language-${language} ${styles.code}`}
         tagName="code"
         html={verbatim}
-        onChange={changeCode}
-        onBlur={saveCode}
+        onChange={(e) => onChange(e.target.value)}
+        onBlur={onBlur}
       />
     </pre>
   )

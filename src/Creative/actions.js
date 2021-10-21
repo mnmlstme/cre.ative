@@ -95,6 +95,25 @@ export function loadResource(filepath, loader, lang = 'js') {
   }
 }
 
+const UpdateScene = 'UpdateScene'
+
+export function updateScene(scene, chunk, data) {
+  return {
+    type: UpdateScene,
+    number: scene,
+    chunk,
+    data,
+  }
+}
+
+const SaveWorkbook = 'SaveWorkbook'
+
+export function saveWorkbook() {
+  return {
+    type: SaveWorkbook,
+  }
+}
+
 export default {
   ChangeFile,
   ChangeScene,
@@ -104,4 +123,6 @@ export default {
   WorkbookError,
   LoadResource,
   ResourceError,
+  UpdateScene,
+  SaveWorkbook,
 }

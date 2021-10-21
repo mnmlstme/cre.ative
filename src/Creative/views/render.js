@@ -15,7 +15,7 @@ export class Render extends React.Component {
 
   componentDidMount() {
     const { workbook, doLoadResource } = this.props
-    const { modules } = workbook
+    const modules = workbook.get('modules')
 
     console.log('Rendering Workbook', workbook)
 
@@ -24,7 +24,8 @@ export class Render extends React.Component {
 
   componentDidUpdate(prevProps) {
     const { workbook, resources } = this.props
-    const { modules, init } = workbook
+    const modules = workbook.get('modules')
+    const init = workbook.get('init')
     const mountpoint = this.node.current
 
     if (resources !== prevProps.resources) {
