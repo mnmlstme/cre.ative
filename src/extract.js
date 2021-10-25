@@ -1,19 +1,9 @@
 module.exports = {
   extract,
-  definitions
-}
+};
 
-function extract( { scenes }, language ) {
+function extract({ scenes }, mode) {
   return scenes
-    .map( scn => scn.view )
-    .map( token => token
-      && token.type === 'code'
-      && (!language || token.lang === language ) ? token : null)
-}
-
-function definitions( { scenes }, language ) {
-  return scenes
-    .map( scn => scn.definitions )
-    .reduce( (a,b) => a.concat(b), [] )
-    .filter( token => token && (!language || token.lang === language ))
+    .map((scn) => scn.blocks.filter((b) => !mode || b.mode === mode))
+    .reduce((a, b) => a.concat(b), []);
 }
