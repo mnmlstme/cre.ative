@@ -15,8 +15,8 @@ function collate(workbook, lang) {
   // generates JSX module
 
   const { imports, moduleName, shape } = workbook
-  const scenes = Kr.extract(workbook, lang)
-  const defns = Kr.definitions(workbook, lang)
+  const scenes = Kr.extract(workbook, 'perform')
+  const defns = Kr.extract(workbook, 'compose')
 
   const code = `// module ${moduleName} (JSX)
 import React from 'react'
@@ -101,15 +101,15 @@ function genExposeModel(shape) {
   return '{}'
 }
 
-function genView(token) {
-  return token
-    ? `<li key="${token.id}" id="${token.id}">
-       ${token.text.split('\n').join('\n        ')}
+function genView(block) {
+  return block
+    ? `<li key="${block.id}" id="${block.id}">
+       ${block.text.split('\n').join('\n        ')}
      </li>
     `
     : '<li></li>'
 }
 
-function genDefn(token) {
-  return token.text
+function genDefn(block) {
+  return block.text
 }

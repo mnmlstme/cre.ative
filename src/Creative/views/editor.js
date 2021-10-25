@@ -4,7 +4,7 @@ import Prism from 'prismjs'
 import theme from 'prismjs/themes/prism-funky.css'
 import ContentEditable from 'react-contenteditable'
 
-import styles from './workbook.css'
+import styles from './document.css'
 
 Prism.manual = true
 

@@ -17,8 +17,8 @@ function bind(moduleName, lang = 'elm') {
 function collate(workbook, lang = 'elm') {
   // generates Elm module
   const { imports, moduleName, shape, init } = workbook
-  const scenes = Kr.extract(workbook, lang)
-  const defns = Kr.definitions(workbook, lang)
+  const scenes = Kr.extract(workbook, 'perform')
+  const defns = Kr.extract(workbook, 'compose')
 
   const code = `port module ${moduleName} exposing (main)
 import Browser
@@ -156,15 +156,15 @@ function genExposeModel(shape) {
   return ''
 }
 
-function genView(token) {
-  return token
-    ? `Html.li [Attr.id "${token.id}"]
-        [ ${token.text.split('\n').join('\n        ')}
+function genView(block) {
+  return block
+    ? `Html.li [Attr.id "${block.id}"]
+        [ ${block.text.split('\n').join('\n        ')}
         ]
     `
     : 'Html.li [] []'
 }
 
-function genDefn(token) {
-  return token.text
+function genDefn(block) {
+  return block.text
 }

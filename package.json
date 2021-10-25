@@ -7,11 +7,9 @@
     "DOCROOT": "./workbooks"
   },
   "scripts": {
-    "parcel-build": "parcel build --log-level verbose --no-cache --dist-dir ./dist src/index.html",
-    "parcel-run": "parcel --log-level verbose src/index.html",
     "build": "webpack",
-    "server": "webpack serve",
-    "webpack-hot": "webpack-dev-server --hot --progress",
+    "start": "webpack serve",
+    "hot": "webpack-dev-server --hot --progress",
     "test": "echo \"Error: no test specified\" && exit 1",
     "clean": "rm -rf node_modules dist .parcel-cache package-lock.json"
   },
@@ -25,7 +23,7 @@
     "elm-css-modules-plugin": "^1.0.2",
     "elm-webpack-loader": "^8.0.0",
     "immutable": "^4.0.0-rc.12",
-    "kram": "file:../kram",
+    "kram": "mnmlstme/kram",
     "prism-react-renderer": "^1.2.1",
     "prismjs": "^1.25.0",
     "react": "^17.0.2",
