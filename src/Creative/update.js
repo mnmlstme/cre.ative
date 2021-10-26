@@ -1,4 +1,5 @@
 import Im from 'immutable'
+import marked from 'marked'
 import { initial } from './model'
 import Actions from './actions'
 
@@ -62,16 +63,37 @@ export function update(state = initial, action = {}) {
       )
 
     case Actions.UpdateScene: {
-      console.log('update UpdateScene', action.data)
+      console.log('update UpdateScene', action.text)
       const workbook = state.get('workbook') || Im.Map()
-      const { number, chunk, data } = action
-      const updateFn = (scn) =>
-        Object.assign(scn, {
-          doc: data,
-        })
+      const { scene, block, mode, lang, text } = action
+      const updateFn = (scn) => {
+        if (mode === 'remark') {
+          const firstRem =
+            scn.blocks.slice(0, block).filter((b) => b.mode === 'remark')
+              .length == 0
+          const tokens = marked.lexer(text)
+          const hd0 = firstRem && tokens.filter((t) => t.type === 'heading')[0]
+          const title = hd0 ? hd0.text : scn.title
 
-      debugger
-      return state.updateIn(['workbook', 'scenes', number], updateFn)
+          return {
+            title,
+            blocks: scn.blocks.splice(block, 1, { mode, tokens }),
+          }
+        } else {
+          return {
+            title: scn.title,
+            blocks: scn.blocks.splice(block, 1, { mode, lang, text }),
+          }
+        }
+        const newBlock =
+          mode === 'remark'
+            ? { mode, tokens: marked.lexer(text) }
+            : { mode, lang, text }
+
+        const title = scn.title
+      }
+
+      return state.updateIn(['workbook', 'scenes', scene], updateFn)
     }
 
     case Actions.SaveWorkbook:

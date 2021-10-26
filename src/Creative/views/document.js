@@ -20,7 +20,7 @@ export function Document({ workbook, doUpdate, doSave }) {
                 <Remark
                   key={i}
                   block={blk}
-                  onChange={(s) => doUpdate(i, s)}
+                  onChange={(s) => doUpdate(i, blk.mode, s)}
                   onBlur={doSave}
                 />
               ) : (
@@ -29,18 +29,19 @@ export function Document({ workbook, doUpdate, doSave }) {
                   className={styles.compose}
                   lang={blk.lang}
                   code={blk.text}
-                  onChange={(s) => doUpdate(blk.mode, s)}
-                  onBlur={doSave}
+                  // onBlur={doSave}
+                  // onChange={(s, lang) => doUpdate(i, blk.mode, s, lang)}
                 />
               )
             )}
             {view && (
               <Editor
+                key="perform"
                 className={styles.perform}
                 lang={view.lang}
                 code={view.text}
-                onChange={(s) => doUpdate(view.mode, s)}
-                onBlur={doSave}
+                //onChange={(s, lang) => doUpdate(i, view.mode, s, lang)}
+                //onBlur={doSave}
               />
             )}
           </li>

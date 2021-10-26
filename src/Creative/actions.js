@@ -97,12 +97,14 @@ export function loadResource(filepath, loader, lang = 'js') {
 
 const UpdateScene = 'UpdateScene'
 
-export function updateScene(scene, chunk, data) {
+export function updateScene(scene, block, mode, text, lang = 'markdown') {
   return {
     type: UpdateScene,
-    number: scene,
-    chunk,
-    data,
+    scene,
+    block,
+    mode,
+    lang,
+    text,
   }
 }
 
