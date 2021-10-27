@@ -11,6 +11,7 @@
   width: 100vw;
   height: 100vh;
   background: radial-gradient(circle at right, #fff, #fff 50vw, #203f48 100vw);
+  padding-bottom: 2rem;
 }
 
 .workbook > header {
@@ -77,7 +78,8 @@
 .layout {
   display: grid;
   position: relative; /* inline style to set top */
-  grid-template-rows: [doc] 1fr [view] 1fr;
+  height: 100%;
+  grid-template-rows: [doc] 100vh [view] 100vh;
   grid-auto-columns: 100vw;
   grid-auto-flow: row;
   justify-items: start;
@@ -110,10 +112,8 @@
   grid-row-start: view;
   place-self: center;
   overflow: visible;
-  position: relative;
-  top: -50%;
-  right: -50%;
-  height: 100vh;
-  width: 50vw;
-  z-index: 0;
+  place-self: center;
+  overflow: visible;
+  max-width: 50vw;
+  transform: translate(25vw, -100vh);
 }
