@@ -29,8 +29,7 @@ export function Document({ workbook, doUpdate, doSave }) {
                   className={styles.compose}
                   lang={blk.lang}
                   code={blk.text}
-                  // onBlur={doSave}
-                  // onChange={(s, lang) => doUpdate(i, blk.mode, s, lang)}
+                  onChange={(s, lang) => doUpdate(i, blk.mode, s, lang)}
                 />
               )
             )}
@@ -40,8 +39,7 @@ export function Document({ workbook, doUpdate, doSave }) {
                 className={styles.perform}
                 lang={view.lang}
                 code={view.text}
-                //onChange={(s, lang) => doUpdate(i, view.mode, s, lang)}
-                //onBlur={doSave}
+                onChange={(s, lang) => doUpdate(i, view.mode, s, lang)}
               />
             )}
           </li>

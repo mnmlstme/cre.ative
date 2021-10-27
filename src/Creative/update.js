@@ -85,12 +85,6 @@ export function update(state = initial, action = {}) {
             blocks: scn.blocks.splice(block, 1, { mode, lang, text }),
           }
         }
-        const newBlock =
-          mode === 'remark'
-            ? { mode, tokens: marked.lexer(text) }
-            : { mode, lang, text }
-
-        const title = scn.title
       }
 
       return state.updateIn(['workbook', 'scenes', scene], updateFn)

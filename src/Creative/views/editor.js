@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Kr from 'kram'
 import Prism from 'prismjs'
 import theme from 'prismjs/themes/prism-funky.css'
@@ -8,17 +8,24 @@ import styles from './document.css'
 
 Prism.manual = true
 
-export function Editor({ code, lang, className, onChange, onBlur }) {
+export function Editor(props) {
+  const { lang, className, onChange } = props
+  const [code, setCode] = useState(props.code)
   console.log('Editor:', code, lang)
+
+  const handleBlur = () => onChange(code, lang)
 
   return (
     <figure className={className}>
-      <PrismCode
-        code={code}
-        language={lang}
-        onChange={onChange}
-        onBlur={onBlur}
-      />
+      <pre className={`language-${lang}`}>
+        <PrismCode code={code} language={lang} />
+        <textarea
+          className={styles.codeinput}
+          value={code}
+          onChange={(e) => setCode(e.target.value)}
+          onBlur={handleBlur}
+        />
+      </pre>
       <figcaption>
         <dl className={styles.specs}>
           <dt>Language</dt>
@@ -29,23 +36,20 @@ export function Editor({ code, lang, className, onChange, onBlur }) {
   )
 }
 
-function PrismCode({ code, plugins, language, onChange, onBlur }) {
-  const verbatim = Prism.highlight(code, Prism.languages[language], language)
-    .replace(/\<span class="([\sa-z-]+)"\>/g, replacePrismClasses)
-    .split('\n')
-    .map((line) => `<div class="${styles.line}">${line}</div>`)
-    .join('')
+function PrismCode({ code, plugins, language }) {
+  const verbatim = {
+    __html: Prism.highlight(code, Prism.languages[language], language)
+      .replace(/\<span class="([\sa-z-]+)"\>/g, replacePrismClasses)
+      .split('\n')
+      .map((line) => `<div class="${styles.line}">${line}</div>`)
+      .join(''),
+  }
 
   return (
-    <pre className={`language-${language}`}>
-      <ContentEditable
-        className={`language-${language} ${styles.code}`}
-        tagName="code"
-        html={verbatim}
-        onChange={(e) => onChange(e.target.value)}
-        onBlur={onBlur}
-      />
-    </pre>
+    <code
+      className={`language-${language} ${styles.code}`}
+      dangerouslySetInnerHTML={verbatim}
+    />
   )
 }
 
