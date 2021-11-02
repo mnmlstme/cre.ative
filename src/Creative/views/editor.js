@@ -1,8 +1,7 @@
 import React, { useState } from 'react'
 import Kr from 'kram'
-import Prism from 'prismjs'
-import theme from 'prismjs/themes/prism-funky.css'
 import ContentEditable from 'react-contenteditable'
+import { Highlight } from './highlight.js'
 
 import styles from './document.css'
 
@@ -18,11 +17,14 @@ export function Editor(props) {
   return (
     <figure className={className}>
       <pre className={`language-${lang}`}>
-        <PrismCode code={code} language={lang} />
-        <textarea
+        <Highlight code={code} language={lang} />
+        <ContentEditable
           className={styles.codeinput}
-          value={code}
-          onChange={(e) => setCode(e.target.value)}
+          tagName="code"
+          html={escapeHtml(code)}
+          lang="zxx"
+          spellcheck="false"
+          onChange={(e) => setCode(unescapeHtml(e.target.value))}
           onBlur={handleBlur}
         />
       </pre>
@@ -36,28 +38,10 @@ export function Editor(props) {
   )
 }
 
-function PrismCode({ code, plugins, language }) {
-  const verbatim = {
-    __html: Prism.highlight(code, Prism.languages[language], language)
-      .replace(/\<span class="([\sa-z-]+)"\>/g, replacePrismClasses)
-      .split('\n')
-      .map((line) => `<div class="${styles.line}">${line}</div>`)
-      .join(''),
-  }
-
-  return (
-    <code
-      className={`language-${language} ${styles.code}`}
-      dangerouslySetInnerHTML={verbatim}
-    />
-  )
+function escapeHtml(unsafe) {
+  return unsafe.replace(/</g, '&lt;')
 }
 
-function replacePrismClasses(match, className) {
-  const classes = className
-    .split(/\s+/)
-    .map((cls) => theme[cls] || cls)
-    .join(' ')
-
-  return match.replace(className, classes)
+function unescapeHtml(safe) {
+  return safe.replace(/&lt;/g, '<')
 }
