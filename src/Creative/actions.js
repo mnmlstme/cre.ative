@@ -97,7 +97,8 @@ export function loadResource(filepath, loader, lang = 'js') {
 
 const UpdateScene = 'UpdateScene'
 
-export function updateScene(scene, block, mode, text, lang = 'markdown') {
+export function updateScene(scene, block, mode, text, lang = 'html') {
+  debugger
   return {
     type: UpdateScene,
     scene,

@@ -23,7 +23,7 @@
     "elm-css-modules-plugin": "^1.0.2",
     "elm-webpack-loader": "^8.0.0",
     "immutable": "^4.0.0-rc.12",
-    "kram": "mnmlstme/kram",
+    "kram": "file:../kram",
     "prism-react-renderer": "^1.2.1",
     "prismjs": "^1.25.0",
     "react": "^17.0.2",

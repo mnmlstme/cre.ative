@@ -1,7 +1,5 @@
 import React from 'react'
-import Kr from 'kram'
 import styles from './document.css'
-import ContentEditable from 'react-contenteditable'
 import { Editor } from './editor'
 
 export function Document({ workbook, doUpdate, doSave }) {
@@ -17,11 +15,14 @@ export function Document({ workbook, doUpdate, doSave }) {
           <li key={i} className={styles.doc}>
             {blocks.map((blk, i) =>
               blk.mode === 'remark' ? (
-                <Remark
+                <Editor
                   key={i}
-                  block={blk}
-                  onChange={(s) => doUpdate(i, blk.mode, s)}
-                  onBlur={doSave}
+                  className={styles.remark}
+                  lang={blk.lang}
+                  code={blk.text}
+                  wysiwyg={true}
+                  onChange={(s) => doUpdate(i, blk.mode, s, 'html')}
+                  onExit={doSave}
                 />
               ) : (
                 <Editor
@@ -29,7 +30,9 @@ export function Document({ workbook, doUpdate, doSave }) {
                   className={styles.compose}
                   lang={blk.lang}
                   code={blk.text}
+                  highlight={true}
                   onChange={(s, lang) => doUpdate(i, blk.mode, s, lang)}
+                  onExit={doSave}
                 />
               )
             )}
@@ -39,32 +42,14 @@ export function Document({ workbook, doUpdate, doSave }) {
                 className={styles.perform}
                 lang={view.lang}
                 code={view.text}
+                highlight={true}
                 onChange={(s, lang) => doUpdate(i, view.mode, s, lang)}
+                onExit={doSave}
               />
             )}
           </li>
         )
       })}
     </ol>
-  )
-}
-
-function Remark({ block, onBlur, onChange }) {
-  // const [tag, cls] = {
-  //   heading: [`h${depth}`, styles.heading],
-  //   paragraph: ['p', ''],
-  //   space: ['p', styles.blank],
-  //   code: ['code', `language-${lang} ${styles.code}`],
-  //   _: ['pre', ''],
-  // }[type || '_']
-
-  return (
-    <ContentEditable
-      className={styles.remark}
-      tagName="section"
-      html={Kr.format(block) || ''}
-      onChange={(e) => onChange(e.target.value)}
-      onBlur={onBlur}
-    />
   )
 }

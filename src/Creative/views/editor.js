@@ -8,24 +8,37 @@ import styles from './document.css'
 Prism.manual = true
 
 export function Editor(props) {
-  const { lang, className, onChange } = props
+  const { lang, className, wysiwyg, highlight, onExit } = props
   const [code, setCode] = useState(props.code)
   console.log('Editor:', code, lang)
 
-  const handleBlur = () => onChange(code, lang)
+  const handleBlur = () => onExit(code, lang)
 
-  return (
+  const handleKey = () => {}
+
+  return wysiwyg ? (
+    <ContentEditable
+      className={className}
+      tagName="section"
+      html={code}
+      spellCheck={true}
+      onChange={(e) => setCode(e.target.value)}
+      onBlur={handleBlur}
+      onKeyPress={handleKey}
+    />
+  ) : (
     <figure className={className}>
       <pre className={`language-${lang}`}>
-        <Highlight code={code} language={lang} />
+        {highlight && <Highlight code={code} language={lang} />}
         <ContentEditable
           className={styles.codeinput}
           tagName="code"
-          html={escapeHtml(code)}
           lang="zxx"
-          spellcheck="false"
+          spellCheck={false}
+          html={escapeHtml(code)}
           onChange={(e) => setCode(unescapeHtml(e.target.value))}
           onBlur={handleBlur}
+          onKeyPress={handleKey}
         />
       </pre>
       <figcaption>
@@ -39,9 +52,9 @@ export function Editor(props) {
 }
 
 function escapeHtml(unsafe) {
-  return unsafe.replace(/</g, '&lt;')
+  return unsafe.replace(/</g, '&lt;').replace(/>/g, '&gt;')
 }
 
 function unescapeHtml(safe) {
-  return safe.replace(/&lt;/g, '<')
+  return safe.replace(/<br>/g, '\n').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
 }
