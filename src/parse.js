@@ -1,6 +1,7 @@
 const hash = require("object-hash");
 const marked = require("marked");
 const frontMatter = require("front-matter");
+const { format } = "../format";
 
 module.exports = {
   parse,
@@ -70,23 +71,30 @@ function coalesce(tokens) {
 }
 
 function classify(list) {
-  const blocks = list.map((tokens, i) =>
-    tokens[0].type === "code"
-      ? Object.assign(tokens[0], { mode: i ? "compose" : "perform" })
-      : {
-          mode: "remark",
-          tokens,
-          // html: marked.parse(tokens),
-        }
-  );
+  const blocks = list.map((tokens, i) => {
+    const { type, id, lang, text } = tokens[0];
 
-  console.log("Classify: ", blocks);
-
-  const rem0 = blocks.filter((b) => b.mode === "remark")[0];
-  const hd0 = rem0 && rem0.tokens.filter((t) => t.type === "heading")[0];
+    if (type === "code") {
+      return {
+        mode: i ? "compose" : "perform",
+        id,
+        lang,
+        text,
+      };
+    } else {
+      return {
+        mode: "remark",
+        lang: "html",
+        text: marked.parser(tokens),
+        title: tokens
+          .map((t) => t.type === "heading" && t.text)
+          .filter(Boolean)[0],
+      };
+    }
+  });
 
   return {
-    title: hd0 && hd0.text,
+    title: blocks.map((b) => b.mode === "remark" && b.title).filter(Boolean)[0],
     blocks,
   };
 }
