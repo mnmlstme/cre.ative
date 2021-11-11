@@ -7,11 +7,12 @@
     "DOCROOT": "./workbooks"
   },
   "scripts": {
-    "build": "webpack",
+    "build": "webpack build --config-name frontend",
     "start": "webpack serve",
-    "hot": "webpack-dev-server --hot --progress",
+    "backend": "webpack build --config-name backend",
+    "server": "nodemon dist/server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "clean": "rm -rf node_modules dist .parcel-cache package-lock.json"
+    "clean": "rm -rf node_modules dist package-lock.json"
   },
   "keywords": [
     "creative",
@@ -22,6 +23,8 @@
   "dependencies": {
     "elm-css-modules-plugin": "^1.0.2",
     "elm-webpack-loader": "^8.0.0",
+    "express": "^4.17.1",
+    "file-system": "^2.2.2",
     "immutable": "^4.0.0-rc.12",
     "kram": "file:../kram",
     "prism-react-renderer": "^1.2.1",
@@ -47,6 +50,7 @@
     "webpack": "^4.16.1",
     "webpack-cli": "^4.8.0",
     "webpack-dev-server": "^4.0.0-rc.1",
+    "webpack-node-externals": "^3.0.0",
     "yaml-loader": "^0.6.0"
   }
 }

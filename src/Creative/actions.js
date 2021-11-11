@@ -98,7 +98,6 @@ export function loadResource(filepath, loader, lang = 'js') {
 const UpdateScene = 'UpdateScene'
 
 export function updateScene(scene, block, mode, text, lang = 'html') {
-  debugger
   return {
     type: UpdateScene,
     scene,
@@ -109,11 +108,12 @@ export function updateScene(scene, block, mode, text, lang = 'html') {
   }
 }
 
-const SaveWorkbook = 'SaveWorkbook'
+const SaveScene = 'SaveScene'
 
-export function saveWorkbook() {
+export function saveScene(scene) {
   return {
-    type: SaveWorkbook,
+    type: SaveScene,
+    scene,
   }
 }
 
@@ -127,5 +127,5 @@ export default {
   LoadResource,
   ResourceError,
   UpdateScene,
-  SaveWorkbook,
+  SaveScene,
 }

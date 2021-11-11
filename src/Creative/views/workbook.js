@@ -8,7 +8,7 @@ import {
   loadWorkbook,
   loadResource,
   updateScene,
-  saveWorkbook,
+  saveScene,
 } from '../actions'
 import styles from './workbook.css'
 
@@ -29,7 +29,7 @@ function Workbook({ workbook, filepath, resources, scene, urlpath, dispatch }) {
   const doPrevScene = () => dispatch(changeScene(scene - 1))
   const doUpdateDocument = (chunk, mode, content, lang) =>
     dispatch(updateScene(scene - 1, chunk, mode, content, lang))
-  const doSaveDocument = () => dispatch(saveWorkbook())
+  const doSaveDocument = () => dispatch(saveScene(scene - 1))
   const doLoadResource = (loader, lang) =>
     dispatch(loadResource(filepath, loader, lang))
 

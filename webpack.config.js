@@ -1,12 +1,29 @@
 var path = require('path')
 const webpack = require('webpack')
+const nodeExternals = require('webpack-node-externals')
 
-module.exports = {
+const frontend = {
+  name: 'frontend',
+
   entry: {
     app: './src/index.js',
   },
 
-  mode: 'development',
+  plugins: [
+    new webpack.HotModuleReplacementPlugin(), // Enable HMR
+  ],
+
+  devServer: {
+    port: 9000,
+    historyApiFallback: true,
+    hot: true, // Tell the dev-server we're using HMR
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3000',
+        secure: false,
+      },
+    },
+  },
 
   module: {
     rules: [
@@ -136,6 +153,25 @@ module.exports = {
       },
     ],
   },
+}
+
+const backend = {
+  name: 'backend',
+
+  entry: {
+    server: './src/server/index.js',
+  },
+
+  output: {
+    filename: '[name].js',
+    path: path.resolve(__dirname, './dist'),
+  },
+  target: 'node',
+  externals: [nodeExternals()],
+}
+
+const common = {
+  mode: 'development',
 
   resolve: {
     alias: {
@@ -151,19 +187,14 @@ module.exports = {
     mainFields: ['loader', 'main'],
   },
 
-  plugins: [
-    new webpack.HotModuleReplacementPlugin(), // Enable HMR
-  ],
-
   output: {
     filename: '[name].bundle.js',
     chunkFilename: 'chunk.[id].js',
     publicPath: '/',
   },
-
-  devServer: {
-    port: 3000,
-    historyApiFallback: true,
-    hot: true, // Tell the dev-server we're using HMR
-  },
 }
+
+module.exports = [
+  Object.assign({}, common, frontend),
+  Object.assign({}, common, backend),
+]

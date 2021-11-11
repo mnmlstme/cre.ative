@@ -5,51 +5,38 @@ import { Editor } from './editor'
 export function Document({ workbook, doUpdate, doSave }) {
   console.log('Document:', workbook.toObject())
   const scenes = workbook.get('scenes')
+
   return (
     <ol>
       {scenes.map((scn, i) => {
-        const view = scn.blocks.find((b) => b.mode === 'perform')
-        const blocks = scn.blocks.filter((b) => b.mode !== 'perform')
-
         return (
           <li key={i} className={styles.doc}>
-            {blocks.map((blk, i) =>
-              blk.mode === 'remark' ? (
+            {scn.blocks
+              .map((blk, j) => Object.assign(blk, { index: j }))
+              .sort(performLast)
+              .map(({ index, mode, lang, text }) => (
                 <Editor
-                  key={i}
-                  className={styles.remark}
-                  lang={blk.lang}
-                  code={blk.text}
-                  wysiwyg={true}
-                  onChange={(s) => doUpdate(i, blk.mode, s, 'html')}
-                  onExit={doSave}
+                  key={index}
+                  className={styles[mode]}
+                  lang={lang}
+                  code={text}
+                  highlight={mode !== 'remark'}
+                  wysiwyg={mode === 'remark'}
+                  onChange={(s, lang) => doUpdate(index, mode, s, lang)}
+                  onSave={doSave}
                 />
-              ) : (
-                <Editor
-                  key={i}
-                  className={styles.compose}
-                  lang={blk.lang}
-                  code={blk.text}
-                  highlight={true}
-                  onChange={(s, lang) => doUpdate(i, blk.mode, s, lang)}
-                  onExit={doSave}
-                />
-              )
-            )}
-            {view && (
-              <Editor
-                key="perform"
-                className={styles.perform}
-                lang={view.lang}
-                code={view.text}
-                highlight={true}
-                onChange={(s, lang) => doUpdate(i, view.mode, s, lang)}
-                onExit={doSave}
-              />
-            )}
+              ))}
           </li>
         )
       })}
     </ol>
   )
+}
+
+function performLast(a, b) {
+  return a.mode === b.mode || (b.mode !== 'perform' && a.mode !== 'perform')
+    ? a > b
+    : a.mode === 'perform'
+    ? 1
+    : -1
 }

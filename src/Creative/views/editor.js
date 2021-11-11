@@ -8,13 +8,18 @@ import styles from './document.css'
 Prism.manual = true
 
 export function Editor(props) {
-  const { lang, className, wysiwyg, highlight, onExit } = props
+  const { lang, className, wysiwyg, highlight, onChange, onSave } = props
   const [code, setCode] = useState(props.code)
   console.log('Editor:', code, lang)
 
-  const handleBlur = () => onExit(code, lang)
+  const handleChange = (s) => {
+    setCode(s)
+    onChange(s, lang)
+  }
 
   const handleKey = () => {}
+
+  const handleBlur = onSave
 
   return wysiwyg ? (
     <ContentEditable
@@ -22,7 +27,7 @@ export function Editor(props) {
       tagName="section"
       html={code}
       spellCheck={true}
-      onChange={(e) => setCode(e.target.value)}
+      onChange={(e) => handleChange(e.target.value)}
       onBlur={handleBlur}
       onKeyPress={handleKey}
     />
@@ -36,7 +41,7 @@ export function Editor(props) {
           lang="zxx"
           spellCheck={false}
           html={escapeHtml(code)}
-          onChange={(e) => setCode(unescapeHtml(e.target.value))}
+          onChange={(e) => handleChange(unescapeHtml(e.target.value))}
           onBlur={handleBlur}
           onKeyPress={handleKey}
         />

@@ -2,6 +2,8 @@ import Im from 'immutable'
 import { initial } from './model'
 import Actions from './actions'
 
+const API = '/api'
+
 export function update(state = initial, action = {}) {
   switch (action.type) {
     case Actions.ChangeFile: {
@@ -35,11 +37,12 @@ export function update(state = initial, action = {}) {
 
     case Actions.LoadWorkbook: {
       console.log('update LoadWorkbook', action.data)
-      const { title, scenes, modules, init } = action.data
+      const { basename, title, scenes, modules, init } = action.data
 
       return state.set(
         'workbook',
         Im.Map({
+          basename,
           filepath: action.filepath,
           isLoaded: true,
           title,
@@ -65,17 +68,44 @@ export function update(state = initial, action = {}) {
       console.log('update UpdateScene', action)
       const workbook = state.get('workbook') || Im.Map()
       const { scene, block, mode, lang, text } = action
-      const updateFn = (scn) => ({
-        title: scn.title,
-        blocks: scn.blocks.splice(block, 1, { mode, lang, text }),
-      })
+      const updateFn = (scn) => {
+        scn.blocks.splice(block, 1, { mode, lang, text })
+        return scn
+      }
 
       return state.updateIn(['workbook', 'scenes', scene], updateFn)
     }
 
-    case Actions.SaveWorkbook:
-      console.log('update SaveWorkbook (UNIMPLEMENTED)')
+    case Actions.SaveScene: {
+      console.log('update SaveScene', action)
+      const workbook = state.get('workbook') || Im.Map()
+      const finder = state.get('finder') || Im.Map()
+      const { scene } = action
+      const endpoint = [
+        API,
+        'projects',
+        finder.get('project'),
+        'workbooks',
+        workbook.get('basename'),
+        'scenes',
+        scene,
+      ].join('/')
+
+      fetch(endpoint, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(workbook.getIn(['scenes', scene])),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log('Saved:', data)
+        })
+        .catch((error) => {
+          console.error('Error:', error)
+        })
+
       return state
+    }
 
     case Actions.LoadResource: {
       console.log('update LoadResource', action.data)
