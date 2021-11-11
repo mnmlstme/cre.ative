@@ -1,7 +1,6 @@
 const hash = require("object-hash");
 const marked = require("marked");
 const frontMatter = require("front-matter");
-const { format } = "../format";
 
 module.exports = {
   parse,

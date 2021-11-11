@@ -1,12 +1,12 @@
 const { parse } = require("./parse");
-const { format } = require("./format");
 const { extract } = require("./extract");
+const { pack } = require("./pack");
 const { recordType, scalarType, arrayType } = require("./utils");
 
 module.exports = {
   parse,
-  format,
   extract,
+  pack,
   recordType,
   scalarType,
   arrayType,

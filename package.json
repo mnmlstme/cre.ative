@@ -12,7 +12,9 @@
   "dependencies": {
     "front-matter": "^4.0.2",
     "marked": "^2.0.3",
-    "object-hash": "^2.2.0"
+    "node-html-parser": "^5.1.0",
+    "object-hash": "^2.2.0",
+    "yaml": "^1.10.2"
   },
   "devDependencies": {
     "loader-utils": "^2.0.0"
