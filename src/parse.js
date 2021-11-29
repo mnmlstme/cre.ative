@@ -35,7 +35,7 @@ function parse(md, basename) {
     scenes: paginate(tokens).map(coalesce).map(classify),
   };
 
-  console.log("Workbook:", JSON.stringify(result));
+  // console.log("Workbook:", JSON.stringify(result));
 
   const hashkey = hashcode(result);
   const moduleName = `Kram_${hashkey}_${basename}`;
@@ -64,7 +64,7 @@ function coalesce(tokens) {
     )
     .filter((i) => i !== false);
 
-  console.log("Leaders: ", leaders);
+  // console.log("Leaders: ", leaders);
 
   return leaders.map((ld, i) => tokens.slice(ld, leaders[i + 1]));
 }

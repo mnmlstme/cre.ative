@@ -16,7 +16,7 @@ function loader(content) {
 
     const callback = this.async()
 
-    console.log("Kram resource: ", this.resourcePath)
+    // console.log("Kram resource: ", this.resourcePath)
 
     const getConfig = platform =>
       getPlatformByName(platform, options.platforms)
@@ -32,8 +32,7 @@ function loader(content) {
       const config = getConfig(platform)
 
       if (config.plugin) {
-        const pluginPath = path.resolve(this.rootContext, config.plugin)
-        return require(pluginPath)
+        return config.plugin
       } else {
         return defaultPlugin
       }
@@ -114,7 +113,7 @@ function collect(workbook, config) {
 
   const definitions = modules.map(resourceDefn).join(",\n")
 
-  console.log("Kram module definitions: ", definitions)
+  // console.log("Kram module definitions: ", definitions)
 
   return `export default Object.assign(${json},{modules: [${definitions}]})`
 }
