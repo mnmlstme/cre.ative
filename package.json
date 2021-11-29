@@ -1,5 +1,5 @@
 {
-  "name": "cre-at-ive",
+  "name": "cre-a-tive",
   "version": "1.0.0",
   "description": "A framework-agnostic creative programming environment",
   "main": "src/index.js",
@@ -28,6 +28,8 @@
     "immutable": "^4.0.0-rc.12",
     "kram": "file:../kram",
     "nodemon": "^2.0.15",
+    "kram-elm": "file:../kram-elm",
+    "kram-react-redux": "file:../kram-react-redux",
     "prism-react-renderer": "^1.2.1",
     "prismjs": "^1.25.0",
     "react": "^17.0.2",

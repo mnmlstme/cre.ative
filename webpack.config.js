@@ -133,7 +133,7 @@ const frontend = {
                     use: 'css-loader',
                   },
                 ],
-                plugin: './platforms/react-redux',
+                plugin: require('kram-react-redux'),
               },
               {
                 name: 'elm',
@@ -145,7 +145,7 @@ const frontend = {
                     use: 'elm-webpack-loader',
                   },
                 ],
-                plugin: './platforms/elm',
+                plugin: require('kram-elm'),
               },
             ],
           },
