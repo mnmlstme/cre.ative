@@ -3,6 +3,7 @@ const Kr = require('kram')
 module.exports = {
   collate,
   bind,
+  classify
 }
 
 function bind(moduleName, lang = 'elm') {
@@ -14,11 +15,31 @@ function bind(moduleName, lang = 'elm') {
   }`
 }
 
+const elmDefnRegex = /^\s*(\w+)(\s*:|(\s+\w+)*\s*=)/
+
+function classify(code, lang) {
+  switch( lang ) {
+    case "elm":
+      const elmDefnMatch = code.match(elmDefnRegex)
+      if (elmDefnMatch) {
+        return {
+          mode: "define",
+          type: "function",
+          name: elmDefnMatch[1]
+        }
+      } else {
+        return {mode: "eval"}
+      }
+    default:
+      return {mode: "define"}
+  }
+}
+
 function collate(workbook, lang = 'elm') {
   // generates Elm module
   const { imports, moduleName, shape, init } = workbook
-  const scenes = Kr.extract(workbook, 'perform')
-  const defns = Kr.extract(workbook, 'compose')
+  const evals = Kr.extract(workbook, 'eval')
+  const defns = Kr.extract(workbook, 'define')
 
   const code = `port module ${moduleName} exposing (main)
 import Browser
@@ -70,7 +91,7 @@ view : Model -> Html.Html Msg
 view model =
   ${genExposeModel(shape)}
   Html.ol []
-    [ ${scenes.map(genView).join('\n    , ')}
+    [ ${evals.map(genView).join('\n    , ')}
     ]
 
 ${defns.map(genDefn).join('\n')}
