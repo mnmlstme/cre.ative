@@ -1,0 +1,15 @@
+{
+  "name": "kram-react-redux",
+  "version": "1.0.0",
+  "description": "kram platform for React with Redux for model store",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "ken@mnmlst.me",
+  "license": "BSD-3-Clause",
+  "dependencies": {
+    "kram": "file:../kram"
+  }
+
+}
