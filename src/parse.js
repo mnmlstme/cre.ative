@@ -2,11 +2,23 @@ const hash = require("object-hash");
 const marked = require("marked");
 const frontMatter = require("front-matter");
 
+const defaultPlugin = {
+  collate: function (workbook, lang) {
+    const chunks = Kr.extract(workbook, lang)
+    return chunks.map(t => t.text).join('\n')
+  },
+  classify: function (code, lang) {
+    return "define"
+  }
+}
+
 module.exports = {
   parse,
+  defaultPlugin
 };
 
-function parse(md, basename) {
+
+function parse(md, basename, getPlugin ) {
   const { body, attributes } = frontMatter(md);
   const defaultLang = attributes.lang || "text";
 
@@ -23,6 +35,7 @@ function parse(md, basename) {
   });
 
   const { title, platform, model, imports } = attributes;
+  const plugin = getPlugin && getPlugin(platform) || defaultPlugin;
 
   let result = {
     title,
@@ -32,7 +45,7 @@ function parse(md, basename) {
     init: model,
     shape: getShapeOf(model),
     imports: getImportSpecs(imports),
-    scenes: paginate(tokens).map(coalesce).map(classify),
+    scenes: paginate(tokens).map(coalesce).map(ls => classify(ls, plugin.classify)),
   };
 
   // console.log("Workbook:", JSON.stringify(result));
@@ -69,20 +82,21 @@ function coalesce(tokens) {
   return leaders.map((ld, i) => tokens.slice(ld, leaders[i + 1]));
 }
 
-function classify(list) {
+const defaultClassifier = (s) => ({mode: "define"})
+
+function classify(list, classifier = defaultClassifier) {
   const blocks = list.map((tokens, i) => {
     const { type, id, lang, text } = tokens[0];
 
     if (type === "code") {
-      return {
-        mode: i ? "compose" : "perform",
+      return Object.assign({
         id,
         lang,
         text,
-      };
+      }, classifier(text, lang));
     } else {
       return {
-        mode: "remark",
+        mode: "discuss",
         lang: "html",
         text: marked.parser(tokens),
         title: tokens
@@ -93,7 +107,7 @@ function classify(list) {
   });
 
   return {
-    title: blocks.map((b) => b.mode === "remark" && b.title).filter(Boolean)[0],
+    title: blocks.map((b) => b.mode === "discuss" && b.title).filter(Boolean)[0],
     blocks,
   };
 }

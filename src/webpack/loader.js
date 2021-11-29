@@ -21,20 +21,13 @@ function loader(content) {
     const getConfig = platform =>
       getPlatformByName(platform, options.platforms)
 
-    const defaultPlugin = {
-      collate: function (workbook, lang) {
-        const chunks = Kr.extract(workbook, lang)
-        return chunks.map(t => t.text).join('\n')
-      }
-    }
-
     const getPlugin = platform => {
       const config = getConfig(platform)
 
       if (config.plugin) {
         return config.plugin
       } else {
-        return defaultPlugin
+        return Kr.defaultPlugin
       }
     }
 
@@ -47,7 +40,7 @@ function loader(content) {
 
     // initial parse of markdown and frontMatter
 
-    parse(content, basename)
+    parse(content, basename, getPlugin)
       .then(wb => dekram(wb, getConfig(wb.platform), emit, getPlugin(wb.platform)))
       .then(wb => collect(wb, getConfig(wb.platform)))
       .then(component => callback(null, component))
@@ -64,10 +57,10 @@ function getPlatformByName(name, list) {
   }
 }
 
-function parse(content, basename) {
+function parse(content, basename, plugin=Kr.defaultPlugin) {
   return new Promise((resolve, reject) => {
     try {
-      const workbook = Kr.parse(content, basename)
+      const workbook = Kr.parse(content, basename, plugin)
 
       resolve(workbook)
     } catch (err) {
@@ -76,7 +69,7 @@ function parse(content, basename) {
   })
 }
 
-function dekram(workbook, config, emitter, plugin=defaultPlugin) {
+function dekram(workbook, config, emitter, plugin=Kr.defaultPlugin) {
   const { moduleName, languages } = workbook
   const { collate } = plugin
 
