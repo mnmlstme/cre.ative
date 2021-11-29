@@ -20,8 +20,8 @@ export function Document({ workbook, doUpdate, doSave }) {
                   className={styles[mode]}
                   lang={lang}
                   code={text}
-                  highlight={mode !== 'remark'}
-                  wysiwyg={mode === 'remark'}
+                  highlight={mode !== 'discuss'}
+                  wysiwyg={mode === 'discuss'}
                   onChange={(s, lang) => doUpdate(index, mode, s, lang)}
                   onSave={doSave}
                 />
@@ -34,9 +34,9 @@ export function Document({ workbook, doUpdate, doSave }) {
 }
 
 function performLast(a, b) {
-  return a.mode === b.mode || (b.mode !== 'perform' && a.mode !== 'perform')
+  return a.mode === b.mode || (b.mode !== 'eval' && a.mode !== 'eval')
     ? a > b
-    : a.mode === 'perform'
+    : a.mode === 'eval'
     ? 1
     : -1
 }
