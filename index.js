@@ -3,6 +3,7 @@ const Kr = require('kram')
 module.exports = {
   collate,
   bind,
+  classify
 }
 
 function bind(moduleName, lang = 'jsx') {
@@ -11,12 +12,38 @@ function bind(moduleName, lang = 'jsx') {
   }`
 }
 
+const jsxDefnRegex = /^\s*(function|let|const|var)\s+(\w+)/
+const keywordToType = {
+  "function": "function",
+  "const": "constant",
+  "var": "variable",
+  "let": "variable"
+}
+
+function classify(code, lang) {
+  switch( lang ) {
+    case "jsx":
+      const jsxDefnMatch = code.match(jsxDefnRegex)
+      if (jsxDefnMatch) {
+        return {
+          mode: "define",
+          type: keywordToType[jsxDefnMatch[1]],
+          name: jsxDefnMatch[2]
+        }
+      } else {
+        return {mode: "eval"}
+      }
+    default:
+      return {mode: "define"}
+  }
+}
+
 function collate(workbook, lang) {
   // generates JSX module
 
   const { imports, moduleName, shape } = workbook
-  const scenes = Kr.extract(workbook, 'perform')
-  const defns = Kr.extract(workbook, 'compose')
+  const evals = Kr.extract(workbook, 'eval')
+  const defns = Kr.extract(workbook, 'define')
 
   const code = `// module ${moduleName} (JSX)
 import React from 'react'
@@ -30,7 +57,7 @@ ${defns.map(genDefn).join('\n')}
 
 const Program = (${genProps(shape)}) =>
   (<ol>
-      ${scenes.map(genView).join('\n')}
+      ${evals.map(genView).join('\n')}
   </ol>)
 
 const mapStateToProps = state =>
