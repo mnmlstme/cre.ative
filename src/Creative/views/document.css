@@ -48,25 +48,25 @@
   line-height: 0;
 }
 
-.compose {
+.define {
   width: 100%;
 }
 
-.perform,
-.compose {
+.eval,
+.define {
   margin: 1rem 0 1rem 0.5rem;
   border-left: 2px solid #686863;
 }
 
-.perform > pre,
-.compose > pre {
+.eval > pre,
+.define > pre {
   position: relative;
   overflow-x: visible;
   z-index: 0;
 }
 
-.perform > figcaption,
-.compose > figcaption {
+.eval > figcaption,
+.define > figcaption {
   line-height: 1rem;
   height: 1rem;
 }
@@ -107,11 +107,11 @@ dl.specs > dt + dd {
   pointer-events: none;
 }
 
-.perform > pre {
+.nextValue > pre {
   min-height: calc(5 * 1.25em + 1rem);
 }
 
-.compose > pre[class*='language-'] {
+.define > pre[class*='language-'] {
   background: none;
 }
 

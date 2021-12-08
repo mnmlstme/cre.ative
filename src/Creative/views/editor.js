@@ -10,7 +10,7 @@ Prism.manual = true
 export function Editor(props) {
   const { lang, className, wysiwyg, highlight, onChange, onSave } = props
   const [code, setCode] = useState(props.code)
-  console.log('Editor:', code, lang)
+  // console.log('Editor:', code, lang)
 
   const handleChange = (s) => {
     setCode(s)

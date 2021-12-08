@@ -29,7 +29,7 @@ const frontend = {
     rules: [
       {
         test: /\.jsx?$/,
-        exclude: [path.resolve(__dirname, './node_modules')],
+        include: [path.resolve(__dirname, 'src')],
         use: {
           loader: 'babel-loader',
           query: {
@@ -58,7 +58,7 @@ const frontend = {
       },
       {
         test: /.elm$/,
-        exclude: [/elm-stuff/, /node_modules/],
+        include: [path.resolve(__dirname, 'src')],
         use: [
           {
             loader: 'babel-loader',
@@ -73,6 +73,10 @@ const frontend = {
       },
       {
         test: /\.css$/i,
+        include: [
+          path.resolve(__dirname, 'src'),
+          path.resolve(__dirname, 'node_modules/prismjs/themes'),
+        ],
         use: [
           'style-loader',
           {
@@ -87,7 +91,7 @@ const frontend = {
       },
       {
         test: /\.svg$/,
-        exclude: /node_modules/,
+        include: [path.resolve(__dirname, 'src')],
         use: {
           loader: 'svg-inline-loader',
           query: {
@@ -130,7 +134,8 @@ const frontend = {
                   },
                   {
                     language: 'css',
-                    use: 'css-loader',
+                    use:
+                      'style-loader!css-loader?{modules:{localIdentName:"[local]--[hash:base64:5]"}}',
                   },
                 ],
                 plugin: require('kram-react-redux'),

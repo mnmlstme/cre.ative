@@ -1,24 +1,34 @@
 ---
 title: React Workbook
 platform: react-redux
-imports:
+imports: []
 model:
   count: 0
   tenth: 0.1
   hello: Hello, world
 ---
 ```jsx
-<p>{ hello }</p>
+<p className={Styles.hi}>{ hello }</p>
 ```
 
 # Hello, World
 
-We can write JSX expressions and have them rendered
+We can write JSX expressions and have them evaluated and rendered.
+We can write documentation to discuss what we&#39;re doing.
+Kram supports Markdown for documentation, and uses code blocks
+to separate code from documentation.
 
+Code can be in different languages, as long as they are
+supported by the same platform. For example, here we
+are defining a CSS class that&#39;s used in the example:
 
-We can put more documentation after.
-Kram supports Markdown; it just turns it inside out.
-
+```css
+.hi {
+  font-family: Impact;
+  color: #835cf0;
+  font-size: 4rem;
+}
+```
 ---
 ```jsx
 <input type="number" defaultValue={asString(count)}/>

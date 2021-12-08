@@ -21,10 +21,10 @@ const ProjectError = 'ProjectError'
 
 export function loadProject(filepath) {
   return (dispatch) => {
-    console.log('loadProject', filepath)
+    // console.log('loadProject', filepath)
     import(`Workbooks/${filepath}/project.yaml`)
       .then((mod) => {
-        console.log('Action: LoadProject ', JSON.stringify(mod.default))
+        // console.log('Action: LoadProject ', JSON.stringify(mod.default))
         return dispatch({
           type: LoadProject,
           filepath,
@@ -32,7 +32,7 @@ export function loadProject(filepath) {
         })
       })
       .catch((error) => {
-        console.log('Action: ProjectError ', error)
+        // console.log('Action: ProjectError ', error)
         return dispatch({
           type: ProjectError,
           filepath,
@@ -77,7 +77,7 @@ export function loadResource(filepath, loader, lang = 'js') {
 
     loader(filepath)
       .then((mod) => {
-        console.log('Action: LoadResource ', filepath, lang, mod)
+        // console.log('Action: LoadResource ', filepath, lang, mod)
         return dispatch({
           type: LoadResource,
           lang,
@@ -85,7 +85,7 @@ export function loadResource(filepath, loader, lang = 'js') {
         })
       })
       .catch((error) => {
-        console.log('Action: LoadError ', error)
+        // console.log('Action: LoadError ', error)
         return dispatch({
           type: ResourceError,
           lang,

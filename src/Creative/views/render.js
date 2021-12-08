@@ -29,15 +29,21 @@ export class Render extends React.Component {
     const mountpoint = this.node.current
 
     if (resources !== prevProps.resources) {
-      modules.forEach(({ language, bind }) => {
-        const r = resources.get(language)
+      const loadedSoFar = resources
+        .filterNot((k, r) => r.isLoaded)
+        .map((r) => r.module)
 
-        if (r.isLoaded) {
-          console.log(`Mounting ${language} resource`, r.module)
+      console.log('Resources loaded:', loadedSoFar.toObject())
 
-          bind(r.module, mountpoint, init)
-        }
-      })
+      modules
+        .filter((m) => m.bind && loadedSoFar.has(m.language))
+        .forEach(({ language, bind }) => {
+          const r = loadedSoFar.get(language)
+          const dict = loadedSoFar.delete(language).toObject()
+
+          console.log('Binding resource: ', language, r, dict)
+          bind(r, mountpoint, init, dict)
+        })
     }
   }
 }
