@@ -1,114 +1,115 @@
-const { getOptions } = require('loader-utils')
-const fs = require('fs')
-const path = require('path')
-const Kr = require('../index.js')
+const { getOptions } = require("loader-utils");
+const fs = require("fs");
+const path = require("path");
+const Kr = require("../index.js");
 
 function loader(content) {
-    const options = getOptions(this) || {}
-    const defaults = options.defaults || {}
-    const root = options.root || this.rootContext
-    const output = options.output
+  const options = getOptions(this) || {};
+  const defaults = options.defaults || {};
+  const root = options.root || this.rootContext;
+  const output = options.output;
 
-    const relpath = path.relative(root, this.resourcePath)
-    const basename = path.basename(relpath, ".kr")
-    const dir = path.join(path.dirname(relpath), basename)
-    const outdir = output ? path.join(output, dir) : dir
+  const relpath = path.relative(root, this.resourcePath);
+  const basename = path.basename(relpath, ".kr");
+  const dir = path.join(path.dirname(relpath), basename);
+  const outdir = output ? path.join(output, dir) : dir;
 
-    const callback = this.async()
+  const callback = this.async();
 
-    // console.log("Kram resource: ", this.resourcePath)
+  // console.log("Kram resource: ", this.resourcePath)
 
-    const getConfig = platform =>
-      getPlatformByName(platform, options.platforms)
+  const getConfig = (platform) =>
+    getPlatformByName(platform, options.platforms);
 
-    const getPlugin = platform => {
-      const config = getConfig(platform)
+  const getPlugin = (platform) => {
+    const config = getConfig(platform);
 
-      if (config.plugin) {
-        return config.plugin
-      } else {
-        return Kr.defaultPlugin
-      }
+    if (config.plugin) {
+      return config.plugin;
+    } else {
+      return Kr.defaultPlugin;
     }
+  };
 
-    const emit = (name, code) => {
-      const filename = path.join(outdir, name)
-      fs.mkdirSync(outdir, {recursive: true})
-      fs.writeFileSync(filename, code)
-      return filename
-    }
+  const emit = (name, code) => {
+    const filename = path.join(outdir, name);
+    fs.mkdirSync(outdir, { recursive: true });
+    fs.writeFileSync(filename, code);
+    return filename;
+  };
 
-    // initial parse of markdown and frontMatter
+  // initial parse of markdown and frontMatter
 
-    parse(content, basename, getPlugin)
-      .then(wb => dekram(wb, getConfig(wb.platform), emit, getPlugin(wb.platform)))
-      .then(wb => collect(wb, getConfig(wb.platform)))
-      .then(component => callback(null, component))
-      .catch(callback)
+  parse(content, basename, getPlugin)
+    .then((wb) =>
+      dekram(wb, getConfig(wb.platform), emit, getPlugin(wb.platform))
+    )
+    .then((wb) => collect(wb, getConfig(wb.platform)))
+    .then((component) => callback(null, component))
+    .catch(callback);
 }
 
 function getPlatformByName(name, list) {
-  const matching = list.filter( p => p.name === name )
+  const matching = list.filter((p) => p.name === name);
 
   if (matching.length === 1) {
-    return matching[0]
+    return matching[0];
   } else {
-    return {}
+    return {};
   }
 }
 
-function parse(content, basename, plugin=Kr.defaultPlugin) {
+function parse(content, basename, plugin = Kr.defaultPlugin) {
   return new Promise((resolve, reject) => {
     try {
-      const workbook = Kr.parse(content, basename, plugin)
+      const workbook = Kr.parse(content, basename, plugin);
 
-      resolve(workbook)
+      resolve(workbook);
     } catch (err) {
-      reject(err)
+      reject(err);
     }
-  })
+  });
 }
 
-function dekram(workbook, config, emitter, plugin=Kr.defaultPlugin) {
-  const { moduleName, languages } = workbook
-  const { collate } = plugin
+function dekram(workbook, config, emitter, plugin = Kr.defaultPlugin) {
+  const { moduleName, languages } = workbook;
+  const { collate } = plugin;
 
-  const emit = lang => {
-    const {name, language, code} = collate(workbook, lang)
+  const emit = (lang) => {
+    const { name, language, code } = collate(workbook, lang);
     return {
       language,
       filepath: emitter(name, code),
-    }
-  }
+    };
+  };
 
   const modules = config.modules
-    .filter( m => languages.find(s => s === m.language) )
-    .map( m => Object.assign(
-      emit(m.language),
-      {
+    .filter((m) => languages.find((s) => s === m.language))
+    .map((m) =>
+      Object.assign(emit(m.language), {
         pipeline: m.use,
-        bind: plugin.bind(moduleName, m.language)
-      }
-    ))
+        bind: plugin.bind(moduleName, m.language) || "null",
+      })
+    );
 
-  return Object.assign({modules}, workbook)
+  return Object.assign({ modules }, workbook);
 }
 
 function collect(workbook, config) {
-  const {modules} = workbook
-  const json = JSON.stringify(Object.assign(workbook, {modules: "TBD"}))
+  const { modules } = workbook;
+  const json = JSON.stringify(Object.assign(workbook, { modules: "TBD" }));
 
-  const loader = m =>
-    `function () { return import(\`!${m.pipeline}!${m.filepath}\`) }`
+  const loader = (m) =>
+    `function () { return import(\`!${m.pipeline}!${m.filepath}\`) }`;
 
-  const resourceDefn = m =>
-    `{language: "${m.language}", load: ${loader(m)}, bind: ${m.bind} }`
+  const resourceDefn = (m) =>
+    `{language: "${m.language}", load: ${loader(m)}, bind: ${m.bind}}`;
 
-  const definitions = modules.map(resourceDefn).join(",\n")
+  const definitions = modules.map(resourceDefn).join(",\n");
 
   // console.log("Kram module definitions: ", definitions)
 
-  return `export default Object.assign(${json},{modules: [${definitions}]})`
+  return `export default Object.assign(${json},{modules: [${definitions}]})`;
 }
 
-module.exports = loader
+module.exports = loader;
