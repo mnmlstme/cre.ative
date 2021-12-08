@@ -1,69 +1,104 @@
-const Kr = require('kram')
+const Kr = require("kram");
 
 module.exports = {
   collate,
   bind,
-  classify
+  classify,
+};
+
+function bind(moduleName, lang) {
+  switch (lang) {
+    case "jsx":
+      return `function(resource, container, initial, dict) {
+        resource.mount(container, initial, dict)
+      }`;
+    default:
+      return null;
+  }
 }
 
-function bind(moduleName, lang = 'jsx') {
-  return `function(module, container, initial) {
-    module.mount(container, initial)
-  }`
-}
-
-const jsxDefnRegex = /^\s*(function|let|const|var)\s+(\w+)/
+const jsxDefnRegex = /^\s*(function|let|const|var)\s+(\w+)/;
 const keywordToType = {
-  "function": "function",
-  "const": "constant",
-  "var": "variable",
-  "let": "variable"
-}
+  function: "function",
+  const: "constant",
+  var: "variable",
+  let: "variable",
+};
 
 function classify(code, lang) {
-  switch( lang ) {
+  switch (lang) {
     case "jsx":
-      const jsxDefnMatch = code.match(jsxDefnRegex)
+      const jsxDefnMatch = code.match(jsxDefnRegex);
       if (jsxDefnMatch) {
         return {
           mode: "define",
           type: keywordToType[jsxDefnMatch[1]],
-          name: jsxDefnMatch[2]
-        }
+          name: jsxDefnMatch[2],
+        };
       } else {
-        return {mode: "eval"}
+        return { mode: "eval" };
       }
     default:
-      return {mode: "define"}
+      return { mode: "define" };
   }
 }
 
 function collate(workbook, lang) {
   // generates JSX module
 
-  const { imports, moduleName, shape } = workbook
-  const evals = Kr.extract(workbook, 'eval')
-  const defns = Kr.extract(workbook, 'define')
+  const evals = Kr.extract(workbook, "eval", lang);
+  const defns = Kr.extract(workbook, "define", lang);
 
-  const code = `// module ${moduleName} (JSX)
+  switch (lang) {
+    case "jsx":
+      return {
+        name: "index.jsx",
+        language: "jsx",
+        code: generateJsx(evals, defns, workbook),
+      };
+    case "css":
+      return {
+        name: "styles.css",
+        language: "css",
+        code: defns.map((b) => b.text).join("\n/****/\n\n"),
+      };
+    default:
+      return {
+        name: `data.${lang}`,
+        language: "lang",
+        code: defns.join("\n"),
+      };
+  }
+
+  return {
+    name: `index.${lang}`,
+    language: lang,
+    code,
+  };
+}
+
+function generateJsx(evals, defns, { moduleName, modules, imports, shape }) {
+  return `// module ${moduleName} (JSX)
 import React from 'react'
 import ReactDOM from 'react-dom'
 const Redux = require('redux')
 import Im from 'immutable'
 import { Provider, connect } from 'react-redux'
-${imports.map(genImport).join('\n')}
+${imports.map(genImport).join("\n")}
 
-${defns.map(genDefn).join('\n')}
+let Styles = {}
+
+${defns.map(genDefn).join("\n")}
 
 const Program = (${genProps(shape)}) =>
   (<ol>
-      ${evals.map(genView).join('\n')}
+      ${evals.map(genView).join("\n")}
   </ol>)
 
 const mapStateToProps = state =>
   ( ${genExposeModel(shape)} )
 
-function mount (mountpoint, initial) {
+function mount (mountpoint, initial, resources = {}) {
 
   const init = Im.Map(initial)
   const store = Redux.createStore(update)
@@ -71,6 +106,10 @@ function mount (mountpoint, initial) {
     mapStateToProps(store.getState()),
     {dispatch: store.dispatch}
   )
+
+  if ( 'css' in resources ) {
+    Styles = resources.css.default
+  }
 
   ReactDOM.render(
     React.createElement(Program, props),
@@ -96,47 +135,41 @@ export {
     Program,
     mount
 }
-`
-
-  return {
-    name: `index.${lang}`,
-    language: lang,
-    code,
-  }
+`;
 }
 
 function genImport(spec) {
-  return `import ${spec.as} from '${spec.from}'`
+  return `import ${spec.as} from '${spec.from}'`;
 }
 
 function genProps(shape) {
-  const record = Kr.recordType(shape)
-  if (record) return `{ ${Object.keys(record).join(', ')} }`
+  const record = Kr.recordType(shape);
+  if (record) return `{ ${Object.keys(record).join(", ")} }`;
 
-  return ''
+  return "";
 }
 
 function genExposeModel(shape) {
-  const record = Kr.recordType(shape)
-  const expose = (k) => `${k}: state.get('${k}')`
+  const record = Kr.recordType(shape);
+  const expose = (k) => `${k}: state.get('${k}')`;
 
   if (record)
     return `{
-      ${Object.keys(record).map(expose).join(', ')}
-    }`
+      ${Object.keys(record).map(expose).join(", ")}
+    }`;
 
-  return '{}'
+  return "{}";
 }
 
 function genView(block) {
   return block
     ? `<li key="${block.id}" id="${block.id}">
-       ${block.text.split('\n').join('\n        ')}
+       ${block.text.split("\n").join("\n        ")}
      </li>
     `
-    : '<li></li>'
+    : "<li></li>";
 }
 
 function genDefn(block) {
-  return block.text
+  return block.text;
 }
