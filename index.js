@@ -1,54 +1,88 @@
-const Kr = require('kram')
+const Kr = require("kram");
 
 module.exports = {
   collate,
   bind,
-  classify
+  classify,
+};
+
+function bind(moduleName, lang = "elm") {
+  switch (lang) {
+    case "elm":
+      return `function(resource, container, initial){
+      let { Elm } = resource
+      let dummy = document.createElement('div')
+      container.appendChild(dummy)
+      let app = Elm.${moduleName}.init({ node: dummy, flags: initial })
+    }`;
+    case "css":
+      return `function(resource, container) {
+        let sheet = document.createElement('style')
+        sheet.innerHTML = resource.default
+        container.appendChild(sheet);
+      }`;
+    default:
+      return null;
+  }
 }
 
-function bind(moduleName, lang = 'elm') {
-  return `function(module, container, initial){
-    let { Elm } = module
-    let dummy = document.createElement('div')
-    container.appendChild(dummy)
-    let app = Elm.${moduleName}.init({node: dummy})
-  }`
-}
-
-const elmDefnRegex = /^\s*(\w+)(\s*:|(\s+\w+)*\s*=)/
+const elmDefnRegex = /^\s*(\w+)(\s*:|(\s+\w+)*\s*=)/;
 
 function classify(code, lang) {
-  switch( lang ) {
+  switch (lang) {
     case "elm":
-      const elmDefnMatch = code.match(elmDefnRegex)
+      const elmDefnMatch = code.match(elmDefnRegex);
       if (elmDefnMatch) {
         return {
           mode: "define",
           type: "function",
-          name: elmDefnMatch[1]
-        }
+          name: elmDefnMatch[1],
+        };
       } else {
-        return {mode: "eval"}
+        return { mode: "eval" };
       }
     default:
-      return {mode: "define"}
+      return { mode: "define" };
   }
 }
 
-function collate(workbook, lang = 'elm') {
+function collate(workbook, lang) {
   // generates Elm module
-  const { imports, moduleName, shape, init } = workbook
-  const evals = Kr.extract(workbook, 'eval')
-  const defns = Kr.extract(workbook, 'define')
+  const evals = Kr.extract(workbook, "eval", lang);
+  const defns = Kr.extract(workbook, "define", lang);
 
-  const code = `port module ${moduleName} exposing (main)
+  switch (lang) {
+    case "elm":
+      return {
+        name: "Main.elm",
+        language: "elm",
+        code: generateElm(evals, defns, workbook),
+      };
+    case "css":
+      return {
+        name: "styles.css",
+        language: "css",
+        code: defns.map((b) => b.text).join("\n/****/\n\n"),
+      };
+    default:
+      return {
+        name: `data.${lang}`,
+        language: lang,
+        code: defns.join("\n"),
+      };
+  }
+}
+
+function generateElm(evals, defns, { moduleName, init, imports, shape }) {
+  // generates Elm module
+  return `port module ${moduleName} exposing (main)
 import Browser
 import Html
-import Html.Attributes as Attr
+import Html.Attributes as Attr exposing (class)
 import Json.Decode as Json
-${imports.map(genImport).join('\n')}
+${imports.map(genImport).join("\n")}
 
-main : Program () Model Msg
+main : Program Json.Value Model Msg
 main =
   Browser.element
     { init = init
@@ -57,31 +91,32 @@ main =
     , subscriptions = subscriptions
     }
 
-port kram_input : (String -> msg) -> Sub msg
+port kram_input : (Json.Value -> msg) -> Sub msg
 
 type alias Model =
   ${genModel(shape)}
 
-init : () -> ( Model, Cmd msg )
+init : Json.Value -> ( Model, Cmd msg )
 init json =
   let
     initial =
       ${genInitModel(init)}
   in
-  ( initial, Cmd.none )
+  ( Result.withDefault initial <| Json.decodeValue decoder json , Cmd.none )
 
 type Msg
-  = Incoming String
+  = Incoming Json.Value
 
 update : Msg -> Model -> ( Model, Cmd msg )
 update msg model =
   case msg of
     Incoming json ->
-      ( Result.withDefault model <| Json.decodeString decoder json, Cmd.none )
+      ( Result.withDefault model <| Json.decodeValue decoder json, Cmd.none )
 
 decoder : Json.Decoder Model
 decoder =
   ${genDecoder(shape)}
+
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
@@ -91,101 +126,95 @@ view : Model -> Html.Html Msg
 view model =
   ${genExposeModel(shape)}
   Html.ol []
-    [ ${evals.map(genView).join('\n    , ')}
+    [ ${evals.map(genView).join("\n    , ")}
     ]
 
-${defns.map(genDefn).join('\n')}
-`
-
-  return {
-    name: `${moduleName}.${lang}`,
-    language: lang,
-    code,
-  }
+${defns.map(genDefn).join("\n")}
+`;
 }
 
 function genImport(spec) {
-  return `import ${spec.from} as ${spec.as}`
+  return `import ${spec.from} as ${spec.as}`;
 }
 
 const typemap = {
-  string: 'String',
-  int: 'Int',
-  float: 'Float',
-  boolean: 'Boolean',
-}
+  string: "String",
+  int: "Int",
+  float: "Float",
+  boolean: "Boolean",
+};
 
 function genModel(shape) {
-  const field = (k, sh) => `${k}: ${genModel(sh)}`
+  const field = (k, sh) => `${k}: ${genModel(sh)}`;
 
-  let t = Kr.arrayType(shape)
-  if (t) return `(List ${genModel(t)})`
+  let t = Kr.arrayType(shape);
+  if (t) return `(List ${genModel(t)})`;
 
-  t = Kr.recordType(shape)
+  t = Kr.recordType(shape);
   if (t)
     return `{ ${Object.entries(t)
       .map(([k, sh]) => field(k, sh))
-      .join('\n  ,')}
-  }`
+      .join("\n  ,")}
+  }`;
 
-  return typemap[Kr.scalarType(shape)] || 't'
+  return typemap[Kr.scalarType(shape)] || "t";
 }
 
 function genInitModel(model) {
-  const field = (k, val) => `${k} = ${JSON.stringify(val)}`
+  const field = (k, val) => `${k} = ${JSON.stringify(val)}`;
 
   return `{ ${Object.entries(model)
     .map(([k, val]) => field(k, val))
-    .join('\n      , ')}
-      }`
+    .join("\n      , ")}
+      }`;
 }
 
 const decodermap = {
-  string: 'Json.string',
-  int: 'Json.int',
-  float: 'Json.float',
-  boolean: 'Json.bool',
-}
+  string: "Json.string",
+  int: "Json.int",
+  float: "Json.float",
+  boolean: "Json.bool",
+};
 
 function genDecoder(shape) {
-  const field = (k, sh) => `(Json.field "${k}" <| ${genDecoder(sh)})`
+  const field = (k, sh) => `(Json.field "${k}" <| ${genDecoder(sh)})`;
 
-  let t = Kr.arrayType(shape)
-  if (t) return `Json.list <| ${genDecoder(t)}`
+  let t = Kr.arrayType(shape);
+  if (t) return `Json.list <| ${genDecoder(t)}`;
 
-  t = Kr.recordType(shape)
+  t = Kr.recordType(shape);
   if (t) {
-    const n = Object.keys(t).length
+    const n = Object.keys(t).length;
     return `Json.map${n} Model
     ${Object.entries(t)
       .map(([k, sh]) => field(k, sh))
-      .join('\n    ')}`
+      .join("\n    ")}`;
   }
 
-  return decodermap[Kr.scalarType(shape)] || 't'
+  return decodermap[Kr.scalarType(shape)] || "t";
 }
 
 function genExposeModel(shape) {
-  const record = Kr.recordType(shape)
-  const expose = (k) => `${k} = model.${k}`
+  const record = Kr.recordType(shape);
+  const expose = (k) => `${k} = model.${k}`;
 
   if (record)
     return `let
-    ${Object.keys(record).map(expose).join('\n    ')}
-  in`
+    ${Object.keys(record).map(expose).join("\n    ")}
+  in`;
 
-  return ''
+  return "";
 }
 
 function genView(block) {
   return block
     ? `Html.li [Attr.id "${block.id}"]
-        [ ${block.text.split('\n').join('\n        ')}
+        [ ${block.text.split("\n").join("\n        ")}
         ]
     `
-    : 'Html.li [] []'
+    : "Html.li [] []";
 }
 
 function genDefn(block) {
-  return block.text
+  return block.text;
 }
