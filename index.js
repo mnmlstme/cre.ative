@@ -9,8 +9,14 @@ module.exports = {
 function bind(moduleName, lang) {
   switch (lang) {
     case "jsx":
-      return `function(resource, container, initial, dict) {
-        resource.mount(container, initial, dict)
+      return `function(resource, container, initial) {
+        resource.mount(container, initial)
+      }`;
+    case "css":
+      return `function(resource, container) {
+        let sheet = document.createElement('style')
+        sheet.innerHTML = resource.default
+        container.appendChild(sheet);
       }`;
     default:
       return null;
@@ -44,8 +50,6 @@ function classify(code, lang) {
 }
 
 function collate(workbook, lang) {
-  // generates JSX module
-
   const evals = Kr.extract(workbook, "eval", lang);
   const defns = Kr.extract(workbook, "define", lang);
 
@@ -65,19 +69,14 @@ function collate(workbook, lang) {
     default:
       return {
         name: `data.${lang}`,
-        language: "lang",
+        language: lang,
         code: defns.join("\n"),
       };
   }
-
-  return {
-    name: `index.${lang}`,
-    language: lang,
-    code,
-  };
 }
 
-function generateJsx(evals, defns, { moduleName, modules, imports, shape }) {
+function generateJsx(evals, defns, { moduleName, imports, shape }) {
+  // generates JSX module
   return `// module ${moduleName} (JSX)
 import React from 'react'
 import ReactDOM from 'react-dom'
@@ -98,7 +97,7 @@ const Program = (${genProps(shape)}) =>
 const mapStateToProps = state =>
   ( ${genExposeModel(shape)} )
 
-function mount (mountpoint, initial, resources = {}) {
+function mount (mountpoint, initial) {
 
   const init = Im.Map(initial)
   const store = Redux.createStore(update)
@@ -106,10 +105,6 @@ function mount (mountpoint, initial, resources = {}) {
     mapStateToProps(store.getState()),
     {dispatch: store.dispatch}
   )
-
-  if ( 'css' in resources ) {
-    Styles = resources.css.default
-  }
 
   ReactDOM.render(
     React.createElement(Program, props),
