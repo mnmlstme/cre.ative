@@ -7,7 +7,7 @@ model:
   hello: Hello, world
 ---
 ```elm
-Html.p []
+Html.p [ class "hi" ]
   [Html.text hello]
 ```
 
@@ -15,6 +15,15 @@ Html.p []
 
 We can write Html expressions in Elm and have them rendered.
 
+We can also pull in CSS classes and reference them using the `class` attribute.
+
+```css
+.hi {
+  font-family: Impact;
+  color: #835cf0;
+  font-size: 4rem;
+}
+```
 ---
 ```elm
 Html.input

@@ -38,6 +38,7 @@ const frontend = {
               [
                 'prismjs',
                 {
+                  // we support code highlighting for these languages:
                   languages: [
                     'javascript',
                     'css',
@@ -102,7 +103,7 @@ const frontend = {
         },
       },
       {
-        test: /\.yaml$/,
+        test: /project\.yaml$/,
         include: [path.resolve(__dirname, 'workbooks')],
         type: 'json', // Required by Webpack v4
         use: 'yaml-loader',
@@ -134,8 +135,7 @@ const frontend = {
                   },
                   {
                     language: 'css',
-                    use:
-                      'style-loader!css-loader?{modules:{localIdentName:"[local]--[hash:base64:5]"}}',
+                    use: 'css-loader',
                   },
                 ],
                 plugin: require('kram-react-redux'),
@@ -148,6 +148,10 @@ const frontend = {
                   {
                     language: 'elm',
                     use: 'elm-webpack-loader',
+                  },
+                  {
+                    language: 'css',
+                    use: 'css-loader',
                   },
                 ],
                 plugin: require('kram-elm'),

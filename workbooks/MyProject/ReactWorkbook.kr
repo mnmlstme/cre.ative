@@ -8,7 +8,7 @@ model:
   hello: Hello, world
 ---
 ```jsx
-<p className={Styles.hi}>{ hello }</p>
+<p className="hi">{ hello }</p>
 ```
 
 # Hello, World
