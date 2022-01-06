@@ -1,6 +1,6 @@
 import React from 'react'
 import styles from './document.css'
-import { Editor } from './editor'
+import { CodeEditor, ProseEditor } from './editor'
 
 export function Document({ workbook, doUpdate, doSave }) {
   console.log('Document:', workbook.toObject())
@@ -14,18 +14,20 @@ export function Document({ workbook, doUpdate, doSave }) {
             {scn.blocks
               .map((blk, j) => Object.assign(blk, { index: j }))
               .sort(performLast)
-              .map(({ index, mode, lang, text }) => (
-                <Editor
-                  key={index}
-                  className={styles[mode]}
-                  lang={lang}
-                  code={text}
-                  highlight={mode !== 'discuss'}
-                  wysiwyg={mode === 'discuss'}
-                  onChange={(s, lang) => doUpdate(index, mode, s, lang)}
-                  onSave={doSave}
-                />
-              ))}
+              .map(({ index, mode, lang, text }) => {
+                const Editor = mode === 'discuss' ? ProseEditor : CodeEditor
+
+                return (
+                  <Editor
+                    key={index}
+                    className={styles[mode]}
+                    lang={lang}
+                    content={text}
+                    onChange={(s, lang) => doUpdate(index, mode, s, lang)}
+                    onSave={doSave}
+                  />
+                )
+              })}
           </li>
         )
       })}
