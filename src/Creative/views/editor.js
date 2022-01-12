@@ -1,17 +1,20 @@
 import React, { useState } from 'react'
-import Kr from 'kram'
 import ContentEditable from 'react-contenteditable'
-import { Highlight } from './highlight.js'
+const he = require('he')
 
 import styles from './document.css'
 
-Prism.manual = true
-
-export function ProseEditor(props) {
-  const { className, onChange, onSave } = props
+export function Editor(props) {
+  const {
+    className,
+    tagName,
+    options,
+    keymaps,
+    onUpdate,
+    onChange,
+    onSave,
+  } = props
   const [content, setContent] = useState(props.content)
-
-  const keymaps = [proseKeymap, globalKeymap]
 
   const handleKeyDown = (e) => {
     const fn = resolveKey(e, keymaps)
@@ -24,20 +27,71 @@ export function ProseEditor(props) {
   }
 
   const handleChange = (e) => {
-    const s = e.target.value
+    const value = he.decode(e.target.value)
+    const prior = he.decode(content)
+    const shortest = Math.min(prior.length, value.length)
+
+    let start = 0
+    while (start < shortest && value[start] === prior[start]) {
+      if (value[start] === '<') {
+        const vtag = parse_tag_forward(value, start)
+        const ptag = parse_tag_forward(prior, start)
+        if (vtag === ptag) {
+          start += vtag.length
+        } else {
+          break
+        }
+      } else {
+        start++
+      }
+    }
+
+    let end = -1
+    while (
+      shortest + end > start &&
+      value[value.length + end] === prior[prior.length + end]
+    ) {
+      if (value[value.length + end] === '>') {
+        const vtag = parse_tag_backward(value, end)
+        const ptag = parse_tag_backward(prior, end)
+        console.log('parse_tag_backward:', end, vtag, ptag)
+        if (vtag === ptag) {
+          end -= vtag.length
+        } else {
+          end++
+          break
+        }
+      } else {
+        end--
+      }
+    }
+
+    const s = onUpdate(
+      value,
+      start,
+      value.length + end + 1,
+      value.slice(start, value.length + end + 1),
+      prior.slice(start, prior.length + end + 1)
+    )
+
+    console.log('onUpdate returns ', s)
 
     setContent(s)
     onChange(s)
   }
 
-  const handleBlur = onSave
+  const handleBlur = (e) => {
+    //debugger
+    onSave(e)
+  }
 
   return (
     <ContentEditable
       className={className}
-      tagName="section"
+      tagName={options.tagname || 'code'}
       html={content}
-      spellCheck={true}
+      spellCheck={options.spellCheck}
+      lang={options.lang || 'zxx'}
       onChange={handleChange}
       onBlur={handleBlur}
       onKeyDown={handleKeyDown}
@@ -46,63 +100,26 @@ export function ProseEditor(props) {
   )
 }
 
-export function CodeEditor(props) {
-  const { lang, className, onChange, onSave } = props
-  const [content, setContent] = useState(props.content)
+function parse_tag_forward(s, start) {
+  // TODO: make tag parsing more robust
+  const end = s.indexOf('>', start + 1)
 
-  const keymaps = [codeKeymap, globalKeymap]
-
-  const handleKeyDown = (e) => {
-    const fn = resolveKey(e, keymaps)
-    fn && fn(e, { content, setContent })
-  }
-
-  const handleKeyUp = (e) => {
-    // resolve Key Up events to cancel default behaviors
-    resolveKey(e, keymaps)
-  }
-
-  const handleChange = (e) => {
-    const s = unescapeHtml(e.target.value)
-
-    setContent(s)
-    onChange(s, lang)
-  }
-
-  const handleBlur = onSave
-
-  return (
-    <figure className={className}>
-      <pre className={`language-${lang}`}>
-        <Highlight code={content} language={lang} />
-        <ContentEditable
-          className={styles.codeinput}
-          tagName="code"
-          lang="zxx"
-          spellCheck={false}
-          html={escapeHtml(content)}
-          onChange={handleChange}
-          onBlur={handleBlur}
-          onKeyDown={handleKeyDown}
-          onKeyUp={handleKeyUp}
-        />
-      </pre>
-      <figcaption>
-        <dl className={styles.specs}>
-          <dt>Language</dt>
-          <dd>{lang}</dd>
-        </dl>
-      </figcaption>
-    </figure>
-  )
+  return s.slice(start, end + 1)
 }
 
-function escapeHtml(unsafe) {
-  return unsafe.replace(/</g, '&lt;').replace(/>/g, '&gt;')
-}
+function parse_tag_backward(s, end) {
+  // TODO: make tag parsing more robust
+  let start = end - 1
 
-function unescapeHtml(safe) {
-  return safe.replace(/<br>/g, '\n').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+  if (start < 0) {
+    start = s.length + start
+  }
+
+  while (start > 0 && s[start] !== '<') {
+    start--
+  }
+
+  return s.slice(start, end + 1)
 }
 
 function resolveKey(e, keymaps) {
@@ -151,7 +168,7 @@ function lookupKey({ key, shiftKey, ctrlKey, altKey, metaKey }, keymap) {
   return keymap[code]
 }
 
-const globalKeymap = {
+export const globalKeymap = {
   Tab: 'do-nothing',
   'S-Enter': 'finished',
   // Most (all?) browsers have good defaults for the following.
@@ -175,10 +192,6 @@ const globalKeymap = {
   '^e': null, // end of line
   '^v': null, // page down
 }
-
-const proseKeymap = {}
-
-const codeKeymap = {}
 
 const actions = {
   'do-nothing': () => null,

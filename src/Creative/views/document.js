@@ -1,6 +1,7 @@
 import React from 'react'
 import styles from './document.css'
-import { CodeEditor, ProseEditor } from './editor'
+import { CodeEditor } from './codeEditor'
+import { ProseEditor } from './proseEditor'
 
 export function Document({ workbook, doUpdate, doSave }) {
   console.log('Document:', workbook.toObject())
@@ -15,10 +16,10 @@ export function Document({ workbook, doUpdate, doSave }) {
               .map((blk, j) => Object.assign(blk, { index: j }))
               .sort(performLast)
               .map(({ index, mode, lang, text }) => {
-                const Editor = mode === 'discuss' ? ProseEditor : CodeEditor
+                const Edit = mode === 'discuss' ? ProseEditor : CodeEditor
 
                 return (
-                  <Editor
+                  <Edit
                     key={index}
                     className={styles[mode]}
                     lang={lang}

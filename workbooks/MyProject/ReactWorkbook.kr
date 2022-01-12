@@ -13,22 +13,33 @@ model:
 
 # Hello, World
 
-We can write JSX expressions and have them evaluated and rendered.
-We can write documentation to discuss what we&#39;re doing.
-Kram supports Markdown for documentation, and uses code blocks
+This workbook contains React expressions
+which we evaluated and render.
+We can write documentation alongside the
+code to discuss what we're doing.
+
+Kram supports Markdown for documentation,
+and uses code blocks
 to separate code from documentation.
 
-Code can be in different languages, as long as they are
-supported by the same platform. For example, here we
-are defining a CSS class that&#39;s used in the example:
+We can also put code in other languages,
+such as CSS like this:
 
 ```css
 .hi {
-  font-family: Impact;
+  font-family: Georgia;
   color: #835cf0;
   font-size: 4rem;
 }
 ```
+
+The `react-redux` platform supports the following languages:
+
+* HTML
+* CSS
+* Javascript
+* JSX (React extension to JS)
+
 ---
 ```jsx
 <input type="number" defaultValue={asString(count)}/>

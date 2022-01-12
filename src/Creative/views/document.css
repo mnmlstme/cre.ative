@@ -20,8 +20,9 @@
 }
 
 .discuss > * {
-  margin: 0 0.5em;
+  margin-left: 2rem;
   width: 80%;
+  position: relative;
 }
 
 .discuss > h1,
@@ -63,6 +64,41 @@
 .discuss > br {
   margin: 0;
   line-height: 0;
+}
+
+.discuss > *::before {
+  position: absolute;
+  width: 1.5rem;
+  height: 100%;
+  text-align: center;
+  left: -2rem;
+  display: block;
+  border-right: 1px solid;
+  font-size: 0.75rem;
+  font-family: 'IBM Plex Sans Condensed', sans-serif;
+  font-style: italic;
+  font-weight: 300;
+  color: #a8a8a1;
+}
+
+.discuss > div::before {
+  content: "DIV";
+}
+
+.discuss > p::before {
+  content: "P";
+}
+
+.discuss > h1::before {
+  content: "H1";
+}
+
+.discuss > h2::before {
+  content: "H2";
+}
+
+.discuss > h3::before {
+  content: "H3";
 }
 
 .define {
