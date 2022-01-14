@@ -59,7 +59,7 @@ function htmlToMarkdown(html) {
 }
 
 function nodeToMarkdown(node) {
-  const { tagName, innerHTML, outerHTML, childNodes } = node;
+  const { tagName, innerHTML } = node;
 
   console.log("n2md input:", node);
 
@@ -75,9 +75,9 @@ function nodeToMarkdown(node) {
     case "h3":
       return `### ${innerHTML}`;
     case "ol":
-      return listToMarkdown("1.", childNodes);
+      return listToMarkdown("1.", node);
     case "ul":
-      return listToMarkdown("*", childNodes);
+      return listToMarkdown("*", node);
     default:
       return "";
   }
@@ -88,7 +88,14 @@ function log(prefix, value) {
   return value;
 }
 
-function listToMarkdown(prefix, nodes) {
+function listToMarkdown(prefix, node) {
+  const items = node.getElementsByTagName('li')
+
+  return items.map(n => liToMarkdown(prefix, n)).join('\n')
+}
+
+function liToMarkdown(prefix, node) {
   // TODO: nested lists
-  return nodes.map((n) => `${prefix} ${n.innerHtml}`).join("\n");
+  console.log("li2md input:", node);
+  return `${prefix} ${node.innerHTML}`
 }
