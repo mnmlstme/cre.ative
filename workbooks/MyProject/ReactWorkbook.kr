@@ -16,7 +16,7 @@ model:
 This workbook contains React expressions
 which we evaluated and render.
 We can write documentation alongside the
-code to discuss what we're doing.
+code to discuss what we&#39;re doing.
 
 Kram supports Markdown for documentation,
 and uses code blocks
@@ -33,13 +33,13 @@ such as CSS like this:
 }
 ```
 
-The `react-redux` platform supports the following languages:
+The <code>react-redux</code> platform supports the following languages:
 
 * HTML
 * CSS
 * Javascript
-* JSX (React extension to JS)
-
+* JSX (React)
+* SVG<br>
 ---
 ```jsx
 <input type="number" defaultValue={asString(count)}/>
