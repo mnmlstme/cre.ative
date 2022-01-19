@@ -5,15 +5,7 @@ const he = require('he')
 import styles from './document.css'
 
 export function Editor(props) {
-  const {
-    className,
-    tagName,
-    options,
-    keymaps,
-    onUpdate,
-    onChange,
-    onSave,
-  } = props
+  const { className, options, keymaps, onUpdate, onChange, onSave } = props
   const [content, setContent] = useState(props.content)
 
   const apply = (action, event, scope) => action(event, scope)
@@ -44,7 +36,7 @@ export function Editor(props) {
       if (value[start] === '<') {
         const vtag = parse_tag_forward(value, start)
         const ptag = parse_tag_forward(prior, start)
-        if (vtag === ptag) {
+        if (vtag === ptag && vtag.length > 0) {
           start += vtag.length
         } else {
           break
@@ -63,7 +55,7 @@ export function Editor(props) {
         const vtag = parse_tag_backward(value, end)
         const ptag = parse_tag_backward(prior, end)
         console.log('parse_tag_backward:', end, vtag, ptag)
-        if (vtag === ptag) {
+        if (vtag === ptag && vtag.length > 0) {
           end -= vtag.length
         } else {
           end++

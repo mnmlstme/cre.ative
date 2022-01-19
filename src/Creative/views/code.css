@@ -53,8 +53,8 @@ dl.specs > dt + dd {
 
 .code {
   font-family: 'IBM Plex Mono', monospace;
-  box-shadow: none !important;
-  pointer-events: none;
+  background: black;
+  color: white;
 }
 
 .nextValue > pre {
@@ -75,45 +75,4 @@ dl.specs > dt + dd {
 .line:empty::after {
   display: inline-block;
   content: ' ';
-}
-
-.codeinput {
-  padding: 0.4em 0.8em;
-  font-size: inherit;
-  font-family: inherit;
-  line-height: inherit;
-  white-space: pre;
-  border: none;
-}
-
-.codeinput::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: -1;
-}
-
-.codeinput:hover::before {
-  background: rgba(0, 0, 0, 0.2);
-}
-
-.codeinput:focus::before {
-  background: rgb(0, 0, 0);
-}
-
-.code + .codeinput {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-  color: transparent;
-  /* v--debugging placement--v **
-  text-shadow: 0 0 5px white;
-  outline: 1px solid cyan;
-  /* ^--debugging placement--^ */
 }

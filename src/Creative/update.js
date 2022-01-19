@@ -91,6 +91,8 @@ export function update(state = initial, action = {}) {
         scene,
       ].join('/')
 
+      debugger
+
       fetch(endpoint, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },

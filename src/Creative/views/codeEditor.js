@@ -2,36 +2,46 @@ import React, { useState } from 'react'
 import { Editor, globalKeymap } from './editor.js'
 import { Highlight } from './highlight.js'
 
+import Prism from 'prismjs'
+import theme from 'prismjs/themes/prism-funky.css'
 import styles from './code.css'
 
 Prism.manual = true
 
 export function CodeEditor(props) {
-  const { mode, lang, onChange, onSave } = props
-  const [content, setContent] = useState(props.content)
+  const { mode, lang, content, onChange, onSave } = props
 
   const keymaps = [languages[lang] || {}, codeKeymap, globalKeymap]
   const options = {
     tagName: 'code',
     spellCheck: false,
+    lang,
+  }
+
+  const handleChange = (s) => {
+    onChange(rawCode(s), lang)
+  }
+
+  const handleSave = (s) => {
+    onSave(rawCode(s))
+  }
+
+  function tidy(html, start, end, change, was) {
+    console.log('CodeEditor#tidy:', start, end, change, was)
+    return highlightCode(rawCode(html), lang)
   }
 
   return (
     <figure className={styles[mode]}>
       <pre className={`language-${lang}`}>
-        <Highlight code={content} language={lang} />
         <Editor
-          className={styles.codeinput}
+          className={styles.code}
           options={options}
           keymaps={keymaps}
-          content={escapeHtml(content)}
-          onChange={onChange}
-          onSave={onSave}
-          onUpdate={(s) => {
-            const t = tidy(s)
-            setContent(t)
-            return t
-          }}
+          content={highlightCode(content, lang)}
+          onChange={handleChange}
+          onSave={handleSave}
+          onUpdate={tidy}
         />
       </pre>
       <figcaption>
@@ -44,16 +54,39 @@ export function CodeEditor(props) {
   )
 }
 
-function tidy(content) {
-  return unescapeHtml(content)
-}
-
 function escapeHtml(unsafe) {
   return unsafe.replace(/</g, '&lt;').replace(/>/g, '&gt;')
 }
 
 function unescapeHtml(safe) {
   return safe.replace(/<br>/g, '\n').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+}
+
+function rawCode(html) {
+  const parser = new DOMParser()
+  const doc = parser.parseFromString(html, 'text/html')
+  const code = doc.body.innerText
+
+  console.log('CodeEditor changed:', code)
+
+  return code
+}
+
+function highlightCode(code, lang) {
+  return Prism.highlight(code, Prism.languages[lang], lang)
+    .replace(/\<span class="([\sa-z-]+)"\>/g, replaceThemeClasses)
+    .split('\n')
+    .map((line) => `<span class="${styles.line}">${line}</span>`)
+    .join('\n')
+}
+
+function replaceThemeClasses(match, className) {
+  const classes = className
+    .split(/\s+/)
+    .map((cls) => theme[cls] || cls)
+    .join(' ')
+
+  return match.replace(className, classes)
 }
 
 const codeKeymap = {}
