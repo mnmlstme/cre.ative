@@ -20,8 +20,8 @@ export function Document({ workbook, doUpdate, doSave }) {
 
                 return (
                   <Edit
+                    mode={mode}
                     key={index}
-                    className={styles[mode]}
                     lang={lang}
                     content={text}
                     onChange={(s, lang) => doUpdate(index, mode, s, lang)}

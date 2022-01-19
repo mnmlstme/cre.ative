@@ -1,7 +1,7 @@
 import React from 'react'
 import Prism from 'prismjs'
 import theme from 'prismjs/themes/prism-funky.css'
-import styles from './document.css'
+import styles from './code.css'
 
 export function Highlight({ code, language }) {
   const verbatim = {

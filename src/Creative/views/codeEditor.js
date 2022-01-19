@@ -1,13 +1,14 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Editor, globalKeymap } from './editor.js'
 import { Highlight } from './highlight.js'
 
-import styles from './document.css'
+import styles from './code.css'
 
 Prism.manual = true
 
 export function CodeEditor(props) {
-  const { className, lang, content, onChange, onSave } = props
+  const { mode, lang, onChange, onSave } = props
+  const [content, setContent] = useState(props.content)
 
   const keymaps = [languages[lang] || {}, codeKeymap, globalKeymap]
   const options = {
@@ -16,7 +17,7 @@ export function CodeEditor(props) {
   }
 
   return (
-    <figure className={className}>
+    <figure className={styles[mode]}>
       <pre className={`language-${lang}`}>
         <Highlight code={content} language={lang} />
         <Editor
@@ -26,7 +27,11 @@ export function CodeEditor(props) {
           content={escapeHtml(content)}
           onChange={onChange}
           onSave={onSave}
-          onUpdate={tidy}
+          onUpdate={(s) => {
+            const t = tidy(s)
+            setContent(t)
+            return t
+          }}
         />
       </pre>
       <figcaption>
@@ -39,7 +44,7 @@ export function CodeEditor(props) {
   )
 }
 
-function tidy(content, previous) {
+function tidy(content) {
   return unescapeHtml(content)
 }
 

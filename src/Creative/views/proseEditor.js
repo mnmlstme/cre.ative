@@ -1,6 +1,6 @@
 import React from 'react'
 import { Editor, globalKeymap } from './editor.js'
-
+import styles from './prose.css'
 export function ProseEditor(props) {
   const { className, content, onChange, onSave } = props
 
@@ -12,7 +12,7 @@ export function ProseEditor(props) {
 
   return (
     <Editor
-      className={className}
+      className={styles.prose}
       options={options}
       content={content}
       keymaps={keymaps}
@@ -23,29 +23,12 @@ export function ProseEditor(props) {
   )
 }
 
-function tidy(content, start, end, replacement, was) {
-  console.log('ProseEditor#tidy:', start, end, replacement, was)
+function tidy(content, start, end, change, was) {
+  console.log('ProseEditor#tidy:', start, end, change, was)
 
-  // Here we try to catch and normalize all the crazy things browsers put in.
-  // TODO: a more holistic approach to this.
+  // remove redundant <br> before an end tag
+  change = change.replace(/<br><\/(div|p|h1|h2|h3|li)>/, '</$1>')
 
-  switch (replacement) {
-    case '<div><br></div>':
-    case '<div><br></div>\n':
-      replacement = '<p></p>\n'
-      break
-    case '</p><p>':
-    case '<br></p><p>':
-    case ' <br></p><p>':
-      replacement = '</p>\n<p>'
-      break
-    case '</h1><h1>':
-    case '<br></h1><h1>':
-    case ' <br></h1><h1>':
-      replacement = '</h1>\n<h1>'
-      break
-  }
-
-  return content.slice(0, start) + replacement + content.slice(end)
+  return content.slice(0, start) + change + content.slice(end)
 }
 const proseKeymap = {}

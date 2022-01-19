@@ -16,9 +16,17 @@ export function Editor(props) {
   } = props
   const [content, setContent] = useState(props.content)
 
+  const apply = (action, event, scope) => action(event, scope)
+
+  const builtins = {
+    content,
+    setContent,
+    saveContent: onSave,
+  }
+
   const handleKeyDown = (e) => {
-    const fn = resolveKey(e, keymaps)
-    fn && fn(e, { content, setContent })
+    const action = resolveKey(e, keymaps)
+    action && apply(action, e, builtins)
   }
 
   const handleKeyUp = (e) => {
@@ -82,7 +90,7 @@ export function Editor(props) {
 
   const handleBlur = (e) => {
     //debugger
-    onSave(e)
+    //onSave(e)
   }
 
   return (
@@ -195,5 +203,5 @@ export const globalKeymap = {
 
 const actions = {
   'do-nothing': () => null,
-  finished: ({ target }) => target.blur(),
+  finished: (ev, { saveContent }) => saveContent(),
 }
