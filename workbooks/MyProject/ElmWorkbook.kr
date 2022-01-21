@@ -8,7 +8,7 @@ model:
   hello: Hello, world
 ---
 ```elm
-Html.p [ class "hi" ]
+Html.div [ class "hi" ]
   [Html.text hello]
 ```
 
@@ -16,8 +16,8 @@ Html.p [ class "hi" ]
 
 We can write Html expressions in Elm and have them rendered.
 <br>
+
 ### subtitle
-<br>
 
 We can also pull in CSS classes and reference them using the <code>class</code> attribute.
 

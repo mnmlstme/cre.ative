@@ -5,8 +5,8 @@ const he = require('he')
 import styles from './document.css'
 
 export function Editor(props) {
-  const { className, options, keymaps, onUpdate, onChange, onSave } = props
-  const [content, setContent] = useState(props.content)
+  const { className, options, keymaps, onChange, onSave } = props
+  const [content, setContent] = useState(props.initialContent)
 
   const apply = (action, event, scope) => action(event, scope)
 
@@ -27,57 +27,9 @@ export function Editor(props) {
   }
 
   const handleChange = (e) => {
-    const value = he.decode(e.target.value)
-    const prior = he.decode(content)
-    const shortest = Math.min(prior.length, value.length)
-
-    let start = 0
-    while (start < shortest && value[start] === prior[start]) {
-      if (value[start] === '<') {
-        const vtag = parse_tag_forward(value, start)
-        const ptag = parse_tag_forward(prior, start)
-        if (vtag === ptag && vtag.length > 0) {
-          start += vtag.length
-        } else {
-          break
-        }
-      } else {
-        start++
-      }
-    }
-
-    let end = -1
-    while (
-      shortest + end > start &&
-      value[value.length + end] === prior[prior.length + end]
-    ) {
-      if (value[value.length + end] === '>') {
-        const vtag = parse_tag_backward(value, end)
-        const ptag = parse_tag_backward(prior, end)
-        console.log('parse_tag_backward:', end, vtag, ptag)
-        if (vtag === ptag && vtag.length > 0) {
-          end -= vtag.length
-        } else {
-          end++
-          break
-        }
-      } else {
-        end--
-      }
-    }
-
-    const s = onUpdate(
-      value,
-      start,
-      value.length + end + 1,
-      value.slice(start, value.length + end + 1),
-      prior.slice(start, prior.length + end + 1)
-    )
-
-    console.log('onUpdate returns ', s)
-
-    setContent(s)
-    onChange(s)
+    const html = e.target.value
+    setContent(html)
+    onChange(html)
   }
 
   const handleBlur = (e) => {
@@ -88,7 +40,7 @@ export function Editor(props) {
   return (
     <ContentEditable
       className={className}
-      tagName={options.tagname || 'code'}
+      tagName={options.tagName || 'code'}
       html={content}
       spellCheck={options.spellCheck}
       lang={options.lang || 'zxx'}
@@ -98,28 +50,6 @@ export function Editor(props) {
       onKeyUp={handleKeyUp}
     />
   )
-}
-
-function parse_tag_forward(s, start) {
-  // TODO: make tag parsing more robust
-  const end = s.indexOf('>', start + 1)
-
-  return s.slice(start, end + 1)
-}
-
-function parse_tag_backward(s, end) {
-  // TODO: make tag parsing more robust
-  let start = end - 1
-
-  if (start < 0) {
-    start = s.length + start
-  }
-
-  while (start > 0 && s[start] !== '<') {
-    start--
-  }
-
-  return s.slice(start, end + 1)
 }
 
 function resolveKey(e, keymaps) {

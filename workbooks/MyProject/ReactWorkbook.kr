@@ -8,7 +8,9 @@ model:
   hello: Hello, world
 ---
 ```jsx
-<p className="hi">{ hello }</p>
+<p className="hi">{ hello + hello  }</p>
+
+
 ```
 
 # Hello, World
@@ -27,7 +29,7 @@ such as CSS like this:
 
 ```css
 .hi {
-  font-family: Georgia;
+  font-family: Impact;
   color: #835cf0;
   font-size: 4rem;
 }

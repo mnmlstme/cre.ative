@@ -2,15 +2,13 @@ import React, { useState } from 'react'
 import { Editor, globalKeymap } from './editor.js'
 import { Highlight } from './highlight.js'
 
-import Prism from 'prismjs'
-import theme from 'prismjs/themes/prism-funky.css'
 import styles from './code.css'
 
 Prism.manual = true
 
 export function CodeEditor(props) {
   const { mode, lang, content, onChange, onSave } = props
-
+  const [transient, setTransient] = useState(content)
   const keymaps = [languages[lang] || {}, codeKeymap, globalKeymap]
   const options = {
     tagName: 'code',
@@ -18,30 +16,23 @@ export function CodeEditor(props) {
     lang,
   }
 
-  const handleChange = (s) => {
-    onChange(rawCode(s), lang)
-  }
-
-  const handleSave = (s) => {
-    onSave(rawCode(s))
-  }
-
-  function tidy(html, start, end, change, was) {
-    console.log('CodeEditor#tidy:', start, end, change, was)
-    return highlightCode(rawCode(html), lang)
+  const handleChange = (html) => {
+    const s = unescapeHtml(html)
+    setTransient(s)
+    onChange(s, lang)
   }
 
   return (
     <figure className={styles[mode]}>
       <pre className={`language-${lang}`}>
+        <Highlight code={transient} language={lang} />
         <Editor
           className={styles.code}
           options={options}
           keymaps={keymaps}
-          content={highlightCode(content, lang)}
+          initialContent={escapeHtml(content)}
           onChange={handleChange}
-          onSave={handleSave}
-          onUpdate={tidy}
+          onSave={onSave}
         />
       </pre>
       <figcaption>
@@ -60,33 +51,6 @@ function escapeHtml(unsafe) {
 
 function unescapeHtml(safe) {
   return safe.replace(/<br>/g, '\n').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
-}
-
-function rawCode(html) {
-  const parser = new DOMParser()
-  const doc = parser.parseFromString(html, 'text/html')
-  const code = doc.body.innerText
-
-  console.log('CodeEditor changed:', code)
-
-  return code
-}
-
-function highlightCode(code, lang) {
-  return Prism.highlight(code, Prism.languages[lang], lang)
-    .replace(/\<span class="([\sa-z-]+)"\>/g, replaceThemeClasses)
-    .split('\n')
-    .map((line) => `<span class="${styles.line}">${line}</span>`)
-    .join('\n')
-}
-
-function replaceThemeClasses(match, className) {
-  const classes = className
-    .split(/\s+/)
-    .map((cls) => theme[cls] || cls)
-    .join(' ')
-
-  return match.replace(className, classes)
 }
 
 const codeKeymap = {}

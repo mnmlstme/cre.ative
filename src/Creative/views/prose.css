@@ -49,6 +49,11 @@
   margin-top: 2em;
 }
 
+.prose ul,
+.prose ol {
+  padding-left: 1em;
+}
+
 .prose code {
   color: #74ec70;
   font-family: 'IBM Plex Mono', monospace;
@@ -94,4 +99,12 @@
 
 .prose > h3::before {
   content: 'H3';
+}
+
+.prose > ul::before {
+  content: 'UL';
+}
+
+.prose > ol::before {
+  content: 'OL';
 }
