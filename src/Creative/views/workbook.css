@@ -10,7 +10,7 @@
   position: fixed;
   width: 100vw;
   height: 100vh;
-  background: radial-gradient(circle at right, #fff, #fff 50vw, #203f48 100vw);
+  background: radial-gradient(circle at right, #fff, #fff 30vw, #203f48 60vw);
   padding-bottom: 2rem;
 }
 
@@ -111,11 +111,17 @@
 
 .container > ol > li {
   /* rendered view */
+  display: flex;
   grid-row-start: view;
   place-self: center;
   overflow: visible;
-  place-self: center;
   overflow: visible;
   max-width: 50vw;
   transform: translate(25vw, -100vh);
+  background: white;
+  box-shadow: 0 0 3rem rgb(40 40 40 / 50%);
+  border-radius: 2rem;
+  padding: 2rem;
+  width: 50vw;
+  height: 50vw;
 }

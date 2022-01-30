@@ -1,0 +1,5 @@
+.editor {
+  position: relative;
+  caret-color: yellow;
+  caret-shape: block;
+}

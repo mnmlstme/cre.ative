@@ -1,88 +1,209 @@
-import React, { useState } from 'react'
-import ContentEditable from 'react-contenteditable'
+import React from 'react'
 const he = require('he')
+import { Popup } from './popup'
 
-import styles from './document.css'
+import styles from './editor.css'
 
-export function Editor(props) {
-  const { className, options, keymaps, onChange, onSave } = props
-  const [content, setContent] = useState(props.initialContent)
+export class Editor extends React.Component {
+  constructor(props) {
+    const { initialContent, onSave } = props
 
-  const apply = (action, event, scope) => action(event, scope)
+    super(props)
 
-  const builtins = {
-    content,
-    setContent,
-    saveContent: onSave,
+    this.state = {
+      content: normalizeHTML(initialContent),
+      popup: null,
+    }
+
+    this.root = React.createRef()
+
+    this.setContent = (html) => this.setState({ content: html })
+
+    this.handleChange = this.handleChange.bind(this)
+    this.handleKeyEvent = this.handleKeyEvent.bind(this)
+    this.handleBlur = this.handleBlur.bind(this)
+    this.handleSelectionChange = this.handleSelectionChange.bind(this)
+
+    this.keymaps = (props.keymaps || []).concat([coreKeymap])
+
+    const primitiveBindings = {
+      // the following can be invoked from actions
+      'get-root-node': () => this.root.current,
+
+      'get-selection': () => document.getSelection(),
+
+      'save-content': onSave,
+
+      'user-select-action': (_, options) =>
+        this.setState({
+          popup: {
+            options,
+            keymap: Object.fromEntries(options.map((o) => [o.key, o.action])),
+          },
+        }),
+    }
+
+    this.bound = (props.bindings || [])
+      .concat([coreBindings])
+      .reverse()
+      .reduce(
+        (bound, bindings) => Object.assign({}, bound, bindings),
+        primitiveBindings
+      )
   }
 
-  const handleKeyDown = (e) => {
-    const action = resolveKey(e, keymaps)
-    action && apply(action, e, builtins)
+  invokeWithCurrentContext(context, action, argsPassed = []) {
+    const fn = typeof action === 'function' ? action : action.fn
+
+    return fn.call(null, context, argsPassed)
   }
 
-  const handleKeyUp = (e) => {
-    // resolve Key Up events to cancel default behaviors
-    resolveKey(e, keymaps)
+  invokeWithNewContext(init, action, argsPassed = []) {
+    const newContext = this.createContext(init)
+
+    return this.invokeWithCurrentContext(newContext, action, argsPassed)
   }
 
-  const handleChange = (e) => {
-    const html = e.target.value
-    setContent(html)
-    onChange(html)
+  createContext(init = {}) {
+    const invoke = (fname, ...args) => {
+      const newContext = this.createContext(init)
+
+      return this.invokeWithCurrentContext(newContext, this.bound[fname], args)
+    }
+
+    return Object.assign({ invoke }, init)
   }
 
-  const handleBlur = (e) => {
-    //debugger
-    //onSave(e)
-  }
+  invokeOnEvent(e, action) {}
 
-  return (
-    <ContentEditable
-      className={className}
-      tagName={options.tagName || 'code'}
-      html={content}
-      spellCheck={options.spellCheck}
-      lang={options.lang || 'zxx'}
-      onChange={handleChange}
-      onBlur={handleBlur}
-      onKeyDown={handleKeyDown}
-      onKeyUp={handleKeyUp}
-    />
-  )
-}
-
-function resolveKey(e, keymaps) {
-  switch (e.key) {
-    case 'Shift':
-    case 'Meta':
-    case 'Alt':
-    case 'Control':
+  handleKeyEvent(e) {
+    if (['Shift', 'Meta', 'Alt', 'Control'].includes(e.key)) {
       // ignore modifier keys
-      return null
-    default:
-    // continue
+      return
+    }
+
+    const keymaps = this.popup
+      ? [this.popup.keymap].concat(this.keymaps)
+      : this.keymaps
+    const fname = lookupKeyEvent(e, keymaps)
+    const action = this.bound[fname]
+
+    if (action) {
+      const { on, fn } =
+        typeof action === 'function' ? { on: 'keydown', fn: action } : action
+
+      if (on === e.type) {
+        e.preventDefault()
+        e.stopPropagation()
+        this.invokeWithNewContext({ event: e }, fn)
+      }
+    }
   }
 
-  const found = keymaps.reduce(
-    (accum, current) => accum || lookupKey(e, current),
-    null
-  )
+  handleChange(e) {
+    const { onChange } = this.props
+    const html = normalizeHTML(e.target.innerHTML)
 
-  console.log('Key binding:', found, e)
+    console.log('handleChange', html)
+    if (html !== this.state.content) {
+      this.setContent(html)
+      onChange && onChange(html)
+    } else {
+      debugger
+    }
+  }
 
-  const action = found ? actions[found] : null
+  handleSelectionChange(e) {
+    const range = e.target.getSelection().getRangeAt(0)
+    console.log('SelectionChange', range)
+  }
 
-  if (action) {
-    e.preventDefault()
-    e.stopPropagation()
-    return action
-  } else {
-    return () => null
+  handleBlur(e) {
+    const selection = document.getSelection()
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    const { className, tagName } = this.props
+    const { content, popup } = this.state
+    const el = this.root.current
+
+    if (!el) {
+      return true
+    }
+
+    if (nextState.content !== normalizeHTML(el.innerHTML)) {
+      console.log('Content Updated', content, el.innerHTML)
+      return true
+    }
+
+    if (popup !== nextState.popup) {
+      console.log('popup changed')
+      return true
+    }
+
+    return className !== nextProps.className || tagName !== nextProps.tagName
+  }
+
+  render() {
+    const { className, tagName, disabled, spellCheck, lang } = this.props
+    const { content, popup } = this.state
+
+    return (
+      <div className={styles.editor}>
+        <Popup options={popup && popup.options} />
+        {React.createElement(tagName || 'code', {
+          className,
+          spellCheck,
+          lang: lang || 'zxx',
+          contentEditable: !disabled,
+          onInput: this.handleChange,
+          onKeyDown: this.handleKeyEvent,
+          onKeyUp: this.handleKeyEvent,
+          onBlur: this.handleBlur,
+          ref: this.root,
+          dangerouslySetInnerHTML: { __html: content },
+        })}
+      </div>
+    )
+  }
+
+  componentDidMount() {
+    const el = this.root.current
+    this.setContent(el.innerHTML)
+
+    document.addEventListener('selectionchange', this.handleSelectionChange)
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('selectionchange', this.handleSelectionChange)
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    const el = this.root.current
+    const { content } = this.state
+
+    console.log(
+      'componentDidUpdate',
+      this.props,
+      prevProps,
+      this.state,
+      prevState
+    )
+
+    if (content !== el.innerHTML) {
+      el.innerHTML = content
+    }
   }
 }
 
-function lookupKey({ key, shiftKey, ctrlKey, altKey, metaKey }, keymap) {
+function normalizeHTML(s) {
+  return he.decode(s)
+}
+
+function lookupKeyEvent(
+  { key, type, shiftKey, ctrlKey, altKey, metaKey },
+  keymaps
+) {
   const code = [
     altKey && 'Opt-', // Alt on windows
     metaKey && 'Cmd-', // Windows key on windows
@@ -93,13 +214,15 @@ function lookupKey({ key, shiftKey, ctrlKey, altKey, metaKey }, keymap) {
     .filter((s) => !!s)
     .join('')
 
-  console.log('Keypress:', code)
+  console.log('Key Event:', type, code)
 
-  return keymap[code]
+  const fname = keymaps.reduce((accum, current) => accum || current[code], null)
+
+  return fname
 }
 
-export const globalKeymap = {
-  Tab: 'do-nothing',
+const coreKeymap = {
+  Tab: 'do_nothing',
   'S-Enter': 'finished',
   // Most (all?) browsers have good defaults for the following.
   // We list them here so we don't accidentally override them.
@@ -123,7 +246,9 @@ export const globalKeymap = {
   '^v': null, // page down
 }
 
-const actions = {
-  'do-nothing': () => null,
-  finished: (ev, { saveContent }) => saveContent(),
+function coreBindings({ invoke }) {
+  return {
+    'do-nothing': () => null,
+    finished: ({ invoke }) => invoke('save-content'),
+  }
 }

@@ -24,20 +24,27 @@
 }
 
 .define > pre[class*='language-'] {
-  background: none;
+  background: inherit;
 }
 
 .highlight,
 .code {
   font-family: 'IBM Plex Mono', monospace;
-  background: none;
   color: white;
 }
 
-.highlight + .code {
+.highlight {
   position: absolute;
   top: 0;
   left: 0;
+}
+
+.define code.highlight {
+  box-shadow: none;
+  background: transparent;
+}
+
+.code {
   color: transparent;
 }
 
@@ -45,7 +52,7 @@
   min-height: calc(5 * 1.25em + 1rem);
 }
 
-.line {
+.eval .line {
   width: max-content;
   white-space: inherit;
   background: inherit;

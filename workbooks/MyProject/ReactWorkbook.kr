@@ -8,9 +8,7 @@ model:
   hello: Hello, world
 ---
 ```jsx
-<p className="hi">{ hello + hello  }</p>
-
-
+<p className="hi">{ hello }</p>
 ```
 
 # Hello, World
@@ -24,12 +22,13 @@ Kram supports Markdown for documentation,
 and uses code blocks
 to separate code from documentation.
 
-We can also put code in other languages,
+We can also put code in <br>
+other languages,
 such as CSS like this:
 
 ```css
 .hi {
-  font-family: Impact;
+  font-family: Georgia;
   color: #835cf0;
   font-size: 4rem;
 }

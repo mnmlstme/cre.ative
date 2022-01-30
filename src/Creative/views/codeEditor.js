@@ -1,48 +1,61 @@
-import React, { useState } from 'react'
-import { Editor, globalKeymap } from './editor.js'
+import React from 'react'
+import { Editor, coreKeymap } from './editor.js'
 import { Highlight } from './highlight.js'
 
 import styles from './code.css'
 
 Prism.manual = true
 
-export function CodeEditor(props) {
-  const { mode, lang, content, onChange, onSave } = props
-  const [transient, setTransient] = useState(content)
-  const keymaps = [languages[lang] || {}, codeKeymap, globalKeymap]
-  const options = {
-    tagName: 'code',
-    spellCheck: false,
-    lang,
+export class CodeEditor extends React.Component {
+  constructor(props) {
+    const { lang, content } = props
+    super(props)
+
+    this.state = {
+      transient: content,
+    }
+
+    this.handleChange = this.handleChange.bind(this)
+    this.keymaps = [languages[lang] || {}, codeKeymap]
   }
 
-  const handleChange = (html) => {
+  handleChange(html) {
+    const { onChange } = this.props
     const s = unescapeHtml(html)
-    setTransient(s)
-    onChange(s, lang)
+    this.setState({ transient: s })
+    onChange && onChange(s, this.props.lang)
   }
 
-  return (
-    <figure className={styles[mode]}>
-      <pre className={`language-${lang}`}>
-        <Highlight code={transient} language={lang} />
-        <Editor
-          className={styles.code}
-          options={options}
-          keymaps={keymaps}
-          initialContent={escapeHtml(content)}
-          onChange={handleChange}
-          onSave={onSave}
-        />
-      </pre>
-      <figcaption>
-        <dl className={styles.specs}>
-          <dt>Language</dt>
-          <dd>{lang}</dd>
-        </dl>
-      </figcaption>
-    </figure>
-  )
+  render() {
+    const { mode, lang, content, onChange, onSave } = this.props
+    const { transient } = this.state
+
+    console.log('CodeEditor render...')
+
+    return (
+      <figure className={styles[mode]}>
+        <pre className={`language-${lang}`}>
+          <Highlight code={transient} language={lang} />
+          <Editor
+            className={styles.code}
+            tagName="code"
+            spellCheck={false}
+            lang={lang}
+            keymaps={this.keymaps}
+            initialContent={escapeHtml(content)}
+            onChange={this.handleChange}
+            onSave={onSave}
+          />
+        </pre>
+        <figcaption>
+          <dl className={styles.specs}>
+            <dt>Language</dt>
+            <dd>{lang}</dd>
+          </dl>
+        </figcaption>
+      </figure>
+    )
+  }
 }
 
 function escapeHtml(unsafe) {
