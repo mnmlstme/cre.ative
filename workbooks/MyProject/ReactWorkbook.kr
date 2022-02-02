@@ -14,15 +14,15 @@ model:
 # Hello, World
 
 This workbook contains React expressions
-which we evaluated and render.
+which we evaluate and render.
 We can write documentation alongside the
-code to discuss what we&#39;re doing.
+code to discuss what we're doing.
 
 Kram supports Markdown for documentation,
 and uses code blocks
 to separate code from documentation.
 
-We can also put code in <br>
+We can also put code in
 other languages,
 such as CSS like this:
 

@@ -1,5 +1,10 @@
 .editor {
   position: relative;
+  overflow: visible;
   caret-color: yellow;
-  caret-shape: block;
+}
+
+.focus {
+  color: white;
+  background: black;
 }

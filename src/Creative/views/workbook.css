@@ -10,7 +10,7 @@
   position: fixed;
   width: 100vw;
   height: 100vh;
-  background: radial-gradient(circle at right, #fff, #fff 30vw, #203f48 60vw);
+  background: radial-gradient(circle at 75% 25%, #d38a01, #0d0841 60vw);
   padding-bottom: 2rem;
 }
 
@@ -103,8 +103,7 @@
   /* document view */
   grid-row-start: doc;
   align-self: end;
-  overflow-x: hidden;
-  overflow-y: auto;
+  overflow: visible;
   margin-bottom: 1.5rem;
   max-width: 50vw;
 }
@@ -113,15 +112,14 @@
   /* rendered view */
   display: flex;
   grid-row-start: view;
-  place-self: center;
-  overflow: visible;
-  overflow: visible;
+  overflow: auto;
   max-width: 50vw;
-  transform: translate(25vw, -100vh);
+  transform: translate(50vw, -100vh);
   background: white;
   box-shadow: 0 0 3rem rgb(40 40 40 / 50%);
   border-radius: 2rem;
   padding: 2rem;
   width: 50vw;
-  height: 50vw;
+  height: 50vh;
+  margin: 2rem 0 0 -2rem;
 }
