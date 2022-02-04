@@ -410,7 +410,7 @@ function keyCombo({ key, shiftKey, ctrlKey, altKey, metaKey }) {
   const code = [
     altKey && 'Opt-', // Alt on windows
     metaKey && 'Cmd-', // Windows key on windows
-    shiftKey && 'S-',
+    shiftKey && key.length > 1 && 'S-',
     ctrlKey && '^',
     key,
   ]
