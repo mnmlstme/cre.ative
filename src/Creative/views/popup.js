@@ -23,7 +23,9 @@ export class Popup extends React.Component {
     const Item = (opt) => (
       <li key={opt.key}>
         <button
-          className={styles.action}
+          className={[styles.action]
+            .concat(opt.description ? [styles.tool] : [])
+            .join(' ')}
           data-tip={opt.description}
           onClick={(e) => {
             e.preventDefault()
