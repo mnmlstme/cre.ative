@@ -28,20 +28,19 @@ export class Editor extends React.Component {
 
     this.keymaps = (props.keymaps || []).concat([coreKeymap])
 
-    const primitiveBindings = {
+    let primitives = {
       // the following can be invoked from actions
-      'get-root-node': () => this.root.current,
+      getRootNode: () => this.root.current,
 
-      'get-selection-range': () => this.state.range,
+      getSelectionRange: () => this.state.range,
 
-      'get-blocks-in-focus': () => selectedBlocks(this.state.range),
+      getBlocksInFocus: () => selectedBlocks(this.state.range),
 
-      'save-content': onSave,
+      saveContent: onSave,
 
-      'user-select-action': (_, options) =>
-        this.setState({ popup: { options } }),
+      userSelectAction: (options) => this.setState({ popup: { options } }),
 
-      'modify-block-tag': (_, [tag, parentTag, el]) => {
+      modifyBlockTag: (tag, parentTag, el) => {
         if (el.tagName !== tag) {
           this.saveExcursion(() => {
             const parentEl = el.parentNode
@@ -65,13 +64,11 @@ export class Editor extends React.Component {
       },
     }
 
-    this.bound = (props.bindings || [])
-      .concat([coreBindings])
-      .reverse()
-      .reduce(
-        (bound, bindings) => Object.assign({}, bound, bindings),
-        primitiveBindings
-      )
+    this._agent = createAgent(primitives, coreBindings.concat(props.exposing))
+  }
+
+  getAgent() {
+    return this._agent
   }
 
   saveExcursion(thunk) {
@@ -118,7 +115,7 @@ export class Editor extends React.Component {
   invokeWithCurrentContext(context, action, argsPassed = []) {
     const fn = typeof action === 'function' ? action : action.fn
 
-    return fn.call(null, context, argsPassed)
+    return fn.call(context, ...argsPassed)
   }
 
   invokeWithNewContext(init, action, argsPassed = []) {
@@ -127,17 +124,22 @@ export class Editor extends React.Component {
     return this.invokeWithCurrentContext(newContext, action, argsPassed)
   }
 
-  createContext(init = {}) {
-    const invoke = (fname, ...args) => {
-      const newContext = this.createContext(init)
+  createContext(init) {
+    const agent = this.getAgent()
 
-      return this.invokeWithCurrentContext(newContext, this.bound[fname], args)
-    }
-
-    return Object.assign({ invoke }, init)
+    return agent.setContext(init)
   }
 
-  invokeOnEvent(e, action) {}
+  invokeOnEvent(e, action, defaultOn = 'keydown') {
+    const { on, fn } =
+      typeof action === 'function' ? { on: defaultOn, fn: action } : action
+
+    if (on === e.type) {
+      e.preventDefault()
+      e.stopPropagation()
+      this.invokeWithNewContext({ event: e }, fn)
+    }
+  }
 
   handleKeyEvent(e) {
     if (['Shift', 'Meta', 'Alt', 'Control'].includes(e.key)) {
@@ -148,18 +150,10 @@ export class Editor extends React.Component {
     if (this.state.popup) {
       this.handlePopupKeyEvent(e)
     } else {
-      const fname = lookupKeyEvent(e, this.keymaps)
-      const action = this.bound[fname]
+      const action = lookupKeyEvent(e, this.keymaps)
 
       if (action) {
-        const { on, fn } =
-          typeof action === 'function' ? { on: 'keydown', fn: action } : action
-
-        if (on === e.type) {
-          e.preventDefault()
-          e.stopPropagation()
-          this.invokeWithNewContext({ event: e }, fn)
-        }
+        this.invokeOnEvent(e, action, 'keydown')
       }
     }
   }
@@ -176,13 +170,12 @@ export class Editor extends React.Component {
 
         if (chosen) {
           console.log('User Selected', chosen.name)
-          chosen.action.call()
           this.setState({ popup: null })
+          this.invokeOnEvent(e, chosen.action, 'keyup')
         } else {
           console.log('!!! Invalid key, try again')
           // TODO: beep or flash the popup or something
         }
-      // and continue...
       default:
         e.preventDefault()
         e.stopPropagation()
@@ -225,7 +218,7 @@ export class Editor extends React.Component {
 
   handlePopupSelection(opt) {
     this.setState({ popup: null })
-    opt && opt.action.call(this)
+    opt && this.invokeWithNewContext({}, opt.action)
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -324,6 +317,27 @@ export class Editor extends React.Component {
   }
 }
 
+function createAgent(primitives, bindings) {
+  // primitives are already bound to the editor
+  // bindings will be bound to the agent
+
+  let context = {}
+  let agent = {
+    getContext: () => context,
+    setContext: (init) => {
+      context = Object.assign({}, init)
+      return agent
+    },
+  }
+  const boundEntries = bindings
+    .filter((fn) => typeof fn === 'function')
+    .map((fn) => [fn.displayName || fn.name, fn.bind(agent)])
+
+  Object.assign(agent, primitives, Object.fromEntries(boundEntries))
+
+  return agent
+}
+
 function normalizeHTML(s) {
   return he.decode(s)
 }
@@ -420,11 +434,17 @@ function keyCombo({ key, shiftKey, ctrlKey, altKey, metaKey }) {
   return code
 }
 
+function doNothing() {}
+
+function finished() {
+  this.saveContent()
+}
+
 const coreKeymap = {
-  Tab: 'do-nothing',
-  'S-Enter': 'finished',
+  Tab: doNothing,
+  'S-Enter': finished,
   // Most (all?) browsers have good defaults for the following.
-  // We list them here so we don't bother overriding them.
+  // We list them here to reserve them.
   ArrowUp: null,
   ArrowDown: null,
   ArrowRight: null,
@@ -445,7 +465,4 @@ const coreKeymap = {
   '^v': null, // page down
 }
 
-const coreBindings = {
-  'do-nothing': () => null,
-  finished: ({ invoke }) => invoke('save-content'),
-}
+const coreBindings = [doNothing, finished]
