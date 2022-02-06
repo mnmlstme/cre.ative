@@ -25,7 +25,28 @@ function styleBlock() {
   const blocks = this.getBlocksInFocus()
 
   const fmt = (tag, parentTag) => () =>
-    blocks.map((el) => this.modifyBlockTag(tag, parentTag, el))
+    blocks.map((el) => {
+      if (el.tagName !== tag) {
+        this.saveExcursion(() => {
+          const parentEl = el.parentNode
+
+          let replacement = document.createElement(tag)
+          el.before(replacement)
+
+          while (el.firstChild) {
+            replacement.appendChild(el.firstChild)
+          }
+
+          if (parentTag && (!parentEl || parentTag !== parentEl.tagName)) {
+            let newParent = document.createElement(parentTag)
+            el.before(newParent)
+            newParent.appendChild(replacement)
+          }
+
+          el.remove()
+        })
+      }
+    })
 
   const styleOptions = [
     {
