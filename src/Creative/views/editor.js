@@ -1,6 +1,7 @@
 import React from 'react'
 const he = require('he')
 import { Popup } from './popup'
+import { createAgent, delegateKeyEvent, delegateUserAction } from './agent'
 
 import styles from './editor.css'
 
@@ -16,18 +17,6 @@ export class Editor extends React.Component {
       popup: null,
     }
 
-    this.root = React.createRef()
-
-    this.setContent = (html) => this.setState({ content: html })
-
-    this.handleChange = this.handleChange.bind(this)
-    this.handleKeyEvent = this.handleKeyEvent.bind(this)
-    this.handleBlur = this.handleBlur.bind(this)
-    this.handleSelectionChange = this.handleSelectionChange.bind(this)
-    this.handlePopupSelection = this.handlePopupSelection.bind(this)
-
-    this.keymaps = (props.keymaps || []).concat([coreKeymap])
-
     let primitives = {
       // the following can be invoked from actions
       getRootNode: () => this.root.current,
@@ -38,37 +27,39 @@ export class Editor extends React.Component {
 
       saveContent: onSave,
 
-      userSelectAction: (options) => this.setState({ popup: { options } }),
+      promptWithOptions: this.promptWithOptions.bind(this),
+      cancelPrompt: this.cancelPrompt.bind(this),
 
-      modifyBlockTag: (tag, parentTag, el) => {
-        if (el.tagName !== tag) {
-          this.saveExcursion(() => {
-            const parentEl = el.parentNode
-
-            let replacement = document.createElement(tag)
-            el.before(replacement)
-
-            while (el.firstChild) {
-              replacement.appendChild(el.firstChild)
-            }
-
-            if (parentTag && (!parentEl || parentTag !== parentEl.tagName)) {
-              let newParent = document.createElement(parentTag)
-              el.before(newParent)
-              newParent.appendChild(replacement)
-            }
-
-            el.remove()
-          })
-        }
-      },
+      saveExcursion: this.saveExcursion.bind(this),
     }
 
-    this._agent = createAgent(primitives, coreBindings.concat(props.exposing))
+    let agent = createAgent(
+      primitives,
+      coreBindings.concat(props.exposing),
+      (props.keymaps || []).concat([coreKeymap])
+    )
+
+    this.getAgent = () => agent
+
+    this.root = React.createRef()
+
+    this.setContent = (html) => this.setState({ content: html })
+
+    this.handleChange = this.handleChange.bind(this)
+    this.handleKeyEvent = (e) => delegateKeyEvent(agent, e)
+    this.handleBlur = this.handleBlur.bind(this)
+    this.handleSelectionChange = this.handleSelectionChange.bind(this)
+    this.handlePopupSelection = this.handlePopupSelection.bind(this)
   }
 
-  getAgent() {
-    return this._agent
+  promptWithOptions(options) {
+    this.getAgent().setContext({ options })
+    this.setState({ popup: { options } })
+  }
+
+  cancelPrompt() {
+    this.setState({ popup: null })
+    this.getAgent().clearContext('options')
   }
 
   saveExcursion(thunk) {
@@ -112,76 +103,6 @@ export class Editor extends React.Component {
     })
   }
 
-  invokeWithCurrentContext(context, action, argsPassed = []) {
-    const fn = typeof action === 'function' ? action : action.fn
-
-    return fn.call(context, ...argsPassed)
-  }
-
-  invokeWithNewContext(init, action, argsPassed = []) {
-    const newContext = this.createContext(init)
-
-    return this.invokeWithCurrentContext(newContext, action, argsPassed)
-  }
-
-  createContext(init) {
-    const agent = this.getAgent()
-
-    return agent.setContext(init)
-  }
-
-  invokeOnEvent(e, action, defaultOn = 'keydown') {
-    const { on, fn } =
-      typeof action === 'function' ? { on: defaultOn, fn: action } : action
-
-    if (on === e.type) {
-      e.preventDefault()
-      e.stopPropagation()
-      this.invokeWithNewContext({ event: e }, fn)
-    }
-  }
-
-  handleKeyEvent(e) {
-    if (['Shift', 'Meta', 'Alt', 'Control'].includes(e.key)) {
-      // ignore modifier keys on their own
-      return
-    }
-
-    if (this.state.popup) {
-      this.handlePopupKeyEvent(e)
-    } else {
-      const action = lookupKeyEvent(e, this.keymaps)
-
-      if (action) {
-        this.invokeOnEvent(e, action, 'keydown')
-      }
-    }
-  }
-
-  handlePopupKeyEvent(e) {
-    const code = keyCombo(e)
-    const { options } = this.state.popup
-
-    console.log('popup key event', e.type, code)
-
-    switch (e.type) {
-      case 'keyup':
-        const chosen = options.find((opt) => opt.key === code)
-
-        if (chosen) {
-          console.log('User Selected', chosen.name)
-          this.setState({ popup: null })
-          this.invokeOnEvent(e, chosen.action, 'keyup')
-        } else {
-          console.log('!!! Invalid key, try again')
-          // TODO: beep or flash the popup or something
-        }
-      default:
-        e.preventDefault()
-        e.stopPropagation()
-    }
-  }
-
   handleChange(e) {
     const { onChange } = this.props
     const html = getHTML(e.target)
@@ -217,8 +138,8 @@ export class Editor extends React.Component {
   }
 
   handlePopupSelection(opt) {
-    this.setState({ popup: null })
-    opt && this.invokeWithNewContext({}, opt.action)
+    this.closePrompt()
+    opt && delegateUserAction(this.getAgent(), opt.action)
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -287,7 +208,7 @@ export class Editor extends React.Component {
 
   componentDidMount() {
     const el = this.root.current
-    this.setState({ content: el.innerHTML })
+    this.setState({ content: getHTML(el) })
 
     document.addEventListener('selectionchange', this.handleSelectionChange)
   }
@@ -317,35 +238,17 @@ export class Editor extends React.Component {
   }
 }
 
-function createAgent(primitives, bindings) {
-  // primitives are already bound to the editor
-  // bindings will be bound to the agent
-
-  let context = {}
-  let agent = {
-    getContext: () => context,
-    setContext: (init) => {
-      context = Object.assign({}, init)
-      return agent
-    },
-  }
-  const boundEntries = bindings
-    .filter((fn) => typeof fn === 'function')
-    .map((fn) => [fn.displayName || fn.name, fn.bind(agent)])
-
-  Object.assign(agent, primitives, Object.fromEntries(boundEntries))
-
-  return agent
-}
-
 function normalizeHTML(s) {
   return he.decode(s)
 }
 
-const cleanRE = new RegExp(`<([a-z1-6]+)\\s+class="${styles.focus}"`)
+const cleanRE = new RegExp(
+  `<([a-z1-6]+(\\s+id="[a-zA-Z0-9_-]+")?)\\s+class="(${styles.focus})?"`,
+  'g'
+)
 
 function getHTML(el) {
-  return normalizeHTML(el.innerHTML).replace(cleanRE, '<$1')
+  return normalizeHTML(el.innerHTML).replaceAll(cleanRE, '<$1')
 }
 
 function getSelectionWithin(el) {
@@ -408,30 +311,6 @@ function selectedBlocks(range, root) {
 
 function sameBlocks(a, b) {
   return a.length === b.length && a.every((n, i) => b[i] === n)
-}
-
-function lookupKeyEvent(e, keymaps) {
-  const code = keyCombo(e)
-
-  console.log('Key Event:', e.type, code)
-
-  const fname = keymaps.reduce((accum, current) => accum || current[code], null)
-
-  return fname
-}
-
-function keyCombo({ key, shiftKey, ctrlKey, altKey, metaKey }) {
-  const code = [
-    altKey && 'Opt-', // Alt on windows
-    metaKey && 'Cmd-', // Windows key on windows
-    shiftKey && key.length > 1 && 'S-',
-    ctrlKey && '^',
-    key,
-  ]
-    .filter((s) => !!s)
-    .join('')
-
-  return code
 }
 
 function doNothing() {}

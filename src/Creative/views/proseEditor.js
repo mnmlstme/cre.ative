@@ -64,9 +64,15 @@ function styleBlock() {
       label: '# —',
       description: 'Style as Numbered List',
     },
+    {
+      key: 'Escape',
+      action: this.doNothing,
+      label: 'X',
+      description: 'Escape and close popup.',
+    },
   ]
 
-  this.userSelectAction(styleOptions)
+  this.promptWithOptions(styleOptions)
 }
 
 const proseKeymap = {
