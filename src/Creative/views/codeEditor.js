@@ -58,11 +58,11 @@ export class CodeEditor extends React.Component {
   }
 }
 
-function escapeHtml(unsafe) {
+export function escapeHtml(unsafe) {
   return unsafe.replace(/</g, '&lt;').replace(/>/g, '&gt;')
 }
 
-function unescapeHtml(safe) {
+export function unescapeHtml(safe) {
   return safe.replace(/<br>/g, '\n').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
 }
 

@@ -277,7 +277,7 @@ function closestBlock(el, root) {
   }
 
   if (el) {
-    el = el.closest('section,div,p,h1,h2,h3,li')
+    el = el.closest('section,div,p,h1,h2,h3,li,pre')
   }
 
   return el === root ? null : el

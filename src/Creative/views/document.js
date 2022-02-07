@@ -1,7 +1,8 @@
 import React from 'react'
 import styles from './document.css'
-import { CodeEditor } from './codeEditor'
+import { CodeEditor, escapeHtml } from './codeEditor'
 import { ProseEditor } from './proseEditor'
+import codeStyles from './code.css'
 
 export function Document({ workbook, doUpdate, doSave }) {
   console.log('Document:', workbook.toObject())
@@ -10,25 +11,30 @@ export function Document({ workbook, doUpdate, doSave }) {
   return (
     <ol>
       {scenes.map((scn, i) => {
+        const blocks = scn.blocks.map((blk, j) =>
+          Object.assign(blk, { index: j })
+        )
+        const perform = scn.blocks.find((b) => b.mode === 'eval')
+        const discussion = scn.blocks
+          .filter((b) => b.mode !== 'eval')
+          .map((b) => (b.mode === 'discuss' ? b.text : wrapCode(b)))
+          .join('')
+
         return (
           <li key={i} className={styles.doc}>
-            {scn.blocks
-              .map((blk, j) => Object.assign(blk, { index: j }))
-              .sort(performLast)
-              .map(({ index, mode, lang, text }) => {
-                const Edit = mode === 'discuss' ? ProseEditor : CodeEditor
-
-                return (
-                  <Edit
-                    mode={mode}
-                    key={index}
-                    lang={lang}
-                    content={text}
-                    onChange={(s, lang) => doUpdate(index, mode, s, lang)}
-                    onSave={doSave}
-                  />
-                )
-              })}
+            <ProseEditor
+              mode="discuss"
+              content={discussion}
+              // onChange={(s, lang) => doUpdate(index, mode, s, lang)}
+              doSave={doSave}
+            />
+            <CodeEditor
+              mode={perform.mode}
+              lang={perform.lang}
+              content={perform.text}
+              onChange={(s, lang) => doUpdate(perform.index, mode, s, lang)}
+              onSave={doSave}
+            />
           </li>
         )
       })}
@@ -36,10 +42,8 @@ export function Document({ workbook, doUpdate, doSave }) {
   )
 }
 
-function performLast(a, b) {
-  return a.mode === b.mode || (b.mode !== 'eval' && a.mode !== 'eval')
-    ? a > b
-    : a.mode === 'eval'
-    ? 1
-    : -1
+function wrapCode({ text, lang, mode }) {
+  const code = escapeHtml(text)
+
+  return `<pre lang=${lang}><code class="language-${lang}">${code}</code></pre>\n`
 }
