@@ -5,21 +5,84 @@ import { createAgent, delegateKeyEvent, delegateUserAction } from './agent'
 
 import styles from './editor.css'
 
+export class Block extends React.Component {
+  constructor(props) {
+    super(props)
+
+    const { html } = props
+
+    this.root = React.createRef()
+
+    this.state = {
+      content: he.decode(html || ''),
+    }
+
+    this.handleChange = this.handleChange.bind(this)
+  }
+
+  handleChange(e) {
+    const { onChange } = this.props
+    const html = getHTML(e.target)
+
+    console.log('handleChange', html)
+    if (html !== this.state.content) {
+      this.setState({ content: html })
+      onChange && onChange(html)
+    } else {
+      debugger
+    }
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    const { className, tagName } = this.props
+    const { content } = this.state
+    const el = this.root.current
+    const html = el ? getHTML(el) : ''
+
+    if (!el) {
+      return true
+    }
+
+    if (nextState.content !== html) {
+      console.log('Content changed, should update', nextState.content, html)
+      return true
+    }
+
+    return className !== nextProps.className || tagName !== nextProps.tagName
+  }
+
+  render() {
+    const { className, tagName, spellCheck, lang, disabled } = this.props
+    const { content } = this.state
+
+    return React.createElement(tagName || 'div', {
+      className,
+      spellCheck,
+      lang: lang || 'zxx',
+      contentEditable: !disabled,
+      onInput: this.handleChange,
+      ref: this.root,
+      dangerouslySetInnerHTML: { __html: content },
+    })
+  }
+}
+
 export class Editor extends React.Component {
   constructor(props) {
-    const { initialContent, onSave } = props
+    const { onSave } = props
 
     super(props)
 
+    this.root = React.createRef()
+
     this.state = {
-      content: normalizeHTML(initialContent),
       range: null,
       popup: null,
     }
 
     let primitives = {
       // the following can be invoked from actions
-      getRootNode: () => this.root.current,
+      // getRootNode: () => this.root.current,
 
       getSelectionRange: () => this.state.range,
 
@@ -35,17 +98,12 @@ export class Editor extends React.Component {
 
     let agent = createAgent(
       primitives,
-      coreBindings.concat(props.exposing),
+      coreBindings.concat(props.provides),
       (props.keymaps || []).concat([coreKeymap])
     )
 
     this.getAgent = () => agent
 
-    this.root = React.createRef()
-
-    this.setContent = (html) => this.setState({ content: html })
-
-    this.handleChange = this.handleChange.bind(this)
     this.handleKeyEvent = (e) => delegateKeyEvent(agent, e)
     this.handleBlur = this.handleBlur.bind(this)
     this.handleSelectionChange = this.handleSelectionChange.bind(this)
@@ -93,27 +151,14 @@ export class Editor extends React.Component {
 
     frozen.remove()
 
-    updateFocusForRange(range, this.root.current)
+    // updateFocusForRange(range, this.root.current)
 
     console.log('Save Excursion end', range)
 
     this.setState({
-      content: getHTML(this.root.current),
+      // content: getHTML(this.root.current),
       range,
     })
-  }
-
-  handleChange(e) {
-    const { onChange } = this.props
-    const html = getHTML(e.target)
-
-    console.log('handleChange', html)
-    if (html !== this.state.content) {
-      this.setState({ content: html })
-      onChange && onChange(html)
-    } else {
-      debugger
-    }
   }
 
   handleSelectionChange(e) {
@@ -131,10 +176,10 @@ export class Editor extends React.Component {
   }
 
   handleBlur(e) {
-    const el = this.root.current
-    const range = getSelectionWithin(el)
-
-    updateFocusForRange(range, el)
+    // const el = this.root.current
+    // const range = getSelectionWithin(el)
+    //
+    // updateFocusForRange(range, el)
   }
 
   handlePopupSelection(opt) {
@@ -143,30 +188,18 @@ export class Editor extends React.Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    const { className, tagName } = this.props
-    const { content, popup, range } = this.state
-    const el = this.root.current
-    const html = el ? getHTML(el) : ''
-
-    if (!el) {
-      return true
-    }
-
-    if (nextState.content !== html) {
-      console.log('Content changed, should update', nextState.content, html)
-      return true
-    }
+    const { popup, range } = this.state
 
     if (
       (nextState.range && nextState.range.commonAncestorContainer) !==
       (range && range.commonAncestorContainer)
     ) {
-      console.log(
-        'Selector range changed, should update',
-        nextState.range,
-        range
-      )
-      return true
+      // console.log(
+      //   'Selector range changed, should update',
+      //   nextState.range,
+      //   range
+      // )
+      // return true
     }
 
     if (nextState.popup !== popup) {
@@ -174,42 +207,29 @@ export class Editor extends React.Component {
       return true
     }
 
-    return className !== nextProps.className || tagName !== nextProps.tagName
+    return true
   }
 
   render() {
-    const { className, tagName, disabled, spellCheck, lang } = this.props
-    const { content, popup } = this.state
+    const { className, children } = this.props
+    const { popup } = this.state
     const options = popup && popup.options
+    const classes = [styles.editor].concat(className ? [className] : [])
 
     return (
-      <div className={styles.editor}>
+      <section className={classes.join(' ')} ref={this.root}>
+        {children}
         <Popup
           isOpen={Boolean(options)}
           options={options}
           onSelect={this.handlePopupSelection}
           onClose={() => this.setState({ popup: null })}
         />
-        {React.createElement(tagName || 'code', {
-          className,
-          spellCheck,
-          lang: lang || 'zxx',
-          contentEditable: !disabled,
-          onInput: this.handleChange,
-          onKeyDown: this.handleKeyEvent,
-          onKeyUp: this.handleKeyEvent,
-          onBlur: this.handleBlur,
-          ref: this.root,
-          dangerouslySetInnerHTML: { __html: content },
-        })}
-      </div>
+      </section>
     )
   }
 
   componentDidMount() {
-    const el = this.root.current
-    this.setState({ content: getHTML(el) })
-
     document.addEventListener('selectionchange', this.handleSelectionChange)
   }
 
@@ -217,38 +237,11 @@ export class Editor extends React.Component {
     document.removeEventListener('selectionchange', this.handleSelectionChange)
   }
 
-  componentDidUpdate(prevProps, prevState) {
-    const el = this.root.current
-    const { content, range } = this.state
-
-    console.log(
-      'componentDidUpdate',
-      prevProps,
-      prevState,
-      this.props,
-      this.state
-    )
-
-    if (content !== getHTML(el)) {
-      console.log('DOM got out-of-date', content, 'vs', el)
-      el.innerHTML = content
-    }
-
-    updateFocusForRange(range, el)
-  }
+  componentDidUpdate(prevProps, prevState) {}
 }
-
-function normalizeHTML(s) {
-  return he.decode(s)
-}
-
-const cleanRE = new RegExp(
-  `<([a-z1-6]+(\\s+id="[a-zA-Z0-9_-]+")?)\\s+class="(${styles.focus})?"`,
-  'g'
-)
 
 function getHTML(el) {
-  return normalizeHTML(el.innerHTML).replaceAll(cleanRE, '<$1')
+  return el.innerHTML
 }
 
 function getSelectionWithin(el) {

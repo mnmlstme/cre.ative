@@ -1,61 +1,48 @@
 import React from 'react'
-import { Editor, coreKeymap } from './editor.js'
+import { Editor, Block, coreKeymap } from './editor.js'
 import { Highlight } from './highlight.js'
 
 import styles from './code.css'
 
-Prism.manual = true
+export function CodeEditor(props) {
+  const { block, onChange, onSave } = props
+  const { mode, lang, text } = block
+  const keymaps = [languages[lang] || {}, codeKeymap]
 
-export class CodeEditor extends React.Component {
-  constructor(props) {
-    const { lang, content } = props
-    super(props)
+  console.log('CodeEditor render...')
 
-    this.state = {
-      transient: content,
-    }
+  return (
+    <Editor
+      className={styles[mode]}
+      keymaps={keymaps}
+      provides={{}}
+      onChange={onChange}
+      onSave={onSave}
+    >
+      <CodeBlock code={text} lang={lang} />
+      <footer>
+        <dl className={styles.specs}>
+          <dt>Language</dt>
+          <dd>{lang}</dd>
+        </dl>
+      </footer>
+    </Editor>
+  )
+}
 
-    this.handleChange = this.handleChange.bind(this)
-    this.keymaps = [languages[lang] || {}, codeKeymap]
-  }
-
-  handleChange(html) {
-    const { onChange } = this.props
-    const s = unescapeHtml(html)
-    this.setState({ transient: s })
-    onChange && onChange(s, this.props.lang)
-  }
-
-  render() {
-    const { mode, lang, content, onChange, onSave } = this.props
-    const { transient } = this.state
-
-    console.log('CodeEditor render...')
-
-    return (
-      <figure className={styles[mode]}>
-        <pre className={`language-${lang}`}>
-          <Highlight code={transient} language={lang} />
-          <Editor
-            className={styles.code}
-            tagName="code"
-            spellCheck={false}
-            lang={lang}
-            keymaps={this.keymaps}
-            initialContent={escapeHtml(content)}
-            onChange={this.handleChange}
-            onSave={onSave}
-          />
-        </pre>
-        <figcaption>
-          <dl className={styles.specs}>
-            <dt>Language</dt>
-            <dd>{lang}</dd>
-          </dl>
-        </figcaption>
-      </figure>
-    )
-  }
+export function CodeBlock({ code, lang }) {
+  return (
+    <pre className={`language-${lang}`}>
+      <Block
+        tagName="code"
+        className={styles.code}
+        html={escapeHtml(code)}
+        lang={lang}
+        spellCheck={false}
+      />
+      <Highlight code={code} language={lang} />
+    </pre>
+  )
 }
 
 export function escapeHtml(unsafe) {

@@ -6,10 +6,6 @@
   outline: none;
 }
 
-.prose:focus {
-  outline: 1px solid red;
-}
-
 .prose > * {
   margin-left: 2rem;
   width: 80%;
@@ -17,8 +13,7 @@
 }
 
 .prose > *:focus {
-  color: red;
-  background: yellow;
+  background: black;
 }
 
 .prose > h1,

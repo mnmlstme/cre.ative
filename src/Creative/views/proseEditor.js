@@ -1,23 +1,47 @@
 import React from 'react'
-import { Editor } from './editor.js'
+import { Editor, Block } from './editor.js'
+import { CodeBlock } from './codeEditor'
+import { Highlight } from './highlight.js'
 import styles from './prose.css'
+import codeStyles from './code.css'
 
 export function ProseEditor(props) {
-  const { className, content, onChange, onSave } = props
+  const { blocks, onChange, onSave } = props
+  const parser = new DOMParser()
 
   console.log('ProseEditor render...')
 
   return (
     <Editor
       className={styles.prose}
-      tagName="section"
-      spellCheck={true}
-      initialContent={content}
       keymaps={[proseKeymap]}
-      exposing={[styleBlock]}
+      provides={[styleBlock]}
       onChange={onChange}
       onSave={onSave}
-    />
+    >
+      {blocks.map(({ mode, text, lang }, i) => {
+        switch (mode) {
+          case 'eval':
+          case 'define':
+            return <CodeBlock code={text} lang={lang} />
+          default:
+            if (!text) {
+              return null
+            }
+
+            const doc = parser.parseFromString(text, 'text/html')
+
+            return (
+              <Block
+                key={i}
+                tagName={doc.body.firstChild.tagName.toLowerCase()}
+                html={doc.body.firstChild.innerHTML}
+                spellCheck={true}
+              />
+            )
+        }
+      })}
+    </Editor>
   )
 }
 

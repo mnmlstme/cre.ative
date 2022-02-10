@@ -3,6 +3,8 @@ import Prism from 'prismjs'
 import theme from 'prismjs/themes/prism-funky.css'
 import styles from './code.css'
 
+Prism.manual = true
+
 export function Highlight({ code, language }) {
   const verbatim = {
     __html: Prism.highlight(code, Prism.languages[language], language)
