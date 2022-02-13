@@ -46,7 +46,7 @@ export function update(state = initial, action = {}) {
           filepath: action.filepath,
           isLoaded: true,
           title,
-          scenes: Im.List(scenes),
+          scenes: Im.List(scenes).map(immutableScene),
           modules,
           init,
         })
@@ -68,12 +68,14 @@ export function update(state = initial, action = {}) {
       console.log('update UpdateScene', action)
       const workbook = state.get('workbook') || Im.Map()
       const { scene, block, mode, lang, text } = action
-      const updateFn = (scn) => {
-        scn.blocks.splice(block, 1, { mode, lang, text })
-        return scn
+      const updateFn = (blk) => {
+        return Object.assign({}, blk, { mode, lang, text })
       }
 
-      return state.updateIn(['workbook', 'scenes', scene], updateFn)
+      return state.updateIn(
+        ['workbook', 'scenes', scene, 'blocks', block],
+        updateFn
+      )
     }
 
     case Actions.SaveScene: {
@@ -139,4 +141,13 @@ export function update(state = initial, action = {}) {
       console.log('**** Unhandled action:', action)
       return state
   }
+}
+
+function immutableScene(scene) {
+  const { title, blocks } = scene
+
+  return Im.Map({
+    title,
+    blocks: Im.List(blocks.map((blk, j) => Object.assign(blk, { index: j }))),
+  })
 }

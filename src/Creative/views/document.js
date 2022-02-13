@@ -10,24 +10,18 @@ export function Document({ workbook, doUpdate, doSave }) {
   return (
     <ol>
       {scenes.map((scn, i) => {
-        const blocks = scn.blocks.map((blk, j) =>
-          Object.assign(blk, { index: j })
-        )
-        const perform = scn.blocks.find((b) => b.mode === 'eval')
-        const discussion = scn.blocks.filter((b) => b.mode !== 'eval')
+        const blocks = scn.get('blocks')
+        const perform = blocks.find((b) => b.mode === 'eval')
+        const discussion = blocks.filter((b) => b.mode !== 'eval')
 
         return (
           <li key={i} className={styles.doc}>
             <ProseEditor
               blocks={discussion}
-              // onChange={(s, lang) => doUpdate(index, mode, s, lang)}
+              onChange={doUpdate}
               // doSave={doSave}
             />
-            <CodeEditor
-              block={perform}
-              // onChange={(s, lang) => doUpdate(perform.index, mode, s, lang)}
-              // onSave={doSave}
-            />
+            <CodeEditor block={perform} onChange={doUpdate} />
           </li>
         )
       })}

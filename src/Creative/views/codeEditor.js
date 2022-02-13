@@ -6,7 +6,7 @@ import styles from './code.css'
 
 export function CodeEditor(props) {
   const { block, onChange, onSave } = props
-  const { mode, lang, text } = block
+  const { index, mode, lang, text } = block
   const keymaps = [languages[lang] || {}, codeKeymap]
 
   console.log('CodeEditor render...')
@@ -16,10 +16,13 @@ export function CodeEditor(props) {
       className={styles[mode]}
       keymaps={keymaps}
       provides={{}}
-      onChange={onChange}
       onSave={onSave}
     >
-      <CodeBlock code={text} lang={lang} />
+      <CodeBlock
+        code={text}
+        lang={lang}
+        onChange={onChange && ((code) => onChange(index, mode, code, lang))}
+      />
       <footer>
         <dl className={styles.specs}>
           <dt>Language</dt>
@@ -30,26 +33,36 @@ export function CodeEditor(props) {
   )
 }
 
-export function CodeBlock({ code, lang }) {
+export function CodeBlock({ code, lang, onChange }) {
   return (
-    <pre className={`language-${lang}`}>
+    <pre lang={lang} className={`language-${lang}`}>
       <Block
         tagName="code"
         className={styles.code}
-        html={escapeHtml(code)}
+        html={breakLines(escapeHtml(code))}
         lang={lang}
         spellCheck={false}
+        onChange={(s) => onChange(unescapeHtml(s))}
       />
       <Highlight code={code} language={lang} />
     </pre>
   )
 }
 
-export function escapeHtml(unsafe) {
+function escapeHtml(unsafe) {
   return unsafe.replace(/</g, '&lt;').replace(/>/g, '&gt;')
 }
 
-export function unescapeHtml(safe) {
+function breakLines(str) {
+  return (
+    str
+      .split('\n')
+      //.map((line) => `<div class="${styles.line}">${line}</div>`)
+      .join('<br>')
+  )
+}
+
+function unescapeHtml(safe) {
   return safe.replace(/<br>/g, '\n').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
 }
 

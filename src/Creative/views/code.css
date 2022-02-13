@@ -1,8 +1,7 @@
-.eval,
-.define {
-  margin: 1rem 0 1rem 1.5rem;
-  border-left: 2px solid #686863;
-  padding-left: 6px;
+section.eval {
+  border: 1px solid #777;
+  padding: 5px;
+  background: black;
 }
 
 .eval > pre,
@@ -13,23 +12,24 @@
   padding: 0;
 }
 
-.eval > figcaption,
-.define > figcaption {
+
+
+.eval > footer,
+.define > footer {
   line-height: 1rem;
   height: 1rem;
+  background: rgba(150,150,150,0.5);
 }
 
 .define {
   width: 100%;
 }
 
-.define > pre[class*='language-'] {
-  background: inherit;
-}
-
 .highlight,
 .code {
+  display: block;
   font-family: 'IBM Plex Mono', monospace;
+  line-height: 1.25em;
   color: white;
 }
 
@@ -39,6 +39,8 @@
   left: 0;
   z-index: 1;
   pointer-events: none;
+  /* opacity: 0; */
+
 }
 
 .define code.highlight {
@@ -47,7 +49,8 @@
 }
 
 .code {
-  color: transparent;
+  /* color: transparent ;*/
+  color: red;
 }
 
 .nextValue > pre {
@@ -61,12 +64,13 @@
   box-shadow: 0 0 0.1em 0.1em black;
 }
 
-.line::after {
+.highlight > .line::after {
   display: inline-block;
   content: '⮐';
   opacity: 0.4;
   font-size: 50%;
   padding: 0 0.5em;
+  vertical-align: top;
 }
 
 dl.specs {

@@ -14,7 +14,7 @@ export class Block extends React.Component {
     this.root = React.createRef()
 
     this.state = {
-      content: he.decode(html || ''),
+      content: html || '',
     }
 
     this.handleChange = this.handleChange.bind(this)

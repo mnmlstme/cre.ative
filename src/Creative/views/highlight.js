@@ -15,10 +15,7 @@ export function Highlight({ code, language }) {
   }
 
   return (
-    <code
-      className={`language-${language} ${styles.highlight}`}
-      dangerouslySetInnerHTML={verbatim}
-    />
+    <code className={styles.highlight} dangerouslySetInnerHTML={verbatim} />
   )
 }
 

@@ -1,7 +1,7 @@
 import React from 'react'
-import { Editor, Block } from './editor.js'
+import { Editor, Block } from './editor'
 import { CodeBlock } from './codeEditor'
-import { Highlight } from './highlight.js'
+import { Highlight } from './highlight'
 import styles from './prose.css'
 import codeStyles from './code.css'
 
@@ -15,15 +15,23 @@ export function ProseEditor(props) {
     <Editor
       className={styles.prose}
       keymaps={[proseKeymap]}
-      provides={[styleBlock]}
-      onChange={onChange}
+      provides={[]}
       onSave={onSave}
     >
-      {blocks.map(({ mode, text, lang }, i) => {
+      {blocks.map(({ index, mode, text, lang }) => {
         switch (mode) {
           case 'eval':
           case 'define':
-            return <CodeBlock code={text} lang={lang} />
+            return (
+              <CodeBlock
+                key={index}
+                code={text}
+                lang={lang}
+                onChange={
+                  onChange && ((html) => onChange(index, mode, html, lang))
+                }
+              />
+            )
           default:
             if (!text) {
               return null
@@ -33,10 +41,13 @@ export function ProseEditor(props) {
 
             return (
               <Block
-                key={i}
+                key={index}
                 tagName={doc.body.firstChild.tagName.toLowerCase()}
                 html={doc.body.firstChild.innerHTML}
                 spellCheck={true}
+                onChange={
+                  onChange && ((code) => onChange(index, mode, code, lang))
+                }
               />
             )
         }

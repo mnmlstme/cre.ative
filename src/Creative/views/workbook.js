@@ -27,8 +27,8 @@ function Workbook({ workbook, filepath, resources, scene, urlpath, dispatch }) {
   const doChangeScene = (event) => dispatch(changeScene(event.target.value))
   const doNextScene = () => dispatch(changeScene(scene + 1))
   const doPrevScene = () => dispatch(changeScene(scene - 1))
-  const doUpdateDocument = (chunk, mode, content, lang) =>
-    dispatch(updateScene(scene - 1, chunk, mode, content, lang))
+  const doUpdateDocument = (block, mode, content, lang) =>
+    dispatch(updateScene(scene - 1, block, mode, content, lang))
   const doSaveDocument = () => dispatch(saveScene(scene - 1))
   const doLoadResource = (loader, lang) =>
     dispatch(loadResource(filepath, loader, lang))
