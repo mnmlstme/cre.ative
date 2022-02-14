@@ -13,18 +13,23 @@ model:
 
 # Hello, World
 
-This workbook contains React expressions
+This workbook contains **React** expressions
 which we evaluate and render.
 We can write documentation alongside the
 code to discuss what we're doing.
 
-Kram supports Markdown for documentation,
-and uses code blocks
-to separate code from documentation.
+## File Format: Kram
 
-We can also put code in
-other languages,
-such as CSS like this:
+All code and documentation for the workbook
+is maintained in a single file using Kram,
+a text-base format that supports
+
+- _Markdown_ for documentation
+- code blocks to embed code
+- [YAML](https://en.wikipedia.org/wiki/YAML)
+  for configuration and data modeling
+
+Code in multiple languages can be written in the same file.
 
 ```css
 .hi {
@@ -36,11 +41,11 @@ such as CSS like this:
 
 The <code>react-redux</code> platform supports the following languages:
 
-* HTML
-* CSS
-* Javascript
-* JSX (React)
-* SVG<br>
+1. HTML
+1. CSS
+1. Javascript
+1. JSX (React)
+1. SVG<br>
 ---
 ```jsx
 <input type="number" defaultValue={asString(count)}/>

@@ -8,13 +8,24 @@
 }
 
 .prose > * {
-  margin-left: 2rem;
+  margin-left: .5rem;
   width: 80%;
   position: relative;
 }
 
-.prose > *:focus {
+.prose > pre,
+.prose > ul,
+.prose > ol {
+  margin-left: 2rem;
+}
+
+.prose > *:focus-within {
   background: black;
+  outline: none;
+}
+
+.prose > pre > *:focus {
+  outline: none;
 }
 
 .prose > h1,
@@ -58,11 +69,26 @@
   padding-left: 1em;
 }
 
-.prose :not(pre) code {
+.prose > :not(pre) code {
   color: #74ec70;
   font-family: 'IBM Plex Mono', monospace;
   background: black;
   padding: 0 0.25em;
+}
+
+.prose > :not(pre) a {
+  color: inherit;
+  text-decoration: none;
+  background: rgba(255,255,255,0.4);
+  padding: 0 0.25em;
+  border: 1px solid transparent;
+  border-radius: 0.25em;
+  cursor: pointer;
+}
+
+.prose > :not(pre) a:hover {
+  background: none;
+  border-color: rgba(255,255,255,0.4);
 }
 
 .prose > br {
@@ -70,49 +96,96 @@
   line-height: 0;
 }
 
-.prose > *::before {
-  position: absolute;
-  width: 1.5rem;
-  height: 100%;
-  text-align: center;
-  left: -2rem;
-  display: block;
-  border-right: 1px solid;
-  font-size: 0.75rem;
-  font-family: 'IBM Plex Sans Condensed', sans-serif;
-  font-style: italic;
+.prose > *::before,
+.prose > :not(pre) *::before,
+.prose > :not(pre) *::after,
+.prose > * > li::before {
+  display: inline;
+  background: rgba(255,255,255,0.8);
+  color: black;
+  font-size: 0.625rem;
+  font-family: 'IBM Plex Mono', monospace;
   font-weight: 300;
-  color: #a8a8a1;
+  font-style: normal;
+  vertical-align: middle;
+  padding: 0 0.25em;
 }
 
-.prose > div::before {
-  content: 'DIV';
+.prose *::before {
+  border-radius: 0.375em 0 0 0.375em;
+  margin-right: .5em;
 }
 
-.prose > p::before {
-  content: 'P';
+.prose *::after {
+  border-radius: 0 0.375em 0.375em 0;
+  margin-left: .5em;
 }
 
-.prose > h1::before {
-  content: 'H1';
-}
-
-.prose > h2::before {
-  content: 'H2';
-}
-
-.prose > h3::before {
-  content: 'H3';
-}
-
-.prose > ul::before {
-  content: 'UL';
-}
-
+.prose > pre::before,
+.prose > ul::before,
 .prose > ol::before {
-  content: 'OL';
+  display: block;
+  position: absolute;
+  right: 100%;
 }
 
-.prose > pre::before {
+.prose > h1:focus::before {
+  content: '#';
+}
+
+.prose > h2:focus::before {
+  content: '##';
+}
+
+.prose > h3:focus::before {
+  content: '###';
+}
+
+.prose > ul:focus,
+.prose > ol:focus {
+}
+
+.prose > ul:focus > li,
+.prose > ol:focus > li {
+  list-style: none;
+  text-indent: -1em;
+}
+
+.prose > ul:focus > li::before {
+  content: '*';
+}
+
+.prose > ol:focus > li::before {
+  content: '1.';
+}
+
+.prose > pre:focus-within::before {
   content: attr(lang);
+}
+
+.prose > :not(pre):focus code::before,
+.prose > :not(pre):focus code::after {
+  content: '`';
+}
+
+.prose > :not(pre):focus em::before,
+.prose > :not(pre):focus em::after {
+  content: '_';
+}
+
+.prose > :not(pre):focus strong::before,
+.prose > :not(pre):focus strong::after {
+  content: '**';
+}
+
+.prose > :not(pre):focus a::before {
+  content: '['
+}
+
+.prose > :not(pre):focus a::after {
+  content: ']';
+}
+
+.prose > :not(pre):focus a[href]::after {
+  content: '](' attr(href) ')';
 }
