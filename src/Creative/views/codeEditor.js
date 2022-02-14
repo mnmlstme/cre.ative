@@ -6,7 +6,7 @@ import styles from './code.css'
 
 export function CodeEditor(props) {
   const { block, onChange, onSave } = props
-  const { index, mode, lang, text } = block
+  const { index, mode, tag, lang, code } = block
   const keymaps = [languages[lang] || {}, codeKeymap]
 
   console.log('CodeEditor render...')
@@ -19,9 +19,10 @@ export function CodeEditor(props) {
       onSave={onSave}
     >
       <CodeBlock
-        code={text}
+        tagName={tag}
+        code={code}
         lang={lang}
-        onChange={onChange && ((code) => onChange(index, mode, code, lang))}
+        onChange={onChange && ((s) => onChange(index, tag, s, lang))}
       />
       <footer>
         <dl className={styles.specs}>
@@ -33,11 +34,11 @@ export function CodeEditor(props) {
   )
 }
 
-export function CodeBlock({ code, lang, onChange }) {
+export function CodeBlock({ tagName, code, lang, onChange }) {
   return (
     <pre lang={lang} className={`language-${lang}`}>
       <Block
-        tagName="code"
+        tagName={tagName | 'code'}
         className={styles.code}
         html={breakLines(escapeHtml(code))}
         lang={lang}

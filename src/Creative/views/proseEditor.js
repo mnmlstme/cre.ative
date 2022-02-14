@@ -7,7 +7,6 @@ import codeStyles from './code.css'
 
 export function ProseEditor(props) {
   const { blocks, onChange, onSave } = props
-  const parser = new DOMParser()
 
   console.log('ProseEditor render...')
 
@@ -18,36 +17,27 @@ export function ProseEditor(props) {
       provides={[]}
       onSave={onSave}
     >
-      {blocks.map(({ index, mode, text, lang }) => {
+      {blocks.map(({ index, mode, code, tag, html, lang }) => {
         switch (mode) {
           case 'eval':
           case 'define':
             return (
               <CodeBlock
                 key={index}
-                code={text}
+                tagName={tag}
+                code={code}
                 lang={lang}
-                onChange={
-                  onChange && ((html) => onChange(index, mode, html, lang))
-                }
+                onChange={onChange && ((s) => onChange(index, tag, s, lang))}
               />
             )
           default:
-            if (!text) {
-              return null
-            }
-
-            const doc = parser.parseFromString(text, 'text/html')
-
             return (
               <Block
                 key={index}
-                tagName={doc.body.firstChild.tagName.toLowerCase()}
-                html={doc.body.firstChild.innerHTML}
+                tagName={tag}
+                html={html}
                 spellCheck={true}
-                onChange={
-                  onChange && ((code) => onChange(index, mode, code, lang))
-                }
+                onChange={onChange && ((s) => onChange(index, tag, s))}
               />
             )
         }

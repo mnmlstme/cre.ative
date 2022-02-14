@@ -67,14 +67,15 @@ export function update(state = initial, action = {}) {
     case Actions.UpdateScene: {
       console.log('update UpdateScene', action)
       const workbook = state.get('workbook') || Im.Map()
-      const { scene, block, mode, lang, text } = action
-      const updateFn = (blk) => {
-        return Object.assign({}, blk, { mode, lang, text })
-      }
+      const { scene, block, mode, tag, text, lang } = action
+      const replacement = (mode) =>
+        mode === 'eval' || mode === 'define'
+          ? { code: text, lang }
+          : { tag, html: text }
 
       return state.updateIn(
         ['workbook', 'scenes', scene, 'blocks', block],
-        updateFn
+        (blk) => Object.assign({}, blk, replacement(blk.mode))
       )
     }
 
@@ -145,9 +146,34 @@ export function update(state = initial, action = {}) {
 
 function immutableScene(scene) {
   const { title, blocks } = scene
+  const parser = new DOMParser()
 
   return Im.Map({
     title,
-    blocks: Im.List(blocks.map((blk, j) => Object.assign(blk, { index: j }))),
+    blocks: Im.List(
+      blocks
+        .filter(
+          ({ mode, text }) =>
+            mode === 'eval' || mode === 'define' || text !== ''
+        )
+        .map(consumeBlock)
+    ),
   })
+
+  function consumeBlock(blk, index) {
+    const { mode, text, lang } = blk
+
+    switch (mode) {
+      case 'eval':
+      case 'define':
+        return { index, mode, code: text, lang }
+
+      default:
+        const doc = parser.parseFromString(text, 'text/html')
+        const tag = doc.body.firstChild.tagName.toLowerCase()
+        const html = doc.body.firstChild.innerHTML
+
+        return { index, mode, tag, html }
+    }
+  }
 }
