@@ -1,15 +1,10 @@
-section.eval {
-  border: 1px solid #777;
-  padding: 5px;
-  background: black;
-}
-
 .eval > pre,
 .define > pre {
   position: relative;
   overflow-x: visible;
   z-index: 0;
   padding: 0;
+  flex-grow: 1;
 }
 
 
@@ -19,6 +14,7 @@ section.eval {
   line-height: 1rem;
   height: 1rem;
   background: rgba(150,150,150,0.5);
+  flex-grow: 0;
 }
 
 .define {

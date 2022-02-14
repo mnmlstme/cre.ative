@@ -3,6 +3,7 @@ import { Editor, Block, coreKeymap } from './editor.js'
 import { Highlight } from './highlight.js'
 
 import styles from './code.css'
+import editorStyles from './editor.css'
 
 export function CodeEditor(props) {
   const { block, onChange, onSave } = props
@@ -13,7 +14,7 @@ export function CodeEditor(props) {
 
   return (
     <Editor
-      className={styles[mode]}
+      className={[styles[mode], editorStyles[mode]].join(' ')}
       keymaps={keymaps}
       provides={{}}
       onSave={onSave}
@@ -35,6 +36,8 @@ export function CodeEditor(props) {
 }
 
 export function CodeBlock({ tagName, code, lang, onChange }) {
+  console.log('CodeBlock render...')
+
   return (
     <pre lang={lang} className={`language-${lang}`}>
       <Block
@@ -43,7 +46,7 @@ export function CodeBlock({ tagName, code, lang, onChange }) {
         html={breakLines(escapeHtml(code))}
         lang={lang}
         spellCheck={false}
-        onChange={(s) => onChange(unescapeHtml(s))}
+        onChange={(_, s) => onChange(s)}
       />
       <Highlight code={code} language={lang} />
     </pre>
@@ -55,16 +58,19 @@ function escapeHtml(unsafe) {
 }
 
 function breakLines(str) {
-  return (
-    str
-      .split('\n')
-      //.map((line) => `<div class="${styles.line}">${line}</div>`)
-      .join('<br>')
-  )
+  return str
+    .split('\n')
+    .map((line) => `<div class="${styles.line}">${line}</div>`)
+    .join('')
 }
 
 function unescapeHtml(safe) {
-  return safe.replace(/<br>/g, '\n').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+  return safe
+    .replace(/<br>/g, '\n')
+    .replace(/<div>/g, '')
+    .replace(/<\/div>/g, '\n')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
 }
 
 const codeKeymap = {}

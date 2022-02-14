@@ -4,6 +4,7 @@ import { CodeBlock } from './codeEditor'
 import { Highlight } from './highlight'
 import styles from './prose.css'
 import codeStyles from './code.css'
+import editorStyles from './editor.css'
 
 export function ProseEditor(props) {
   const { blocks, onChange, onSave } = props
@@ -12,7 +13,7 @@ export function ProseEditor(props) {
 
   return (
     <Editor
-      className={styles.prose}
+      className={[styles.prose, editorStyles.discuss].join(' ')}
       keymaps={[proseKeymap]}
       provides={[]}
       onSave={onSave}

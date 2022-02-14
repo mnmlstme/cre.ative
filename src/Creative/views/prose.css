@@ -4,7 +4,7 @@
   line-height: 1.3;
   color: #f2f2e0;
   outline: none;
-  padding-bottom: 1em;
+  padding: 10em 0 1em 0;
 }
 
 .prose > * {
@@ -91,6 +91,14 @@
   border-color: rgba(255,255,255,0.4);
 }
 
+.prose > :not(pre) strong {
+  font-weight: 600;
+}
+
+.prose > :not(pre) em {
+  font-style: italic;
+}
+
 .prose > br {
   margin: 0;
   line-height: 0;
@@ -101,13 +109,13 @@
 .prose > :not(pre) *::after,
 .prose > * > li::before {
   display: inline;
-  background: rgba(255,255,255,0.8);
+  background: rgba(235,157,87,0.8);
   color: black;
   font-size: 0.625rem;
   font-family: 'IBM Plex Mono', monospace;
   font-weight: 300;
   font-style: normal;
-  vertical-align: middle;
+  vertical-align: 0.25em;
   padding: 0 0.25em;
 }
 

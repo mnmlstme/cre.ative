@@ -14,6 +14,8 @@ export function Highlight({ code, language }) {
       .join(''),
   }
 
+  console.log('Highlight render...')
+
   return (
     <code className={styles.highlight} dangerouslySetInnerHTML={verbatim} />
   )

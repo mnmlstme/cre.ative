@@ -102,10 +102,12 @@
 .layout > ol > li {
   /* document view */
   grid-row-start: doc;
-  align-self: end;
-  overflow: visible;
   margin-bottom: 1.5rem;
-  max-width: 50vw;
+  display: flex;
+  flex-direction: row;
+  width: 100vw;
+  align-items: flex-end;
+  gap: 2rem;
 }
 
 .container > ol > li {
@@ -113,13 +115,27 @@
   display: flex;
   grid-row-start: view;
   overflow: auto;
-  max-width: 50vw;
-  transform: translate(50vw, -100vh);
+  transform: translate(40vw, -100vh);
+  padding: 4rem 4rem 0 2rem;
+  width: 60vw;
+  height: 75vh;
+  position: relative;
+  z-index: 1;
+}
+
+.container > ol > li::before {
+  content: "";
   background: white;
   box-shadow: 0 0 3rem rgb(40 40 40 / 50%);
-  border-radius: 2rem;
-  padding: 2rem;
-  width: 50vw;
-  height: 50vh;
-  margin: 2rem 0 0 -2rem;
+  border-radius: 2rem 2rem 0 0;
+  margin: ;
+  display: block;
+  position: absolute;
+  box-sizing: content-box;
+  padding: ;
+  z-index: -1;
+  top: 2rem;
+  left: 0;
+  bottom: 0;
+  right: 2rem;
 }

@@ -23,11 +23,12 @@ export class Block extends React.Component {
   handleChange(e) {
     const { onChange } = this.props
     const html = getHTML(e.target)
+    const text = getText(e.target)
 
-    console.log('handleChange', html)
+    console.log('handleChange\n--html--\n', html, '--text--\n', text)
     if (html !== this.state.content) {
       this.setState({ content: html })
-      onChange && onChange(html)
+      onChange && onChange(html, text)
     } else {
       debugger
     }
@@ -54,6 +55,8 @@ export class Block extends React.Component {
   render() {
     const { className, tagName, spellCheck, lang, disabled } = this.props
     const { content } = this.state
+
+    console.log('Block render', tagName)
 
     return React.createElement(tagName || 'div', {
       className,
@@ -242,6 +245,10 @@ export class Editor extends React.Component {
 
 function getHTML(el) {
   return el.innerHTML
+}
+
+function getText(el) {
+  return el.innerText
 }
 
 function getSelectionWithin(el) {
