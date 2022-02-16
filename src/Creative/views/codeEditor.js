@@ -36,8 +36,6 @@ export function CodeEditor(props) {
 }
 
 export function CodeBlock({ tagName, code, lang, onChange }) {
-  console.log('CodeBlock render...')
-
   return (
     <pre lang={lang} className={`language-${lang}`}>
       <Block

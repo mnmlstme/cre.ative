@@ -73,6 +73,8 @@ export function update(state = initial, action = {}) {
           ? { code: text, lang }
           : { tag, html: text }
 
+      console.log('Updating: ', replacement('discuss'))
+
       return state.updateIn(
         ['workbook', 'scenes', scene, 'blocks', block],
         (blk) => Object.assign({}, blk, replacement(blk.mode))

@@ -12,11 +12,6 @@ export class Block extends React.Component {
     const { html } = props
 
     this.root = React.createRef()
-
-    this.state = {
-      content: html || '',
-    }
-
     this.handleChange = this.handleChange.bind(this)
   }
 
@@ -26,37 +21,30 @@ export class Block extends React.Component {
     const text = getText(e.target)
 
     console.log('handleChange\n--html--\n', html, '--text--\n', text)
-    if (html !== this.state.content) {
-      this.setState({ content: html })
-      onChange && onChange(html, text)
-    } else {
-      debugger
-    }
+    onChange && onChange(html, text)
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    const { className, tagName } = this.props
-    const { content } = this.state
+  shouldComponentUpdate(nextProps) {
+    const { className, tagName, html } = nextProps
     const el = this.root.current
-    const html = el ? getHTML(el) : ''
 
     if (!el) {
       return true
     }
 
-    if (nextState.content !== html) {
-      console.log('Content changed, should update', nextState.content, html)
+    if (html !== getHTML(el)) {
+      console.log('Content changed externally, should update', html)
       return true
-    }
-
-    return className !== nextProps.className || tagName !== nextProps.tagName
+    } else
+      return (
+        className !== this.props.className || tagName !== this.props.tagName
+      )
   }
 
   render() {
-    const { className, tagName, spellCheck, lang, disabled } = this.props
-    const { content } = this.state
+    const { className, tagName, html, spellCheck, lang, disabled } = this.props
 
-    console.log('Block render', tagName)
+    console.log(`Block render <${tagName || 'div'}>`, html)
 
     return React.createElement(tagName || 'div', {
       className,
@@ -65,7 +53,7 @@ export class Block extends React.Component {
       contentEditable: !disabled,
       onInput: this.handleChange,
       ref: this.root,
-      dangerouslySetInnerHTML: { __html: content },
+      dangerouslySetInnerHTML: { __html: html },
     })
   }
 }

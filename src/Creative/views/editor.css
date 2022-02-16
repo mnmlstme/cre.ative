@@ -12,6 +12,7 @@
 
 .editor.discuss {
   width: 40vw;
+  max-height: 100%;
 }
 
 .editor.eval {
@@ -35,4 +36,5 @@
   left: 0;
   right: 2rem;
   bottom: 2rem;
+  pointer-events: none;
 }

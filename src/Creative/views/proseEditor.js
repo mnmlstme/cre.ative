@@ -11,6 +11,24 @@ export function ProseEditor(props) {
 
   console.log('ProseEditor render...')
 
+  const handleMarkdown = (index, tag, html) => {
+    if (onChange) {
+      if (tag === 'p') {
+        // check for markdown prefix on previously unmarked paragraph
+        const sp = html.indexOf(' ')
+        const md = sp > 0 ? html.substring(0, sp + 1) : ''
+        const newTag = markdownPrefixToTagName(md)
+
+        if (newTag) {
+          tag = newTag
+          html = html.substring(sp + 1)
+        }
+      }
+
+      onChange(index, tag, html)
+    }
+  }
+
   return (
     <Editor
       className={[styles.prose, editorStyles.discuss].join(' ')}
@@ -38,7 +56,7 @@ export function ProseEditor(props) {
                 tagName={tag}
                 html={html}
                 spellCheck={true}
-                onChange={onChange && ((s) => onChange(index, tag, s))}
+                onChange={(s) => handleMarkdown(index, tag, s)}
               />
             )
         }
@@ -47,81 +65,21 @@ export function ProseEditor(props) {
   )
 }
 
-function styleBlock() {
-  const blocks = this.getBlocksInFocus()
-
-  const fmt = (tag, parentTag) => () =>
-    blocks.map((el) => {
-      if (el.tagName !== tag) {
-        this.saveExcursion(() => {
-          const parentEl = el.parentNode
-
-          let replacement = document.createElement(tag)
-          el.before(replacement)
-
-          while (el.firstChild) {
-            replacement.appendChild(el.firstChild)
-          }
-
-          if (parentTag && (!parentEl || parentTag !== parentEl.tagName)) {
-            let newParent = document.createElement(parentTag)
-            el.before(newParent)
-            newParent.appendChild(replacement)
-          }
-
-          el.remove()
-        })
-      }
-    })
-
-  const styleOptions = [
-    {
-      key: 'p',
-      action: fmt('p'),
-      label: 'P',
-      description: 'Style as Paragraph.',
-    },
-    {
-      key: '1',
-      action: fmt('h1'),
-      label: 'H1',
-      description: 'Style as Top-level Heading',
-    },
-    {
-      key: '2',
-      action: fmt('h2'),
-      label: 'H2',
-      description: 'Style as 2nd-level Heading',
-    },
-    {
-      key: '3',
-      action: fmt('h3'),
-      label: 'H3',
-      description: 'Style as 3rd-level Heading',
-    },
-    {
-      key: '*',
-      action: fmt('li', 'ul'),
-      label: '• —',
-      description: 'Style as Bulleted List',
-    },
-    {
-      key: '#',
-      action: fmt('li', 'ol'),
-      label: '# —',
-      description: 'Style as Numbered List',
-    },
-    {
-      key: 'Escape',
-      action: this.doNothing,
-      label: 'X',
-      description: 'Escape and close popup.',
-    },
-  ]
-
-  this.promptWithOptions(styleOptions)
+function markdownPrefixToTagName(md) {
+  switch (md) {
+    case '# ':
+      return 'h1'
+    case '## ':
+      return 'h2'
+    case '### ':
+      return 'h3'
+    case '* ':
+      return 'li'
+    case '1. ':
+      return 'li'
+    default:
+      return null
+  }
 }
 
-const proseKeymap = {
-  '^/': { on: 'keyup', fn: styleBlock },
-}
+const proseKeymap = {}
