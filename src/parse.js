@@ -45,10 +45,12 @@ function parse(md, basename, getPlugin ) {
     init: model,
     shape: getShapeOf(model),
     imports: getImportSpecs(imports),
-    scenes: paginate(tokens).map(coalesce).map(ls => classify(ls, plugin.classify)),
+    scenes: paginate(tokens)
+      .map(coalesce)
+      .map(ls => classify(ls, plugin.classify)),
   };
 
-  // console.log("Workbook:", JSON.stringify(result));
+  console.log("Workbook:", JSON.stringify(result));
 
   const hashkey = hashcode(result);
   const moduleName = `Kram_${hashkey}_${basename}`;
@@ -67,6 +69,10 @@ function paginate(tokens) {
 }
 
 function coalesce(tokens) {
+  // no coalescing, each block is a single token
+  return tokens.map(t => [t])
+  
+  /*
   let leaders = tokens
     .map((t, i) =>
       t.type === "code"
@@ -80,6 +86,7 @@ function coalesce(tokens) {
   // console.log("Leaders: ", leaders);
 
   return leaders.map((ld, i) => tokens.slice(ld, leaders[i + 1]));
+  */
 }
 
 const defaultClassifier = (s) => ({mode: "define"})
