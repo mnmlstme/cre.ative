@@ -79,7 +79,7 @@ export class Editor extends React.Component {
 
       getBlocksInFocus: () => selectedBlocks(this.state.range),
 
-      saveContent: onSave,
+      saveContent: () => onSave && onSave(),
 
       promptWithOptions: this.promptWithOptions.bind(this),
       cancelPrompt: this.cancelPrompt.bind(this),
@@ -208,7 +208,12 @@ export class Editor extends React.Component {
     const classes = [styles.editor].concat(className ? [className] : [])
 
     return (
-      <section className={classes.join(' ')} ref={this.root}>
+      <section
+        className={classes.join(' ')}
+        onKeyDown={this.handleKeyEvent}
+        onKeyUp={this.handleKeyEvent}
+        ref={this.root}
+      >
         {children}
         <Popup
           isOpen={Boolean(options)}
@@ -308,8 +313,6 @@ function finished() {
 }
 
 const coreKeymap = {
-  Tab: doNothing,
-  'S-Enter': finished,
   // Most (all?) browsers have good defaults for the following.
   // We list them here to reserve them.
   ArrowUp: null,
@@ -330,6 +333,8 @@ const coreKeymap = {
   '^a': null, // beginning of line
   '^e': null, // end of line
   '^v': null, // page down
+  Tab: doNothing,
+  'S-Enter': finished,
 }
 
 const coreBindings = [doNothing, finished]

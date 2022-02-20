@@ -19,7 +19,7 @@ export function Document({ workbook, doUpdate, doSave }) {
             <ProseEditor
               blocks={discussion}
               onChange={doUpdate}
-              // doSave={doSave}
+              onSave={doSave}
             />
             <CodeEditor block={perform} onChange={doUpdate} />
           </li>

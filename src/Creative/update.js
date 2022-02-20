@@ -96,8 +96,6 @@ export function update(state = initial, action = {}) {
         scene,
       ].join('/')
 
-      debugger
-
       fetch(endpoint, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -154,28 +152,25 @@ function immutableScene(scene) {
     title,
     blocks: Im.List(
       blocks
-        .filter(
-          ({ mode, text }) =>
-            mode === 'eval' || mode === 'define' || text !== ''
-        )
+        .filter(({ mode, html }) => typeof html === 'undefined' || html !== '')
         .map(consumeBlock)
     ),
   })
 
   function consumeBlock(blk, index) {
-    const { mode, text, lang } = blk
+    const { mode, code, html, lang } = blk
 
     switch (mode) {
       case 'eval':
       case 'define':
-        return { index, mode, code: text, lang }
+        return { index, mode, code, lang }
 
       default:
-        const doc = parser.parseFromString(text, 'text/html')
+        const doc = parser.parseFromString(html, 'text/html')
         const tag = doc.body.firstChild.tagName.toLowerCase()
-        const html = doc.body.firstChild.innerHTML
+        const inner = doc.body.firstChild.innerHTML
 
-        return { index, mode, tag, html }
+        return { index, mode, tag, html: inner }
     }
   }
 }

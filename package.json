@@ -8,7 +8,8 @@
   },
   "scripts": {
     "build": "webpack build --config-name frontend",
-    "start": "NODE_OPTIONS=--openssl-legacy-provider webpack serve",
+    "start": "webpack serve",
+    "start-legacy": "NODE_OPTIONS=--openssl-legacy-provider webpack serve",
     "backend": "webpack build --config-name backend",
     "server": "nodemon dist/server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
