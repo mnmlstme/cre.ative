@@ -17,8 +17,6 @@ export function ProseEditor(props) {
     Object.keys(unique).map((lang) => getMinorMode(lang))
   )
 
-  console.log('ProseEditor render...')
-
   const handleMarkdown = (index, tag, html) => {
     if (onChange) {
       if (tag === 'p') {
@@ -60,7 +58,7 @@ export function ProseEditor(props) {
               key={index}
               tagName={tag}
               html={html}
-              mode="prose"
+              mode="prose-mode"
               spellCheck={true}
               onChange={(s) => handleMarkdown(index, tag, s)}
             />

@@ -10,8 +10,6 @@ export function CodeEditor(props) {
   const { index, mode, tag, lang, code } = block
   const minorMode = getMinorMode(lang)
 
-  console.log('CodeEditor render...')
-
   return (
     <Editor
       className={[styles[mode], editorStyles[mode]].join(' ')}

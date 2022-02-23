@@ -28,6 +28,7 @@ export function agentFactory(primitives, coreMode, modes) {
     const cached = cache[modename]
 
     if (cached) {
+      console.log(`Using cached agent for ${modename}:`, cached)
       return cached
     }
 
@@ -42,6 +43,7 @@ export function agentFactory(primitives, coreMode, modes) {
 
     Object.assign(agent, primitives, Object.fromEntries(boundEntries))
 
+    console.log(`Built agent for ${modename}:`, agent)
     return agent
   }
 }
@@ -55,8 +57,6 @@ export function delegateUserAction(agent, action, args = [], moreContext = {}) {
 
 export function delegateKeyEvent(agent, e) {
   const block = e.target
-
-  debugger
 
   if (['Shift', 'Meta', 'Alt', 'Control'].includes(e.key)) {
     // ignore modifier keys on their own

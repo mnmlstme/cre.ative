@@ -20,7 +20,7 @@ export class Block extends React.Component {
     const html = getHTML(e.target)
     const text = getText(e.target)
 
-    console.log('handleChange\n--html--\n', html, '--text--\n', text)
+    // console.log('handleChange\n--html--\n', html, '--text--\n', text)
     onChange && onChange(html, text)
   }
 
@@ -33,7 +33,7 @@ export class Block extends React.Component {
     }
 
     if (html !== getHTML(el)) {
-      console.log('Content changed externally, should update', html)
+      // console.log('Content changed externally, should update', html)
       return true
     } else
       return (
@@ -51,8 +51,6 @@ export class Block extends React.Component {
       mode,
       disabled,
     } = this.props
-
-    console.log(`Block render <${tagName || 'div'}>`, html)
 
     return React.createElement(tagName || 'div', {
       className,
@@ -119,6 +117,12 @@ export class Editor extends React.Component {
     return [endContainer, endOffset]
   }
 
+  getAnchor() {
+    const { startContainer, startOffset } = this.state.range
+
+    return [startContainer, startOffset]
+  }
+
   setCaret(node, offset) {
     const pos = [node, offset]
     this.setSelection(pos, pos)
@@ -127,12 +131,6 @@ export class Editor extends React.Component {
   setAnchor(node, offset) {
     const pos = [node, offset]
     this.setSelection(pos)
-  }
-
-  getAnchor() {
-    const { startContainer, startOffset } = this.state.range
-
-    return [startContainer, startOffset]
   }
 
   setSelection(start, end) {
