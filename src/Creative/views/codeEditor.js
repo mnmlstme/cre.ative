@@ -8,15 +8,14 @@ import editorStyles from './editor.css'
 export function CodeEditor(props) {
   const { block, onChange, onSave } = props
   const { index, mode, tag, lang, code } = block
-  const keymaps = [languages[lang] || {}, codeKeymap]
+  const minorMode = getMinorMode(lang)
 
   console.log('CodeEditor render...')
 
   return (
     <Editor
       className={[styles[mode], editorStyles[mode]].join(' ')}
-      keymaps={keymaps}
-      provides={{}}
+      modes={[minorMode]}
       onSave={onSave}
     >
       <CodeBlock
@@ -42,6 +41,7 @@ export function CodeBlock({ tagName, code, lang, onChange }) {
         tagName={tagName | 'code'}
         className={styles.code}
         html={breakLines(escapeHtml(code))}
+        mode={languageMinorMode(lang)}
         lang={lang}
         spellCheck={false}
         onChange={(_, s) => onChange(s)}
@@ -71,15 +71,24 @@ function unescapeHtml(safe) {
     .replace(/&gt;/g, '>')
 }
 
-const codeKeymap = {}
-
-// TODO: plugin architecture for languages
-const jsKeymap = {}
-const jsxKeymap = jsKeymap
-const elmKeymap = {}
-
-const languages = {
-  js: jsKeymap,
-  jsx: jsxKeymap,
-  elm: elmKeymap,
+function languageMinorMode(lang) {
+  return `${lang}-code-mode`
 }
+
+export function getMinorMode(lang) {
+  const minor = minorModes[lang]
+
+  return {
+    name: languageMinorMode(lang),
+    description: `minor mode for ${lang} language code`,
+    keymaps: (minor ? [minor.keymap] : []).concat([major.keymap]),
+    bindings: (minor ? minor.bindings : []).concat(major.bindings),
+  }
+}
+
+const major = {
+  keymap: {},
+  bindings: [],
+}
+
+const minorModes = {}

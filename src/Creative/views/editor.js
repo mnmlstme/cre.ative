@@ -1,7 +1,7 @@
 import React from 'react'
 const he = require('he')
 import { Popup } from './popup'
-import { createAgent, delegateKeyEvent, delegateUserAction } from './agent'
+import { agentFactory, delegateKeyEvent, delegateUserAction } from './agent'
 
 import styles from './editor.css'
 
@@ -42,13 +42,22 @@ export class Block extends React.Component {
   }
 
   render() {
-    const { className, tagName, html, spellCheck, lang, disabled } = this.props
+    const {
+      className,
+      tagName,
+      html,
+      spellCheck,
+      lang,
+      mode,
+      disabled,
+    } = this.props
 
     console.log(`Block render <${tagName || 'div'}>`, html)
 
     return React.createElement(tagName || 'div', {
       className,
       spellCheck,
+      'data-mode-name': mode || 'core',
       lang: lang || 'zxx',
       contentEditable: !disabled,
       onInput: this.handleChange,
@@ -87,22 +96,21 @@ export class Editor extends React.Component {
 
       getBlocksInFocus: () => selectedBlocks(this.state.range),
 
-      promptWithOptions: this.promptWithOptions.bind(this),
-      cancelPrompt: this.cancelPrompt.bind(this),
+      // promptWithOptions: this.promptWithOptions.bind(this),
+      // cancelPrompt: this.cancelPrompt.bind(this),
     }
 
-    let agent = createAgent(
-      primitives,
-      coreBindings.concat(props.provides),
-      (props.keymaps || []).concat([coreKeymap])
-    )
+    let factory = agentFactory(primitives, coreMode, props.modes)
 
-    this.getAgent = () => agent
+    this.getAgent = (modeName) => factory(modeName)
 
-    this.handleKeyEvent = (e) => delegateKeyEvent(agent, e)
+    this.handleKeyEvent = (e) => {
+      const modeName = e.target.dataset.modeName
+      delegateKeyEvent(this.getAgent(modeName), e)
+    }
     this.handleBlur = this.handleBlur.bind(this)
     this.handleSelectionChange = this.handleSelectionChange.bind(this)
-    this.handlePopupSelection = this.handlePopupSelection.bind(this)
+    // this.handlePopupSelection = this.handlePopupSelection.bind(this)
   }
 
   getCaret() {
@@ -275,7 +283,7 @@ export class Editor extends React.Component {
       range,
     })
   }
-
+  /*
   promptWithOptions(options) {
     this.getAgent().setContext({ options })
     this.setState({ popup: { options } })
@@ -285,7 +293,7 @@ export class Editor extends React.Component {
     this.setState({ popup: null })
     this.getAgent().clearContext('options')
   }
-
+*/
   handleSelectionChange(e) {
     const el = this.root.current
     const { range } = this.state
@@ -307,11 +315,12 @@ export class Editor extends React.Component {
     // updateFocusForRange(range, el)
   }
 
+  /*
   handlePopupSelection(opt) {
     this.closePrompt()
     opt && delegateUserAction(this.getAgent(), opt.action)
   }
-
+*/
   shouldComponentUpdate(nextProps, nextState) {
     const { popup, range } = this.state
 
@@ -446,29 +455,34 @@ function finished() {
   this.save_content()
 }
 
-const coreKeymap = {
-  // Most (all?) browsers have good defaults for the following.
-  // We list them here to reserve them.
-  ArrowUp: null,
-  ArrowDown: null,
-  ArrowRight: null,
-  ArrowLeft: null,
-  Backspace: null,
-  'Cmd-x': null,
-  'Cmd-v': null,
-  'Cmd-c': null,
-  'Cmd-z': null,
-  '^n': null, // next line
-  '^p': null, // previous line
-  '^k': null, // kill line
-  '^f': null, // forward character
-  '^b': null, // backward character
-  '^d': null, // delete character
-  '^a': null, // beginning of line
-  '^e': null, // end of line
-  '^v': null, // page down
-  Tab: do_nothing,
-  'S-Enter': finished,
+const coreMode = {
+  name: 'core',
+  description: 'base mode inherited by all other modes',
+  keymaps: [
+    {
+      // Most (all?) browsers have good defaults for the following.
+      // We list them here to reserve them.
+      ArrowUp: null,
+      ArrowDown: null,
+      ArrowRight: null,
+      ArrowLeft: null,
+      Backspace: null,
+      'Cmd-x': null,
+      'Cmd-v': null,
+      'Cmd-c': null,
+      'Cmd-z': null,
+      '^n': null, // next line
+      '^p': null, // previous line
+      '^k': null, // kill line
+      '^f': null, // forward character
+      '^b': null, // backward character
+      '^d': null, // delete character
+      '^a': null, // beginning of line
+      '^e': null, // end of line
+      '^v': null, // page down
+      Tab: do_nothing,
+      'S-Enter': finished,
+    },
+  ],
+  bindings: [do_nothing, finished],
 }
-
-const coreBindings = [do_nothing, finished]

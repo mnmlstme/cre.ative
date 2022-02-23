@@ -1,27 +1,49 @@
-export function createAgent(primitives, bindings, keymaps) {
-  // primitives are already bound to the editor
-  // bindings will be bound to the agent
-
-  let context = { keymaps }
-  let agent = {
-    getContext: (key) => context[key],
-    setContext: (more = {}) => {
-      Object.assign(context, more)
-      return agent
-    },
-    clearContext: (key) => {
-      delete context[key]
-      return agent
-    },
+class Agent {
+  constructor(keymaps) {
+    this._context = { keymaps }
   }
 
-  const boundEntries = bindings
-    .filter((fn) => typeof fn === 'function')
-    .map((fn) => [fn.displayName || fn.name, fn.bind(agent)])
+  getContext(key) {
+    return this._context[key]
+  }
 
-  Object.assign(agent, primitives, Object.fromEntries(boundEntries))
+  setContext(more = {}) {
+    Object.assign(this._context, more)
+    return this
+  }
 
-  return agent
+  clearContext(key) {
+    delete this._context[key]
+    return this
+  }
+}
+
+export function agentFactory(primitives, coreMode, modes) {
+  // primitives are already bound to the editor
+  // mode.bindings will be bound to the agent
+
+  let cache = {}
+
+  return (modename) => {
+    const cached = cache[modename]
+
+    if (cached) {
+      return cached
+    }
+
+    const mode = modes.find((m) => m.name === modename)
+    let agent = (cache[modename] = new Agent(
+      (mode ? mode.keymaps : []).concat(coreMode.keymaps)
+    ))
+    const boundEntries = (mode ? mode.bindings : [])
+      .concat(coreMode.bindings)
+      .filter((fn) => typeof fn === 'function')
+      .map((fn) => [fn.displayName || fn.name, fn.bind(agent)])
+
+    Object.assign(agent, primitives, Object.fromEntries(boundEntries))
+
+    return agent
+  }
 }
 
 export function delegateUserAction(agent, action, args = [], moreContext = {}) {
@@ -32,6 +54,10 @@ export function delegateUserAction(agent, action, args = [], moreContext = {}) {
 }
 
 export function delegateKeyEvent(agent, e) {
+  const block = e.target
+
+  debugger
+
   if (['Shift', 'Meta', 'Alt', 'Control'].includes(e.key)) {
     // ignore modifier keys on their own
     return

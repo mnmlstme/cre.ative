@@ -1,13 +1,21 @@
 import React from 'react'
 import { Editor, Block } from './editor'
-import { CodeBlock } from './codeEditor'
+import { CodeBlock, getMinorMode } from './codeEditor'
 import { Highlight } from './highlight'
+
 import styles from './prose.css'
 import codeStyles from './code.css'
 import editorStyles from './editor.css'
 
 export function ProseEditor(props) {
   const { blocks, onChange, onSave } = props
+  let unique = {}
+
+  blocks.forEach((b) => b.code && unique[b.lang]++)
+
+  const modes = [proseMode].concat(
+    Object.keys(unique).map((lang) => getMinorMode(lang))
+  )
 
   console.log('ProseEditor render...')
 
@@ -32,33 +40,31 @@ export function ProseEditor(props) {
   return (
     <Editor
       className={[styles.prose, editorStyles.discuss].join(' ')}
-      keymaps={[proseKeymap]}
-      provides={proseBindings}
+      modes={modes}
       onSave={onSave}
     >
-      {blocks.map(({ index, mode, code, tag, html, lang }) => {
-        switch (mode) {
-          case 'eval':
-          case 'define':
-            return (
-              <CodeBlock
-                key={index}
-                tagName={tag}
-                code={code}
-                lang={lang}
-                onChange={onChange && ((s) => onChange(index, tag, s, lang))}
-              />
-            )
-          default:
-            return (
-              <Block
-                key={index}
-                tagName={tag}
-                html={html}
-                spellCheck={true}
-                onChange={(s) => handleMarkdown(index, tag, s)}
-              />
-            )
+      {blocks.map(({ index, code, tag, html, lang }) => {
+        if (typeof code !== 'undefined') {
+          return (
+            <CodeBlock
+              key={index}
+              tagName={tag}
+              code={code}
+              lang={lang}
+              onChange={onChange && ((s) => onChange(index, tag, s, lang))}
+            />
+          )
+        } else {
+          return (
+            <Block
+              key={index}
+              tagName={tag}
+              html={html}
+              mode="prose"
+              spellCheck={true}
+              onChange={(s) => handleMarkdown(index, tag, s)}
+            />
+          )
         }
       })}
     </Editor>
@@ -82,11 +88,16 @@ function markdownPrefixToTagName(md) {
   }
 }
 
-const proseKeymap = {
-  '*': hyper_star,
+const proseMode = {
+  name: 'prose-mode',
+  description: 'major mode for editing structured text',
+  keymaps: [
+    {
+      '*': hyper_star,
+    },
+  ],
+  bindings: [hyper_star],
 }
-
-const proseBindings = [hyper_star]
 
 function hyper_star() {
   if (this.backward_select_matching(/\*([^*]+)$/)) {
