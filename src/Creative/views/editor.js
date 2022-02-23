@@ -72,19 +72,23 @@ export class Editor extends React.Component {
     }
 
     let primitives = {
-      // the following can be invoked from actions
-      // getRootNode: () => this.root.current,
+      // the following can be invoked through agent on actions
+      forward_chars: this.forwardChars.bind(this),
+      backward_chars: this.backwardChars.bind(this),
+      insert_chars: this.insertChars.bind(this),
+      forward_select_matching: this.forwardSelectMatching.bind(this),
+      backward_select_matching: this.backwardSelectMatching.bind(this),
+      surround_selection: this.surroundSelection.bind(this),
+      delete_selected_chars: this.deleteSelectedChars.bind(this),
+      save_content: () => onSave && onSave(),
+      save_excursion: this.saveExcursion.bind(this),
 
       getSelectionRange: () => this.state.range,
 
       getBlocksInFocus: () => selectedBlocks(this.state.range),
 
-      saveContent: () => onSave && onSave(),
-
       promptWithOptions: this.promptWithOptions.bind(this),
       cancelPrompt: this.cancelPrompt.bind(this),
-
-      saveExcursion: this.saveExcursion.bind(this),
     }
 
     let agent = createAgent(
@@ -101,14 +105,134 @@ export class Editor extends React.Component {
     this.handlePopupSelection = this.handlePopupSelection.bind(this)
   }
 
-  promptWithOptions(options) {
-    this.getAgent().setContext({ options })
-    this.setState({ popup: { options } })
+  getCaret() {
+    const { endContainer, endOffset } = this.state.range
+
+    return [endContainer, endOffset]
   }
 
-  cancelPrompt() {
-    this.setState({ popup: null })
-    this.getAgent().clearContext('options')
+  setCaret(node, offset) {
+    const pos = [node, offset]
+    this.setSelection(pos, pos)
+  }
+
+  setAnchor(node, offset) {
+    const pos = [node, offset]
+    this.setSelection(pos)
+  }
+
+  getAnchor() {
+    const { startContainer, startOffset } = this.state.range
+
+    return [startContainer, startOffset]
+  }
+
+  setSelection(start, end) {
+    let selection = document.getSelection()
+    let range = this.state.range
+
+    start && range.setStart(start[0], start[1])
+    end && range.setEnd(end[0], end[1])
+    this.setState({ range })
+  }
+
+  moveCaretChars(n) {
+    const [node, offset] = this.getCaret()
+
+    switch (node.nodeType) {
+      case Node.TEXT_NODE:
+      case Node.CDATA_SECTION_NODE:
+      case Node.COMMENT_NODE:
+        const len = node.nodeValue.length
+        if (offset + n < len && offset + n >= 0) {
+          this.setCaret(node, offset + n)
+        } else {
+          console.log('TODO: moveCaretChars beyond end of node')
+        }
+        break
+      default:
+        console.log('TODO: moveCaretChars in non-char data')
+    }
+  }
+
+  forwardChars(n = 1) {
+    this.moveCaretChars(n)
+  }
+
+  backwardChars(n = 1) {
+    this.moveCaretChars(-n)
+  }
+
+  insertChars(s) {
+    const [node, offset] = this.getCaret()
+
+    switch (node.nodeType) {
+      case Node.TEXT_NODE:
+      case Node.CDATA_SECTION_NODE:
+      case Node.COMMENT_NODE:
+        node.insertData(offset, s)
+        this.forwardChars(s.length)
+        break
+      default:
+        const ref = node.childNodes.item(offset)
+        const text = document.createTextNode(s)
+        node.insertBefore(text, ref)
+    }
+  }
+
+  deleteSelectedChars(n = 1) {
+    const [node, offset] = n > 0 ? this.getAnchor() : this.getCaret()
+
+    switch (node.nodeType) {
+      case Node.TEXT_NODE:
+      case Node.CDATA_SECTION_NODE:
+      case Node.COMMENT_NODE:
+        node.deleteData(n > 0 ? offset : offset + n, Math.abs(n))
+        break
+      default:
+        console.log('TODO: deleteSelectedChars from non-char data')
+    }
+  }
+
+  selectMatching(re, backwards) {
+    const [node, offset] = this.getCaret()
+
+    switch (node.nodeType) {
+      case Node.TEXT_NODE:
+      case Node.CDATA_SECTION_NODE:
+      case Node.COMMENT_NODE:
+        const parent = node.parentNode
+        const text = node.nodeValue
+        const side = backwards
+          ? text.substring(0, offset)
+          : text.substring(offset)
+        const matches = side.match(re)
+
+        if (matches) {
+          const distance = matches[0].length
+          this.setSelection(
+            [node, backwards ? offset - distance : offset],
+            [node, backwards ? offset : offset + distance]
+          )
+          return matches[0]
+        }
+        break
+      default:
+        console.log('TODO: selectMatch in non-char data')
+    }
+  }
+
+  forwardSelectMatching(re) {
+    return this.selectMatching(re, false)
+  }
+
+  backwardSelectMatching(re) {
+    return this.selectMatching(re, true)
+  }
+
+  surroundSelection(tag) {
+    const markup = document.createElement(tag)
+    this.state.range.surroundContents(markup)
   }
 
   saveExcursion(thunk) {
@@ -150,6 +274,16 @@ export class Editor extends React.Component {
       // content: getHTML(this.root.current),
       range,
     })
+  }
+
+  promptWithOptions(options) {
+    this.getAgent().setContext({ options })
+    this.setState({ popup: { options } })
+  }
+
+  cancelPrompt() {
+    this.setState({ popup: null })
+    this.getAgent().clearContext('options')
   }
 
   handleSelectionChange(e) {
@@ -306,10 +440,10 @@ function sameBlocks(a, b) {
   return a.length === b.length && a.every((n, i) => b[i] === n)
 }
 
-function doNothing() {}
+function do_nothing() {}
 
 function finished() {
-  this.saveContent()
+  this.save_content()
 }
 
 const coreKeymap = {
@@ -333,8 +467,8 @@ const coreKeymap = {
   '^a': null, // beginning of line
   '^e': null, // end of line
   '^v': null, // page down
-  Tab: doNothing,
+  Tab: do_nothing,
   'S-Enter': finished,
 }
 
-const coreBindings = [doNothing, finished]
+const coreBindings = [do_nothing, finished]

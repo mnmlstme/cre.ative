@@ -33,7 +33,7 @@ export function ProseEditor(props) {
     <Editor
       className={[styles.prose, editorStyles.discuss].join(' ')}
       keymaps={[proseKeymap]}
-      provides={[]}
+      provides={proseBindings}
       onSave={onSave}
     >
       {blocks.map(({ index, mode, code, tag, html, lang }) => {
@@ -82,4 +82,21 @@ function markdownPrefixToTagName(md) {
   }
 }
 
-const proseKeymap = {}
+const proseKeymap = {
+  '*': hyper_star,
+}
+
+const proseBindings = [hyper_star]
+
+function hyper_star() {
+  if (this.backward_select_matching(/\*([^*]+)$/)) {
+    this.delete_selected_chars(1)
+  } else if (this.forward_select_matching(/^([^*]+)\*/)) {
+    this.delete_selected_chars(-1)
+  } else {
+    this.insert_chars('*')
+    return
+  }
+
+  this.surround_selection('strong')
+}
