@@ -1,13 +1,13 @@
 .popup {
   display: flex;
   font-size: 1rem;
-  background: rgba(0,0,0,0.75);
+  background: rgba(0, 0, 0, 0.75);
   box-shadow: 0 0 1em orange;
-  column-gap: .5em;
-  padding: .5em;
+  column-gap: 0.5em;
+  padding: 0.5em;
   position: absolute;
   z-index: 1;
-  border-radius: .5em;
+  border-radius: 0.5em;
 }
 
 .popup:empty {
@@ -18,9 +18,9 @@
   display: inline-block;
   border: 1px solid;
   background: transparent;
-  border-radius: .25em;
+  border-radius: 0.25em;
   color: orange;
-  padding: .5em .25em;
+  padding: 0.5em 0.25em;
   line-height: 2em;
   width: 3em;
   text-align: center;
@@ -33,7 +33,7 @@
 }
 
 .label {
-  font-family: 'IBM Plex Sans Condensed', sans-serif;
+  font-family: var(--fontDisplay);
   font-weight: 600;
   text-align: center;
 }
@@ -44,7 +44,7 @@
   left: 0;
   line-height: 1em;
   color: white;
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: var(--fontCode);
   font-size: 75%;
   padding: 2px;
   background: #ffa50082;
@@ -52,78 +52,74 @@
   border-radius: 4px 0 0 0;
 }
 
-
-
 /*== start of code for tooltips ==*/
 /*== from https://codepen.io/pure-css/pen/bddggP ==*/
 .tool {
-    position: relative;
+  position: relative;
 }
-
 
 /*== common styles for both parts of tool tip ==*/
 .tool::before,
 .tool::after {
-    left: 50%;
-    opacity: 0;
-    position: absolute;
-    z-index: 100;
+  left: 50%;
+  opacity: 0;
+  position: absolute;
+  z-index: 100;
 }
 
 .tool:hover::before,
 .tool:focus::before,
 .tool:hover::after,
 .tool:focus::after {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-    z-index: 100;
+  opacity: 1;
+  transform: scale(1) translateY(0);
+  z-index: 100;
 }
-
 
 /*== pointer tip ==*/
 .tool::before {
-    /** CSS "triangle" **/
-    border-style: solid;
-    border-width: 1em 0.75em 0 0.75em;
-    border-color: #3E474F transparent transparent transparent;
-    bottom: 100%;
-    content: "";
-    margin-left: -0.5em;
-    margin-bottom: 0.25em;
-    transition: all .65s cubic-bezier(.84,-0.18,.31,1.26), opacity .65s .5s;
-    transform:  scale(.6) translateY(-90%);
+  /** CSS "triangle" **/
+  border-style: solid;
+  border-width: 1em 0.75em 0 0.75em;
+  border-color: #3e474f transparent transparent transparent;
+  bottom: 100%;
+  content: '';
+  margin-left: -0.5em;
+  margin-bottom: 0.25em;
+  transition: all 0.65s cubic-bezier(0.84, -0.18, 0.31, 1.26),
+    opacity 0.65s 0.5s;
+  transform: scale(0.6) translateY(-90%);
 }
 
 .tool:hover::before,
 .tool:focus::before {
-    transition: all .65s cubic-bezier(.84,-0.18,.31,1.26) .2s;
+  transition: all 0.65s cubic-bezier(0.84, -0.18, 0.31, 1.26) 0.2s;
 }
-
 
 /*== speech bubble ==*/
 .tool::after {
-    background: #3E474F;
-    border-radius: .25em;
-    bottom: 100%;
-    color: #EDEFF0;
-    content: attr(data-tip);
-    margin-left: -8.75em;
-    margin-bottom: 1em;
-    padding: 1em;
-    transition: all .65s cubic-bezier(.84,-0.18,.31,1.26) .2s;
-    transform:  scale(.6) translateY(50%);
-    width: 17.5em;
+  background: #3e474f;
+  border-radius: 0.25em;
+  bottom: 100%;
+  color: #edeff0;
+  content: attr(data-tip);
+  margin-left: -8.75em;
+  margin-bottom: 1em;
+  padding: 1em;
+  transition: all 0.65s cubic-bezier(0.84, -0.18, 0.31, 1.26) 0.2s;
+  transform: scale(0.6) translateY(50%);
+  width: 17.5em;
 }
 
 .tool:hover::after,
-.tool:focus::after  {
-    transition: all .65s cubic-bezier(.84,-0.18,.31,1.26);
+.tool:focus::after {
+  transition: all 0.65s cubic-bezier(0.84, -0.18, 0.31, 1.26);
 }
 
 @media (max-width: 760px) {
   .tool::after {
-        font-size: .75em;
-        margin-left: -5em;
-        width: 10em;
+    font-size: 0.75em;
+    margin-left: -5em;
+    width: 10em;
   }
 }

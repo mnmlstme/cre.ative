@@ -1,5 +1,5 @@
 .prose {
-  font-family: 'IBM Plex Serif', serif;
+  font-family: var(--fontBody);
   font-weight: 300;
   line-height: 1.3;
   color: #f2f2e0;
@@ -8,7 +8,7 @@
 }
 
 .prose > * {
-  margin-left: .5rem;
+  margin-left: 0.5rem;
   width: 80%;
   position: relative;
 }
@@ -34,7 +34,7 @@
 .prose > h4,
 .prose > h5,
 .prose > h6 {
-  font-family: 'IBM Plex Sans Condensed', sans-serif;
+  font-family: var(--fontDisplay);
   font-weight: 800;
   color: #74ec70;
 }
@@ -71,7 +71,7 @@
 
 .prose > :not(pre) code {
   color: #74ec70;
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: var(--fontCode);
   background: black;
   padding: 0 0.25em;
 }
@@ -79,7 +79,7 @@
 .prose > :not(pre) a {
   color: inherit;
   text-decoration: none;
-  background: rgba(255,255,255,0.4);
+  background: rgba(255, 255, 255, 0.4);
   padding: 0 0.25em;
   border: 1px solid transparent;
   border-radius: 0.25em;
@@ -88,7 +88,7 @@
 
 .prose > :not(pre) a:hover {
   background: none;
-  border-color: rgba(255,255,255,0.4);
+  border-color: rgba(255, 255, 255, 0.4);
 }
 
 .prose > :not(pre) strong {
@@ -105,28 +105,26 @@
 }
 
 .prose > *::before,
+.prose > * > li::before,
 .prose > :not(pre) *::before,
-.prose > :not(pre) *::after,
-.prose > * > li::before {
+.prose > :not(pre) *::after {
   display: inline;
-  background: rgba(235,157,87,0.8);
-  color: black;
-  font-size: 0.625rem;
-  font-family: 'IBM Plex Mono', monospace;
-  font-weight: 300;
+  color: #fbbe49;
+  font-family: var(--fontCode);
+  line-height: 0.8em;
   font-style: normal;
-  vertical-align: 0.25em;
-  padding: 0 0.25em;
+  border-radius: 0.125rem;
+  font-size: 0.8rem;
+  font-weight: 400;
+  padding: 0 0.125em;
+  vertical-align: 0.1rem;
+  border: 0.5px solid;
+  margin: 0 0.1rem;
 }
 
-.prose *::before {
-  border-radius: 0.375em 0 0 0.375em;
-  margin-right: .5em;
-}
-
-.prose *::after {
-  border-radius: 0 0.375em 0.375em 0;
-  margin-left: .5em;
+.prose > *::before,
+.prose > * > li::before {
+  margin-right: 0.25rem;
 }
 
 .prose > pre::before,
@@ -187,7 +185,7 @@
 }
 
 .prose > :not(pre):focus a::before {
-  content: '['
+  content: '[';
 }
 
 .prose > :not(pre):focus a::after {

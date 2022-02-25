@@ -7,13 +7,11 @@
   flex-grow: 1;
 }
 
-
-
 .eval > footer,
 .define > footer {
   line-height: 1rem;
   height: 1rem;
-  background: rgba(150,150,150,0.5);
+  background: rgba(150, 150, 150, 0.5);
   flex-grow: 0;
 }
 
@@ -24,7 +22,7 @@
 .highlight,
 .code {
   display: block;
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: var(--fontCode);
   line-height: 1.25em;
   color: white;
 }
@@ -36,7 +34,6 @@
   z-index: 1;
   pointer-events: none;
   /* opacity: 0; */
-
 }
 
 .define code.highlight {
@@ -70,7 +67,7 @@
 }
 
 dl.specs {
-  font-family: 'IBM Plex Sans Condensed', sans-serif;
+  font-family: var(--fontDisplay);
   font-size: 0.75rem;
   line-height: inherit;
   display: inline-block;
