@@ -135,53 +135,26 @@
   right: 100%;
 }
 
-.prose > h1:focus::before {
-  content: '#';
+.prose > [data-mark-before]:focus::before {
+  content: attr(data-mark-before);
 }
 
-.prose > h2:focus::before {
-  content: '##';
-}
-
-.prose > h3:focus::before {
-  content: '###';
-}
-
-.prose > ul:focus,
-.prose > ol:focus {
-}
-
-.prose > ul:focus > li,
-.prose > ol:focus > li {
+.prose > *:focus > li[data-mark-before] {
   list-style: none;
   text-indent: -1em;
 }
 
-.prose > ul:focus > li::before {
-  content: '*';
-}
-
-.prose > ol:focus > li::before {
-  content: '1.';
+.prose > *:focus > li[data-mark-before]::before {
+  content: attr(data-mark-before);
 }
 
 .prose > pre:focus-within::before {
   content: attr(lang);
 }
 
-.prose > :not(pre):focus code::before,
-.prose > :not(pre):focus code::after {
-  content: '`';
-}
-
-.prose > :not(pre):focus em::before,
-.prose > :not(pre):focus em::after {
-  content: '_';
-}
-
-.prose > :not(pre):focus strong::before,
-.prose > :not(pre):focus strong::after {
-  content: '**';
+.prose > :not(pre):focus [data-mark-around]::before,
+.prose > :not(pre):focus [data-mark-around]::after {
+  content: attr(data-mark-around);
 }
 
 .prose > :not(pre):focus a::before {

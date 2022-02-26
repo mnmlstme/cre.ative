@@ -23,7 +23,7 @@ export function ProseEditor(props) {
         // check for markdown prefix on previously unmarked paragraph
         const sp = html.indexOf(' ')
         const md = sp > 0 ? html.substring(0, sp + 1) : ''
-        const newTag = markdownPrefixToTagName(md)
+        const newTag = markToTag(md)
 
         if (newTag) {
           tag = newTag
@@ -57,7 +57,8 @@ export function ProseEditor(props) {
             <Block
               key={index}
               tagName={tag}
-              html={html}
+              markBefore={tagToMark(tag)}
+              html={markupHTML(html, tag)}
               mode="prose-mode"
               spellCheck={true}
               onChange={(s) => handleMarkdown(index, tag, s)}
@@ -69,21 +70,48 @@ export function ProseEditor(props) {
   )
 }
 
-function markdownPrefixToTagName(md) {
-  switch (md) {
-    case '# ':
-      return 'h1'
-    case '## ':
-      return 'h2'
-    case '### ':
-      return 'h3'
-    case '* ':
-      return 'li'
-    case '1. ':
-      return 'li'
-    default:
-      return null
+const tags = [
+  { tag: 'h1', mark: '#', block: true },
+  { tag: 'h2', mark: '##', block: true },
+  { tag: 'h3', mark: '###', block: true },
+  { tag: 'li', mark: '*', block: true, parent: 'ul' },
+  { tag: 'li', mark: '1.', block: true, parent: 'ol' },
+  { tag: 'strong', mark: '**', inline: true },
+  { tag: 'em', mark: '_', inline: true },
+  { tag: 'code', mark: '`', inline: true },
+]
+
+function tagToMark(tag) {
+  const spec = tags.find((t) => t.tag === tag)
+
+  return spec && spec.mark
+}
+
+function markToTag(md) {
+  const spec = tags.find((t) => t.mark === md)
+
+  return spec && spec.tag
+}
+
+function markupTag(tag, parent) {
+  const spec = tags.find(
+    (t) => t.tag === tag && (!t.parent || parent === t.parent)
+  )
+
+  if (spec) {
+    const { mark, block, inline } = spec
+    const where = block ? 'before' : inline ? 'around' : 'none'
+
+    return `<${tag} data-mark-${where}="${mark}">`
+  } else {
+    return `<${tag}>`
   }
+}
+
+const markupRE = /\<([a-z]+)\>/gi
+
+function markupHTML(html, parent) {
+  return html.replace(markupRE, (_, tag) => markupTag(tag, parent))
 }
 
 const proseMode = {
@@ -92,6 +120,7 @@ const proseMode = {
   keymaps: [
     {
       '*': hyper_star,
+      Backspace: hyper_backspace,
     },
   ],
   bindings: [hyper_star],
@@ -107,5 +136,10 @@ function hyper_star() {
     return
   }
 
-  this.surround_selection('strong')
+  this.surround_selection('strong', '**')
+}
+
+function hyper_backspace() {
+  this.backward_select_chars(1)
+  this.delete_selected_chars()
 }

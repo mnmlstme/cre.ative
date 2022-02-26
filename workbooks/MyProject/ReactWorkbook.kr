@@ -22,7 +22,7 @@ code to discuss what we're doing.
 ## File Format: Kram
 
 All code and documentation for the workbook
-is maintained in a single file using Kram,
+is maintained in a single file using `kram`,
 a text-based format that supports
 
 

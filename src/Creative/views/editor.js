@@ -49,6 +49,7 @@ export class Block extends React.Component {
       spellCheck,
       lang,
       mode,
+      markBefore,
       disabled,
     } = this.props
 
@@ -56,6 +57,7 @@ export class Block extends React.Component {
       className,
       spellCheck,
       'data-mode-name': mode || 'core',
+      'data-mark-before': markBefore,
       lang: lang || 'zxx',
       contentEditable: !disabled,
       onInput: this.handleChange,
@@ -83,6 +85,8 @@ export class Editor extends React.Component {
       forward_chars: this.forwardChars.bind(this),
       backward_chars: this.backwardChars.bind(this),
       insert_chars: this.insertChars.bind(this),
+      forward_select_chars: this.forwardSelectChars.bind(this),
+      backward_select_chars: this.backwardSelectChars.bind(this),
       forward_select_matching: this.forwardSelectMatching.bind(this),
       backward_select_matching: this.backwardSelectMatching.bind(this),
       surround_selection: this.surroundSelection.bind(this),
@@ -152,6 +156,7 @@ export class Editor extends React.Component {
         const len = node.nodeValue.length
         if (offset + n < len && offset + n >= 0) {
           this.setCaret(node, offset + n)
+          return true
         } else {
           console.log('TODO: moveCaretChars beyond end of node')
         }
@@ -162,11 +167,43 @@ export class Editor extends React.Component {
   }
 
   forwardChars(n = 1) {
-    this.moveCaretChars(n)
+    return this.moveCaretChars(n)
   }
 
   backwardChars(n = 1) {
-    this.moveCaretChars(-n)
+    return this.moveCaretChars(-n)
+  }
+
+  selectMoreChars(n) {
+    let [node, offset] = n < 0 ? this.getAnchor() : this.getCaret()
+
+    switch (node.nodeType) {
+      case Node.TEXT_NODE:
+      case Node.CDATA_SECTION_NODE:
+      case Node.COMMENT_NODE:
+        const len = node.nodeValue.length
+        if (offset + n < len && offset + n >= 0) {
+          if (n < 0) {
+            this.setSelection([node, offset + n], null)
+          } else {
+            this.setSelection(null, [node, offset + n])
+          }
+          return true
+        } else {
+          console.log('TODO: selectMoreChars beyond end of node')
+        }
+        break
+      default:
+        console.log('TODO: selectMoreChars in non-char data')
+    }
+  }
+
+  forwardSelectChars(n = 1) {
+    return this.selectMoreChars(n)
+  }
+
+  backwardSelectChars(n = 1) {
+    return this.selectMoreChars(-n)
   }
 
   insertChars(s) {
@@ -178,23 +215,30 @@ export class Editor extends React.Component {
       case Node.COMMENT_NODE:
         node.insertData(offset, s)
         this.forwardChars(s.length)
-        break
+        return true
       default:
         const ref = node.childNodes.item(offset)
         const text = document.createTextNode(s)
         node.insertBefore(text, ref)
+        return true
     }
   }
 
-  deleteSelectedChars(n = 1) {
-    const [node, offset] = n > 0 ? this.getAnchor() : this.getCaret()
+  deleteSelectedChars(n) {
+    const [node, offset] =
+      typeof n === 'undefined' || n > 0 ? this.getAnchor() : this.getCaret()
 
     switch (node.nodeType) {
       case Node.TEXT_NODE:
       case Node.CDATA_SECTION_NODE:
       case Node.COMMENT_NODE:
-        node.deleteData(n > 0 ? offset : offset + n, Math.abs(n))
-        break
+        if (typeof n === 'undefined') {
+          const [node2, end] = this.getCaret()
+          node.deleteData(offset, end - offset)
+        } else {
+          node.deleteData(n > 0 ? offset : offset + n, Math.abs(n))
+        }
+        return true
       default:
         console.log('TODO: deleteSelectedChars from non-char data')
     }
@@ -236,8 +280,9 @@ export class Editor extends React.Component {
     return this.selectMatching(re, true)
   }
 
-  surroundSelection(tag) {
+  surroundSelection(tag, mark) {
     const markup = document.createElement(tag)
+    mark && markup.setAttribute('data-mark-around', mark)
     this.state.range.surroundContents(markup)
   }
 
