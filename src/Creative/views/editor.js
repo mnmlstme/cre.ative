@@ -90,13 +90,10 @@ export class Editor extends React.Component {
       forward_select_matching: this.forwardSelectMatching.bind(this),
       backward_select_matching: this.backwardSelectMatching.bind(this),
       surround_selection: this.surroundSelection.bind(this),
+      delete_selection: this.deleteSelection.bind(this),
       delete_selected_chars: this.deleteSelectedChars.bind(this),
       save_content: () => onSave && onSave(),
       save_excursion: this.saveExcursion.bind(this),
-
-      getSelectionRange: () => this.state.range,
-
-      getBlocksInFocus: () => selectedBlocks(this.state.range),
 
       // promptWithOptions: this.promptWithOptions.bind(this),
       // cancelPrompt: this.cancelPrompt.bind(this),
@@ -125,6 +122,10 @@ export class Editor extends React.Component {
     const { startContainer, startOffset } = this.state.range
 
     return [startContainer, startOffset]
+  }
+
+  getSelection() {
+    return this.state.range
   }
 
   setCaret(node, offset) {
@@ -176,25 +177,50 @@ export class Editor extends React.Component {
 
   selectMoreChars(n) {
     let [node, offset] = n < 0 ? this.getAnchor() : this.getCaret()
+    let remaining = n
 
-    switch (node.nodeType) {
-      case Node.TEXT_NODE:
-      case Node.CDATA_SECTION_NODE:
-      case Node.COMMENT_NODE:
-        const len = node.nodeValue.length
-        if (offset + n < len && offset + n >= 0) {
-          if (n < 0) {
-            this.setSelection([node, offset + n], null)
-          } else {
-            this.setSelection(null, [node, offset + n])
+    console.log('selectMoreChars:', n, node, offset)
+
+    while (remaining) {
+      switch (node.nodeType) {
+        case Node.TEXT_NODE:
+        case Node.CDATA_SECTION_NODE:
+        case Node.COMMENT_NODE:
+          const len = node.nodeValue.length
+          if (offset < 0) {
+            offset = len + offset + 1
           }
-          return true
-        } else {
-          console.log('TODO: selectMoreChars beyond end of node')
-        }
-        break
-      default:
-        console.log('TODO: selectMoreChars in non-char data')
+          const limit =
+            n < 0
+              ? Math.max(remaining, -offset)
+              : Math.min(remaining, len - offset)
+          if (limit !== remaining) {
+            console.log('selectMoreChars beyond end of node', n, node, offset)
+            if (n < 0) {
+              node = node.previousSibling || node.parentNode
+              offset = -1
+            } else {
+              node = node.nextSibling || node.parentNode
+              offset = 0
+            }
+          } else if (n < 0) {
+            this.setSelection([node, offset + limit], null)
+          } else {
+            this.setSelection(null, [node, offset + limit])
+          }
+          remaining = remaining - limit
+          break
+        case Node.ELEMENT_NODE:
+          console.log('selectMoreChars in Element', n, node, offset)
+          node = !offset
+            ? node.firstChild
+            : offset > 0
+            ? node.childNodes.item(offset)
+            : node.lastChild
+          break
+        default:
+          console.log('TODO: selectMoreChars in non-Element and nonChar data')
+      }
     }
   }
 
@@ -224,6 +250,11 @@ export class Editor extends React.Component {
     }
   }
 
+  deleteSelection() {
+    const range = this.getSelection()
+    range.deleteContents()
+  }
+
   deleteSelectedChars(n) {
     const [node, offset] =
       typeof n === 'undefined' || n > 0 ? this.getAnchor() : this.getCaret()
@@ -233,7 +264,8 @@ export class Editor extends React.Component {
       case Node.CDATA_SECTION_NODE:
       case Node.COMMENT_NODE:
         if (typeof n === 'undefined') {
-          const [node2, end] = this.getCaret()
+          const [_, end] = this.getCaret()
+          console.log('deleteSelectedChars entirely', node, offset, end)
           node.deleteData(offset, end - offset)
         } else {
           node.deleteData(n > 0 ? offset : offset + n, Math.abs(n))

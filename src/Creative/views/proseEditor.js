@@ -141,5 +141,5 @@ function hyper_star() {
 
 function hyper_backspace() {
   this.backward_select_chars(1)
-  this.delete_selected_chars()
+  this.delete_selection()
 }
