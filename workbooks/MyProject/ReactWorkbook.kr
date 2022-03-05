@@ -13,7 +13,7 @@ model:
 
 # Hello, World
 
-This workbook contains **React** expressions
+This workbook has **React** expressions
 which we evaluate and render.
 
 We can write documentation alongside the
@@ -25,8 +25,7 @@ All code and documentation for the workbook
 is maintained in a single file using `kram`,
 a text-based format that supports
 
-
-* _Markdown_ for documentation
+* _Markdown_ for *foobar* docs
 * code blocks to embed code
 * [YAML](https://en.wikipedia.org/wiki/YAML)
 for configuration and data modeling
@@ -35,14 +34,13 @@ Code in multiple languages can be written in the same file.
 
 ```css
 .hi {
-  font-family: Impact;
+  font-family: Georgia;
   color: #835cf0;
   font-size: 4rem;
 }
 ```
 
 The `react-redux` platform supports the following languages:
-
 
 1. HTML
 1. CSS
@@ -54,11 +52,22 @@ The `react-redux` platform supports the following languages:
 <input type="number" defaultValue={asString(count)}/>
 ```
 
-# Functions
+<h1 id="functions">Functions</h1>
 
-We can put lots of views in the same file like this. We
+
+
+
+
+
+
+<p>We can put lots of views in the same file like this. We
 can also define helper functions. All helper functions in the
-workbook are available to every view.
+workbook are available to every view.</p>
+
+
+
+
+
 
 
 

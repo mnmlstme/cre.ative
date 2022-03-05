@@ -127,16 +127,11 @@ const proseMode = {
 }
 
 function hyper_star() {
-  if (this.backward_select_matching(/\*([^*]+)$/)) {
-    this.delete_selected_chars(1)
-  } else if (this.forward_select_matching(/^([^*]+)\*/)) {
-    this.delete_selected_chars(-1)
+  if (!this.selection_is_empty()) {
+    this.surround_selection('em', '*')
   } else {
-    this.insert_chars('*')
-    return
+    this.insert_markup('em', '*')
   }
-
-  this.surround_selection('strong', '**')
 }
 
 function hyper_backspace() {
