@@ -50,8 +50,6 @@ function parse(md, basename, getPlugin ) {
       .map(ls => classify(ls, plugin.classify)),
   };
 
-  console.log("Workbook:", JSON.stringify(result));
-
   const hashkey = hashcode(result);
   const moduleName = `Kram_${hashkey}_${basename}`;
 
@@ -71,22 +69,6 @@ function paginate(tokens) {
 function coalesce(tokens) {
   // no coalescing, each block is a single token
   return tokens.map(t => [t])
-  
-  /*
-  let leaders = tokens
-    .map((t, i) =>
-      t.type === "code"
-        ? i
-        : !tokens[i - 1] || tokens[i - 1].type === "code"
-        ? i
-        : false
-    )
-    .filter((i) => i !== false);
-
-  // console.log("Leaders: ", leaders);
-
-  return leaders.map((ld, i) => tokens.slice(ld, leaders[i + 1]));
-  */
 }
 
 const defaultClassifier = (s) => ({mode: "define"})
@@ -99,13 +81,11 @@ function classify(list, classifier = defaultClassifier) {
       return Object.assign({
         id,
         lang,
-        text,
+        code: text,
       }, classifier(text, lang));
     } else {
       return {
-        mode: "discuss",
-        lang: "html",
-        text: marked.parser(tokens),
+        html: marked.parser(tokens),
         title: tokens
           .map((t) => t.type === "heading" && t.text)
           .filter(Boolean)[0],
@@ -114,7 +94,7 @@ function classify(list, classifier = defaultClassifier) {
   });
 
   return {
-    title: blocks.map((b) => b.mode === "discuss" && b.title).filter(Boolean)[0],
+    title: blocks.map((b) => b.title).filter(Boolean)[0],
     blocks,
   };
 }

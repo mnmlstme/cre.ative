@@ -4,7 +4,7 @@ const { parse } = require("node-html-parser");
 module.exports = { pack };
 
 function pack(wb) {
-  const frontMatter = log("frontMatter", configToYaml(wb));
+  const frontMatter = configToYaml(wb)
   const mdPages = wb.scenes.map(sceneToMarkdown);
 
   return ["", frontMatter].concat(mdPages).join("---\n");
@@ -27,75 +27,93 @@ function importsToYaml(imports) {
 }
 
 function sceneToMarkdown(scn) {
-  return scn.blocks.map((b) => log("blkToMd", blockToMarkdown(b))).join("\n");
+  return scn.blocks.map(blockToMarkdown).join("\n");
 }
 
 function blockToMarkdown(blk) {
   const bqbqbq = "```";
 
-  const { mode, lang, text } = blk;
+  const { tag, html, code, lang } = blk;
 
-  console.log("Block", blk);
-
-  if (mode === "discuss") {
-    if (lang === "markdown" || lang === "md") {
-      return `${text}\n`;
-    } else if (lang === "html") {
-      return htmlToMarkdown(text);
-    } else {
-      return `${bqbqbq}${lang}\n${text}\n${bqbqbq}\n`;
-    }
+  if (typeof code !== 'undefined') {
+    return `${bqbqbq}${lang}\n${code}\n${bqbqbq}\n`;
   } else {
-    return `${bqbqbq}${lang}\n${text}\n${bqbqbq}\n`;
+    return htmlToMarkdown(tag, html);
   }
 }
 
-function htmlToMarkdown(html) {
-  const root = parse(html);
-
-  return root.childNodes
-    .map((n) => log("nodeToMd", nodeToMarkdown(n) || ""))
-    .join("\n");
-}
-
-function nodeToMarkdown(node) {
-  const { tagName, innerHTML } = node;
-
-  console.log("n2md input:", node);
+function htmlToMarkdown(tagName, inner) {
+  const root = parse(inner);
+  const innerMd = inlineToMarkdown(root.childNodes)
 
   switch (tagName && tagName.toLowerCase()) {
     case "br":
       return "\n\n";
     case "p":
-      return `${innerHTML}`;
+      return `${innerMd}\n`;
     case "h1":
-      return `# ${innerHTML}`;
+      return `# ${innerMd}\n`;
     case "h2":
-      return `## ${innerHTML}`;
+      return `## ${innerMd}\n`;
     case "h3":
-      return `### ${innerHTML}`;
+      return `### ${innerMd}\n`;
     case "ol":
-      return listToMarkdown("1.", node);
+      return `${listToMarkdown("1.", root.childNodes)}\n`;
     case "ul":
-      return listToMarkdown("*", node);
+      return `${listToMarkdown("*", root.childNodes)}\n`;
     default:
-      return "";
+      return inner;
   }
 }
 
-function log(prefix, value) {
-  console.log(prefix, value);
-  return value;
+function inlineToMarkdown(nodelist) {
+  return nodelist.map(inlineNodeToMarkdown).join('')
 }
 
-function listToMarkdown(prefix, node) {
-  const items = node.getElementsByTagName('li')
+const inlineTagToMark = {
+  strong: '**',
+  em: '_',
+  code: '`',
+  b: '*',
+  i: '_'
+}
 
-  return items.map(n => liToMarkdown(prefix, n)).join('\n')
+function inlineNodeToMarkdown(node) {
+  const {nodeType, tagName, attributes, childNodes, rawText} = node
+
+  if (typeof tagName !== 'undefined')  {
+    const tag = tagName.toLowerCase()
+    const contents = childNodes ? inlineToMarkdown(childNodes) : ''
+
+      switch( tag ){
+        case "strong":
+        case "em":
+        case "code":
+        case "b":
+        case "i":
+          const mark = attributes['data-mark-around'] || inlineTagToMark[tag]
+          return mark ? `${mark}${contents}${mark}` : `<${tag}>${contents}</${tag}>`
+        case "a":
+          const href = attributes['href']
+          const parens = href ? `(${href})` : ''
+          return `[${contents}]${parens}`
+        default:
+          return `<${tag}>${contents}</${tag}>`
+      }
+  } else {
+    return rawText
+  }
+
+}
+
+function listToMarkdown(prefix, nodelist) {
+  return nodelist
+    .filter(n => n.tagName && n.tagName.toLowerCase() === 'li')
+    .map(n => liToMarkdown(prefix, n)).join('\n')
 }
 
 function liToMarkdown(prefix, node) {
+
   // TODO: nested lists
-  console.log("li2md input:", node);
-  return `${prefix} ${node.innerHTML}`
+  return `${prefix} ${inlineToMarkdown(node.childNodes)}`
 }
