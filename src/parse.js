@@ -1,6 +1,7 @@
 const hash = require("object-hash");
-const marked = require("marked");
+const MarkdownIt = require("markdown-it");
 const frontMatter = require("front-matter");
+const { rules } = require("./render");
 
 const defaultPlugin = {
   collate: function (workbook, lang) {
@@ -17,22 +18,37 @@ module.exports = {
   defaultPlugin
 };
 
+const mdit = MarkdownIt('commonmark')
+
+Object.assign(mdit.renderer.rules, rules)
 
 function parse(md, basename, getPlugin ) {
   const { body, attributes } = frontMatter(md);
-  const defaultLang = attributes.lang || "text";
+  const defaultLang = attributes.lang || "text"
+  const tokens = mdit.parse(body)
+  const unhandled = tokens.filter(t => t.type !== 'inline' && typeof rules[t.type] !== 'function')
+  const json = `[{}${mdit.render(body)}]`
 
-  const tokens = marked.lexer(body).map(function (token, index) {
-    if (token.type === "code") {
-      const assign = {
-        id: `krumb-${index}`,
-        lang: token.lang || defaultLang,
-      };
-      return Object.assign(token, assign);
-    } else {
-      return token;
-    }
-  });
+  if (unhandled.length > 0){
+    console.log('Unhandled Tokens:', unhandled)
+  }
+
+  console.log('Rendered JSON:', json)
+
+  const blocks = JSON.parse(json).slice(1)
+
+
+  // lexer(body).map(function (token, index) {
+  //   if (token.type === "code") {
+  //     const assign = {
+  //       id: `krumb-${index}`,
+  //       lang: token.lang || defaultLang,
+  //     };
+  //     return Object.assign(token, assign);
+  //   } else {
+  //     return token;
+  //   }
+  // });
 
   const { title, platform, model, imports } = attributes;
   const plugin = getPlugin && getPlugin(platform) || defaultPlugin;
@@ -41,13 +57,12 @@ function parse(md, basename, getPlugin ) {
     title,
     basename,
     platform,
-    languages: getLanguages(tokens),
+    languages: getLanguages(blocks),
     init: model,
     shape: getShapeOf(model),
     imports: getImportSpecs(imports),
-    scenes: paginate(tokens)
-      .map(coalesce)
-      .map(ls => classify(ls, plugin.classify)),
+    scenes: paginate(blocks)
+      .map(scene => classify(scene, plugin.classify)),
   };
 
   const hashkey = hashcode(result);
@@ -56,47 +71,45 @@ function parse(md, basename, getPlugin ) {
   return Object.assign({ hashkey, moduleName }, result);
 }
 
-function paginate(tokens) {
-  let breaks = tokens
-    .map((t, i) => (t.type === "hr" ? i : false))
+function paginate(blocks) {
+  const isBreak = b =>
+    Array.isArray(b) && b.length === 1 && typeof b[0] === 'object' && b[0].markup === '---'
+  let breaks = blocks
+    .map((b, i) => (isBreak(b) ? i : false))
     .filter((i) => i !== false);
 
   breaks.unshift(-1);
 
-  return breaks.map((b, i) => tokens.slice(b + 1, breaks[i + 1]));
-}
-
-function coalesce(tokens) {
-  // no coalescing, each block is a single token
-  return tokens.map(t => [t])
+  return breaks.map((b, i) => blocks.slice(b + 1, breaks[i + 1]));
 }
 
 const defaultClassifier = (s) => ({mode: "define"})
 
-function classify(list, classifier = defaultClassifier) {
-  const blocks = list.map((tokens, i) => {
-    const { type, id, lang, text } = tokens[0];
+function classify(scene, classifier = defaultClassifier) {
+  const out = scene.map((b, i) => {
+    // console.log('Classify:', b)
+    const { type, id, lang, text } = b[0];
 
     if (type === "code") {
-      return Object.assign({
+      return b.splice(0, 1, Object.assign({
         id,
         lang,
         code: text,
-      }, classifier(text, lang));
+      }, classifier(text, lang)))
     } else {
-      return {
-        html: marked.parser(tokens),
-        title: tokens
-          .map((t) => t.type === "heading" && t.text)
-          .filter(Boolean)[0],
-      };
+      return b
     }
   });
 
-  return {
-    title: blocks.map((b) => b.title).filter(Boolean)[0],
-    blocks,
-  };
+  const headings = out.map((b) => b[0].type === 'heading' && b.slice(1)).filter(Boolean)
+  console.log('Headings:', headings)
+
+  return Object.assign({blocks: out}, headings.length ? {title: textContent(headings[0])} : {})
+}
+
+function textContent(t) {
+  return typeof t === 'string' ? t :
+    Array.isArray(t) ? t.map(s => textContent(s)).join('') : ''
 }
 
 function getLanguages(tokens) {
