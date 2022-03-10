@@ -5,19 +5,27 @@
   "main": "src/index.js",
   "loader": "src/webpack/loader.js",
   "scripts": {
+    "build": "webpack build",
+    "build-legacy": "NODE_OPTIONS=--openssl-legacy-provider webpack build",
+    "start": "nodemon dist/server.js",
     "test": "jest"
   },
   "author": "",
   "license": "BSD-3-Clause",
   "dependencies": {
     "front-matter": "^4.0.2",
+    "loader-utils": "^2.0.0",
     "markdown-it": "^12.3.2",
     "node-html-parser": "^5.1.0",
     "object-hash": "^2.2.0",
-    "yaml": "^1.10.2"
+    "yaml": "^1.10.2",
+    "express": "^4.17.1"
   },
   "devDependencies": {
     "jest": "^27.5.1",
-    "loader-utils": "^2.0.0"
+    "nodemon": "^2.0.15",
+    "webpack": "^4.16.1",
+    "webpack-cli": "^4.8.0",
+    "webpack-node-externals": "^3.0.0"
   }
 }
