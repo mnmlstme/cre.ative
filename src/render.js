@@ -10,8 +10,8 @@ module.exports = {
     ordered_list_close: close_element,
     list_item_open: open_element,
     list_item_close: close_element,
-    softbreak: () => '',
     text: insert_text,
+    softbreak: insert_newline,
     hr: insert_empty_element,
     code_inline: insert_code,
     fence: insert_code_block,
@@ -23,15 +23,18 @@ module.exports = {
   not_implemented
 }
 
+const nl = (b) => b ? '\n' : ''
+
 function open_element(tokens, i) {
-  const {type, tag, markup} = tokens[i]
+  const {type, block, tag, markup} = tokens[i]
+  const ts = JSON.stringify(type.replace(/_(open|close)$/, ''))
   const json = JSON.stringify({
-    type: type.replace(/_(open|close)$/, ''),
     tag: tag.toLowerCase(),
+    block,
     markup
   })
 
-  return `,[${json}`
+  return `,${nl(block)}[${ts},${json}`
 }
 
 function close_element(tokens, i) {
@@ -49,11 +52,15 @@ function insert_text(tokens, i) {
   return content ? `,${json}` : ''
 }
 
+function insert_newline() {
+  return ',"\\n"'
+}
+
 function insert_code(tokens, i) {
   const {type, tag, block, markup, info, content} = tokens[i]
   const json = JSON.stringify([
+    type,
     {
-      type: type,
       tag: tag.toLowerCase(),
       block,
       markup
@@ -61,14 +68,14 @@ function insert_code(tokens, i) {
     content
   ])
 
-  return `,${json}`
+  return `,${nl(block)}${json}`
 }
 
 function insert_code_block(tokens, i) {
   const {type, tag, block, markup, info, content} = tokens[i]
   const json = JSON.stringify([
+    type,
     {
-      type: type,
       tag: 'pre',
       lang: info.toLowerCase(),
       markup,
@@ -77,7 +84,7 @@ function insert_code_block(tokens, i) {
     content
   ])
 
-  return `,${json}`
+  return `,${nl(block)}${json}`
 }
 
 

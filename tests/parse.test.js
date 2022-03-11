@@ -38,10 +38,10 @@ function test_header(n, t, m) {
     expect(title).toBe(ttl)
     expect(blocks).toHaveLength(1)
 
-    const [head, content] = blocks[0]
-    expect(head.type).toBe('heading')
-    expect(head.tag).toBe(t)
-    expect(head.markup).toBe(m)
+    const [type, attrs, content] = blocks[0]
+    expect(type).toBe('heading')
+    expect(attrs.tag).toBe(t)
+    expect(attrs.markup).toBe(m)
     expect(content).toBe(ttl)
   })
 }
@@ -61,10 +61,11 @@ separates paragraphs.
   expect(blocks).toHaveLength(2)
 
   blocks.forEach( p => {
-    expect(p).toHaveLength(3)
+    expect(p).toHaveLength(5) // 2 lines, with newline between lines
 
-    const [head, ...rest] = p
-    expect(head.tag).toBe('p')
+    const [type, attrs, ...rest] = p
+    expect(type).toBe('paragraph')
+    expect(attrs.tag).toBe('p')
   })
 })
 
@@ -80,21 +81,22 @@ test('parses bullet lists', () => {
   expect(title).toBeUndefined()
   expect(blocks).toHaveLength(1)
 
-  const [head, ...list] = blocks[0]
-  expect(head.type).toBe('bullet_list')
-  expect(head.tag).toBe('ul')
-  expect(head.markup).toBe('*')
+  const [type, attrs, ...list] = blocks[0]
+  expect(type).toBe('bullet_list')
+  expect(attrs.tag).toBe('ul')
+  expect(attrs.markup).toBe('*')
 
   list.forEach( li => {
-    expect(li).toHaveLength(2)
+    expect(li).toHaveLength(3)
 
-    const [head, p] = li
-    expect(head.type).toBe('list_item')
-    expect(head.tag).toBe('li')
-    expect(head.markup).toBe('*')
-    expect(p).toHaveLength(2)
-    expect(p[0].tag).toBe('p')
-    expect(p[1]).toMatch(/^(One|Two|Three)$/)
+    const [type, attrs, p] = li
+    expect(type).toBe('list_item')
+    expect(attrs.tag).toBe('li')
+    expect(attrs.markup).toBe('*')
+    expect(p).toHaveLength(3)
+    expect(p[0]).toBe('paragraph')
+    expect(p[1].tag).toBe('p')
+    expect(p[2]).toMatch(/^(One|Two|Three)$/)
   })
 })
 
@@ -110,21 +112,22 @@ test('parses numbered lists', () => {
   expect(title).toBeUndefined()
   expect(blocks).toHaveLength(1)
 
-  const [head, ...list] = blocks[0]
-  expect(head.type).toBe('ordered_list')
-  expect(head.tag).toBe('ol')
-  expect(head.markup).toBe('.')
+  const [type, attrs, ...list] = blocks[0]
+  expect(type).toBe('ordered_list')
+  expect(attrs.tag).toBe('ol')
+  expect(attrs.markup).toBe('.')
 
   list.forEach( li => {
-    expect(li).toHaveLength(2)
+    expect(li).toHaveLength(3)
 
-    const [head, p] = li
-    expect(head.type).toBe('list_item')
-    expect(head.tag).toBe('li')
-    expect(head.markup).toBe('.')
-    expect(p).toHaveLength(2)
-    expect(p[0].tag).toBe('p')
-    expect(p[1]).toMatch(/^(One|Two|Three)$/)
+    const [type, attrs, p] = li
+    expect(type).toBe('list_item')
+    expect(attrs.tag).toBe('li')
+    expect(attrs.markup).toBe('.')
+    expect(p).toHaveLength(3)
+    expect(p[0]).toBe('paragraph')
+    expect(p[1].tag).toBe('p')
+    expect(p[2]).toMatch(/^(One|Two|Three)$/)
   })
 })
 
@@ -143,11 +146,11 @@ ${qqq}`
   expect(title).toBeUndefined()
   expect(blocks).toHaveLength(1)
 
-  const [head, code] = blocks[0]
-  expect(head.type).toBe('fence')
-  expect(head.tag).toBe('pre')
-  expect(head.markup).toBe(qqq)
-  expect(head.lang).toBe('html')
+  const [type, attrs, code] = blocks[0]
+  expect(type).toBe('fence')
+  expect(attrs.tag).toBe('pre')
+  expect(attrs.markup).toBe(qqq)
+  expect(attrs.lang).toBe('html')
   expect(code.split('\n')).toHaveLength(4)
   expect(code).toMatch(/\n$/)
 })
@@ -163,10 +166,10 @@ test('parses inline markup', () => {
   expect(title).toBe('Strong Emphatic Code')
   expect(blocks).toHaveLength(1)
 
-  const [head, ...tokens] = blocks[0]
-  expect(head.type).toBe('heading')
-  expect(head.tag).toBe('h1')
-  expect(head.markup).toBe('#')
+  const [type, attrs, ...tokens] = blocks[0]
+  expect(type).toBe('heading')
+  expect(attrs.tag).toBe('h1')
+  expect(attrs.markup).toBe('#')
   expect(tokens).toHaveLength(5)
 })
 

@@ -73,7 +73,7 @@ function parse(md, basename, getPlugin ) {
 
 function paginate(blocks) {
   const isBreak = b =>
-    Array.isArray(b) && b.length === 1 && typeof b[0] === 'object' && b[0].markup === '---'
+    Array.isArray(b) && b.length === 2 && b[0] === 'hr' && b[1].markup === '---'
   let breaks = blocks
     .map((b, i) => (isBreak(b) ? i : false))
     .filter((i) => i !== false);
@@ -101,7 +101,7 @@ function classify(scene, classifier = defaultClassifier) {
     }
   });
 
-  const headings = out.map((b) => b[0].type === 'heading' && b.slice(1)).filter(Boolean)
+  const headings = out.filter(b => b[0] === 'heading')
   console.log('Headings:', headings)
 
   return Object.assign({blocks: out}, headings.length ? {title: textContent(headings[0])} : {})
@@ -109,7 +109,7 @@ function classify(scene, classifier = defaultClassifier) {
 
 function textContent(t) {
   return typeof t === 'string' ? t :
-    Array.isArray(t) ? t.map(s => textContent(s)).join('') : ''
+    Array.isArray(t) ? t.slice(1).map(s => textContent(s)).join('') : ''
 }
 
 function getLanguages(tokens) {
