@@ -1,7 +1,8 @@
-const { parse, defaultPlugin } = require("./parse");
-const { extract } = require("./extract");
-const { pack } = require("./pack");
-const { recordType, scalarType, arrayType } = require("./utils");
+const { parse, defaultPlugin } = require('./parse')
+const { extract } = require('./extract')
+const { pack } = require('./pack')
+const { recordType, scalarType, arrayType } = require('./utils')
+// const Express = require('./express')
 
 module.exports = {
   parse,
@@ -10,5 +11,6 @@ module.exports = {
   recordType,
   scalarType,
   arrayType,
-  defaultPlugin
+  defaultPlugin,
+  // Express
 };

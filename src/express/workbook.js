@@ -1,10 +1,10 @@
-import path from 'path'
-import fs from 'fs'
-import Kr from '../'
+const path = require('path')
+const fs = require('fs')
+const Kr = require('../')
 
 const kramExt = (id) => `${id}.kr`
 
-export function getById(store, req, res) {
+function getById(store, req, res) {
   const { prjId, wbkId } = req.params
   const filepath = path.join(store.prjDir, prjId, kramExt(wbkId))
 
@@ -17,7 +17,7 @@ export function getById(store, req, res) {
   })
 }
 
-export function update(store, req, res) {
+function update(store, req, res) {
   const { prjId, wbkId } = req.params
   const filepath = path.join(store.prjDir, prjId, kramExt(wbkId))
   const wb = req.body
@@ -31,7 +31,7 @@ export function update(store, req, res) {
   })
 }
 
-export function updateScene(store, req, res) {
+function updateScene(store, req, res) {
   const { prjId, wbkId, scnId } = req.params
   const filepath = path.join(store.prjDir, prjId, kramExt(wbkId))
   const json = req.body
@@ -53,8 +53,8 @@ export function updateScene(store, req, res) {
   })
 }
 
-export default {
+module.exports = {
   getById,
   update,
-  updateScene,
+  updateScene
 }

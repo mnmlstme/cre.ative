@@ -1,11 +1,11 @@
-import express from 'express'
-import {mount} from './api'
+const express = require('express')
+const {mount} = require('./api')
 
 const store = {
   prjDir: './workbooks',
 }
 
-export function create() {
+function create() {
   const app = express()
 
   app.use(function (err, req, res, next) {
@@ -20,8 +20,10 @@ export function create() {
   return app
 }
 
-export function start(app, port =3000) {
+function start(app, port =3000) {
   app.listen(port, () =>
     console.log(`Kram server listening at http://localhost:${port}`)
   )
 }
+
+module.exports = {create, start}

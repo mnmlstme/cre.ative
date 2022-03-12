@@ -19,6 +19,10 @@ module.exports = {
     strong_close: close_element,
     em_open: open_element,
     em_close: close_element,
+    link_open: open_element,
+    link_close: close_element,
+    html_block: insert_text, // escaping html for now
+    html_inline: insert_text // escaping html for now
   },
   not_implemented
 }
@@ -26,13 +30,14 @@ module.exports = {
 const nl = (b) => b ? '\n' : ''
 
 function open_element(tokens, i) {
-  const {type, block, tag, markup} = tokens[i]
+  const {type, block, attrs, tag, markup} = tokens[i]
   const ts = JSON.stringify(type.replace(/_(open|close)$/, ''))
-  const json = JSON.stringify({
+  const attrjson = attrs && attrs.length ? Object.fromEntries(attrs) : {}
+  const json = JSON.stringify(Object.assign(attrjson, {
     tag: tag.toLowerCase(),
     block,
     markup
-  })
+  }))
 
   return `,${nl(block)}[${ts},${json}`
 }
@@ -76,10 +81,12 @@ function insert_code_block(tokens, i) {
   const json = JSON.stringify([
     type,
     {
-      tag: 'pre',
+      tag,
+      preformatted: true,
       lang: info.toLowerCase(),
       markup,
-      block
+      block,
+      id: `krumb-${i}`
     },
     content
   ])

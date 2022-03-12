@@ -1,4 +1,4 @@
-import Server from './server'
-import Api from './api'
+const server = require('./server')
+const api = require('./api')
 
-export default {Server, Api}
+module.exports = {server, api}

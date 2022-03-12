@@ -148,7 +148,9 @@ ${qqq}`
 
   const [type, attrs, code] = blocks[0]
   expect(type).toBe('fence')
-  expect(attrs.tag).toBe('pre')
+  expect(attrs.tag).toBe('code')
+  expect(attrs.preformatted).toBeTruthy()
+  expect(attrs.id).toMatch(/^[A-Za-z-]+\d+$/)
   expect(attrs.markup).toBe(qqq)
   expect(attrs.lang).toBe('html')
   expect(code.split('\n')).toHaveLength(4)
@@ -162,7 +164,6 @@ test('parses inline markup', () => {
   expect(scenes).toHaveLength(1)
 
   const {title, blocks} = scenes[0]
-  console.log('Scene 1:', title, blocks)
   expect(title).toBe('Strong Emphatic Code')
   expect(blocks).toHaveLength(1)
 
@@ -173,6 +174,25 @@ test('parses inline markup', () => {
   expect(tokens).toHaveLength(5)
 })
 
+test('parses links', () => {
+  const md = '# [Link](http://mdn.dev)'
+
+  const {scenes} = parse(md)
+  expect(scenes).toHaveLength(1)
+
+  const {title, blocks} = scenes[0]
+  console.log('Scene 1:', title, blocks)
+  expect(title).toBe('Link')
+  expect(blocks).toHaveLength(1)
+
+  const tokens = blocks[0].slice(2)
+  expect(tokens).toHaveLength(1)
+
+  const [type, attrs, content] = tokens[0]
+  expect(type).toBe('link')
+  expect(attrs.href).toBe('http://mdn.dev')
+  expect(content).toBe('Link')
+})
 
 test(`paginates markdown`, () => {
   const ttl = 'My Testing Workbook'

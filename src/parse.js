@@ -9,7 +9,13 @@ const defaultPlugin = {
     return chunks.map(t => t.text).join('\n')
   },
   classify: function (code, lang) {
-    return "define"
+    switch (lang) {
+      case 'html':
+        return {mode: "eval"}
+
+      default:
+        return {mode: "define"}
+    }
   }
 }
 
@@ -26,30 +32,17 @@ function parse(md, basename, getPlugin ) {
   const { body, attributes } = frontMatter(md);
   const defaultLang = attributes.lang || "text"
   const tokens = mdit.parse(body)
-  const unhandled = tokens.filter(t => t.type !== 'inline' && typeof rules[t.type] !== 'function')
+  const flat = tokens.reduce(
+    (l, r) => r.type === 'inline' ? l.concat(r.children) : l.concat([r]),
+    [] )
+  const unhandled = flat.filter(t => t.type !== 'inline' && typeof rules[t.type] !== 'function')
   const json = `[{}${mdit.render(body)}]`
 
   if (unhandled.length > 0){
     console.log('Unhandled Tokens:', unhandled)
   }
 
-  console.log('Rendered JSON:', json)
-
   const blocks = JSON.parse(json).slice(1)
-
-
-  // lexer(body).map(function (token, index) {
-  //   if (token.type === "code") {
-  //     const assign = {
-  //       id: `krumb-${index}`,
-  //       lang: token.lang || defaultLang,
-  //     };
-  //     return Object.assign(token, assign);
-  //   } else {
-  //     return token;
-  //   }
-  // });
-
   const { title, platform, model, imports } = attributes;
   const plugin = getPlugin && getPlugin(platform) || defaultPlugin;
 
@@ -64,6 +57,8 @@ function parse(md, basename, getPlugin ) {
     scenes: paginate(blocks)
       .map(scene => classify(scene, plugin.classify)),
   };
+
+  console.log('Workbook:', JSON.stringify(result))
 
   const hashkey = hashcode(result);
   const moduleName = `Kram_${hashkey}_${basename}`;
@@ -87,22 +82,20 @@ const defaultClassifier = (s) => ({mode: "define"})
 
 function classify(scene, classifier = defaultClassifier) {
   const out = scene.map((b, i) => {
-    // console.log('Classify:', b)
-    const { type, id, lang, text } = b[0];
+    //console.log('Classify:', b)
+    const [type, attrs, ...rest] = b
 
-    if (type === "code") {
-      return b.splice(0, 1, Object.assign({
-        id,
-        lang,
-        code: text,
-      }, classifier(text, lang)))
+    if (type === "fence") {
+      const { lang } = attrs
+      const [code] = rest
+
+      return [type, Object.assign(attrs, classifier(code, lang)), ...rest]
     } else {
       return b
     }
   });
 
   const headings = out.filter(b => b[0] === 'heading')
-  console.log('Headings:', headings)
 
   return Object.assign({blocks: out}, headings.length ? {title: textContent(headings[0])} : {})
 }
@@ -114,8 +107,8 @@ function textContent(t) {
 
 function getLanguages(tokens) {
   return tokens
-    .filter((t) => t.type === "code")
-    .map((t) => t.lang)
+    .filter(([type]) => type === "fence")
+    .map(([_, attrs]) => attrs.lang)
     .reduce(
       (accum, next) => (accum.includes(next) ? accum : accum.concat([next])),
       []

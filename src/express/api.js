@@ -1,6 +1,6 @@
-import workbook from './workbook'
+const workbook = require('./workbook')
 
-export function mount(app, store) {
+function mount(app, store) {
 
   //  app.get('/api/projects', project.list)
   //  app.get('/api/projects/:id', project.getById)
@@ -19,3 +19,5 @@ export function mount(app, store) {
   )
 
 }
+
+module.exports = {workbook}
