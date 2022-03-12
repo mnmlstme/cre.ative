@@ -7,7 +7,8 @@ import editorStyles from './editor.css'
 
 export function CodeEditor(props) {
   const { block, onChange, onSave } = props
-  const { index, mode, tag, lang, code } = block
+  const [type, attrs, code] = block
+  const { index, mode, tag, lang } = attrs
   const minorMode = getMinorMode(lang)
 
   return (

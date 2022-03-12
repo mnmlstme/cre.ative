@@ -15,11 +15,10 @@ Html.div [ class "hi" ]
 # Introduction
 
 We can write Html expressions in Elm and have them rendered.
-<br>
 
 ### subtitle
 
-We can also pull in CSS classes and reference them using the <code>class</code> attribute.
+We can also pull in CSS classes and reference them using the `class` attribute.
 
 ```css
 .hi {
@@ -41,7 +40,7 @@ Html.input
 
 We can put lots of examples in the same file like this.
 
-We can also define &quot;helper&quot; functions to make the view more
+We can also define "helper" functions to make the view more
 concise.
 
 ```elm

@@ -168,7 +168,7 @@ const backend = {
   name: 'backend',
 
   entry: {
-    server: './src/server/index.js',
+    server: './src/server/main.js',
   },
 
   output: {

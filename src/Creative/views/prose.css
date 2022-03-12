@@ -8,7 +8,7 @@
 }
 
 .prose > * {
-  margin-left: 0.5rem;
+  margin-left: 1.5rem;
   width: 80%;
   position: relative;
 }
@@ -69,6 +69,12 @@
   padding-left: 1em;
 }
 
+.prose ul > li,
+.prose ol > li{
+  position: relative;
+}
+
+
 .prose > :not(pre) code {
   color: #74ec70;
   font-family: var(--fontCode);
@@ -110,21 +116,28 @@
 .prose > :not(pre) *::after {
   display: inline;
   color: #fbbe49;
+  background: #ffda93db;
+  color: black;
   font-family: var(--fontCode);
   line-height: 0.8em;
   font-style: normal;
   border-radius: 0.125rem;
   font-size: 0.8rem;
   font-weight: 400;
-  padding: 0 0.125em;
-  vertical-align: 0.1rem;
+  padding: 0.125em;
+  vertical-align: 0.2em;
   border: 0.5px solid;
   margin: 0 0.1rem;
 }
 
 .prose > *::before,
 .prose > * > li::before {
-  margin-right: 0.25rem;
+  display: block;
+  position: absolute;
+  right: 100%;
+  top: 0.2em;
+  height: 1rem;
+  width: 1rem;
 }
 
 .prose > pre::before,
@@ -141,7 +154,6 @@
 
 .prose > *:focus > li[data-mark-before] {
   list-style: none;
-  text-indent: -1em;
 }
 
 .prose > *:focus > li[data-mark-before]::before {

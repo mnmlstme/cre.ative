@@ -53,17 +53,26 @@ export class Block extends React.Component {
       disabled,
     } = this.props
 
-    return React.createElement(tagName || 'div', {
-      className,
-      spellCheck,
-      'data-mode-name': mode || 'core',
-      'data-mark-before': markBefore,
-      lang: lang || 'zxx',
-      contentEditable: !disabled,
-      onInput: this.handleChange,
-      ref: this.root,
-      dangerouslySetInnerHTML: { __html: html },
-    })
+    return React.createElement(
+      tagName || 'div',
+      Object.assign(
+        {
+          className,
+          spellCheck,
+          'data-mode-name': mode || 'core',
+          lang: lang || 'zxx',
+          contentEditable: !disabled,
+        },
+        markBefore && markBefore !== ''
+          ? { 'data-mark-before': markBefore }
+          : {},
+        {
+          onInput: this.handleChange,
+          ref: this.root,
+          dangerouslySetInnerHTML: { __html: html },
+        }
+      )
+    )
   }
 }
 

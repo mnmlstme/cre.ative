@@ -52,24 +52,11 @@ The `react-redux` platform supports the following languages:
 <input type="number" defaultValue={asString(count)}/>
 ```
 
-<h1 id="functions">Functions</h1>
+## Functions
 
-
-
-
-
-
-
-<p>We can put lots of views in the same file like this. We
+We can put lots of views in the same file like this. We
 can also define helper functions. All helper functions in the
-workbook are available to every view.</p>
-
-
-
-
-
-
-
+workbook are available to every view.
 
 ```jsx
 function asString(n) {

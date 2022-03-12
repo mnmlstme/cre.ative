@@ -11,7 +11,7 @@ export function ProseEditor(props) {
   const { blocks, onChange, onSave } = props
   let unique = {}
 
-  blocks.forEach((b) => b.code && unique[b.lang]++)
+  blocks.forEach(([type, attrs]) => type === 'fence' && unique[attrs.lang]++)
 
   const modes = [proseMode].concat(
     Object.keys(unique).map((lang) => getMinorMode(lang))
@@ -41,13 +41,14 @@ export function ProseEditor(props) {
       modes={modes}
       onSave={onSave}
     >
-      {blocks.map(({ index, code, tag, html, lang }) => {
-        if (typeof code !== 'undefined') {
+      {blocks.map(([type, attrs, ...rest]) => {
+        const { index, tag, markup, lang } = attrs
+        if (type === 'fence') {
           return (
             <CodeBlock
               key={index}
               tagName={tag}
-              code={code}
+              code={rest[0]}
               lang={lang}
               onChange={onChange && ((s) => onChange(index, tag, s, lang))}
             />
@@ -57,8 +58,8 @@ export function ProseEditor(props) {
             <Block
               key={index}
               tagName={tag}
-              markBefore={tagToMark(tag)}
-              html={markupHTML(html, tag)}
+              markBefore={!type.match(/\w+_list/) && markup}
+              html={jsonToHtml(rest)}
               mode="prose-mode"
               spellCheck={true}
               onChange={(s) => handleMarkdown(index, tag, s)}
@@ -70,48 +71,30 @@ export function ProseEditor(props) {
   )
 }
 
-const tags = [
-  { tag: 'h1', mark: '#', block: true },
-  { tag: 'h2', mark: '##', block: true },
-  { tag: 'h3', mark: '###', block: true },
-  { tag: 'li', mark: '*', block: true, parent: 'ul' },
-  { tag: 'li', mark: '1.', block: true, parent: 'ol' },
-  { tag: 'strong', mark: '**', inline: true },
-  { tag: 'em', mark: '_', inline: true },
-  { tag: 'code', mark: '`', inline: true },
-]
-
-function tagToMark(tag) {
-  const spec = tags.find((t) => t.tag === tag)
-
-  return spec && spec.mark
+function jsonToHtml(tokens) {
+  return tokens
+    .map((t) => (typeof t === 'string' ? escapeHtml(t) : tokenToHtml(t)))
+    .join('')
 }
 
-function markToTag(md) {
-  const spec = tags.find((t) => t.mark === md)
+function tokenToHtml([type, attrs, ...children]) {
+  const { tag, block, markup, href } = attrs
+  const hrefPair = href && ['href', href]
+  const markPair = markup &&
+    !type.match(/\w+_list/) &&
+    markup != '' && [`data-mark-${block ? 'before' : 'around'}`, markup]
+  const htmlAttrs = [markPair, hrefPair]
+    .filter(Boolean)
+    .map(([k, v]) => ` ${k}="${v}"`)
+    .join('')
 
-  return spec && spec.tag
+  return children
+    ? `<${tag}${htmlAttrs}>${jsonToHtml(children)}</${tag}>`
+    : `<${tag}${htmlAttrs}/>`
 }
 
-function markupTag(tag, parent) {
-  const spec = tags.find(
-    (t) => t.tag === tag && (!t.parent || parent === t.parent)
-  )
-
-  if (spec) {
-    const { mark, block, inline } = spec
-    const where = block ? 'before' : inline ? 'around' : 'none'
-
-    return `<${tag} data-mark-${where}="${mark}">`
-  } else {
-    return `<${tag}>`
-  }
-}
-
-const markupRE = /\<([a-z]+)\>/gi
-
-function markupHTML(html, parent) {
-  return html.replace(markupRE, (_, tag) => markupTag(tag, parent))
+function escapeHtml(unsafe) {
+  return unsafe.replace(/</g, '&lt;').replace(/>/g, '&gt;')
 }
 
 const proseMode = {

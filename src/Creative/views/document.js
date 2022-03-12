@@ -11,8 +11,12 @@ export function Document({ workbook, doUpdate, doSave }) {
     <ol>
       {scenes.map((scn, i) => {
         const blocks = scn.get('blocks')
-        const perform = blocks.find((b) => b.mode === 'eval')
-        const discussion = blocks.filter((b) => b.mode !== 'eval')
+        const perform = blocks.find(
+          ([type, attrs]) => type === 'fence' && attrs.mode === 'eval'
+        )
+        const discussion = blocks.filter(
+          ([type, attrs]) => type !== 'fence' || attrs.mode !== 'eval'
+        )
 
         return (
           <li key={i} className={styles.doc}>

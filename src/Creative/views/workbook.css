@@ -118,6 +118,7 @@
 .container > ol > li {
   /* rendered view */
   display: flex;
+  align-items: center;
   grid-row-start: view;
   overflow: auto;
   transform: translate(40vw, -100vh);

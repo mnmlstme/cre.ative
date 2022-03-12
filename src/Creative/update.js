@@ -152,25 +152,14 @@ function immutableScene(scene) {
     title,
     blocks: Im.List(
       blocks
-        .filter(({ mode, html }) => typeof html === 'undefined' || html !== '')
+        .filter(([type, attrs, content]) => type !== 'fence' || content !== '')
         .map(consumeBlock)
     ),
   })
 
   function consumeBlock(blk, index) {
-    const { mode, code, html, lang } = blk
+    const [type, attrs, ...rest] = blk
 
-    switch (mode) {
-      case 'eval':
-      case 'define':
-        return { index, mode, code, lang }
-
-      default:
-        const doc = parser.parseFromString(html, 'text/html')
-        const tag = doc.body.firstChild.tagName.toLowerCase()
-        const inner = doc.body.firstChild.innerHTML
-
-        return { index, mode, tag, html: inner }
-    }
+    return [type, Object.assign(attrs, { index }), ...rest]
   }
 }
