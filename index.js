@@ -32,6 +32,7 @@ const keywordToType = {
 };
 
 function classify(code, lang) {
+  console.log('Classify (react-redux):', lang, code)
   switch (lang) {
     case "jsx":
       const jsxDefnMatch = code.match(jsxDefnRegex);
@@ -52,6 +53,7 @@ function classify(code, lang) {
 function collate(workbook, lang) {
   const evals = Kr.extract(workbook, "eval", lang);
   const defns = Kr.extract(workbook, "define", lang);
+  console.log('Collate (react-redux):', lang, defns, evals)
 
   switch (lang) {
     case "jsx":
@@ -64,13 +66,13 @@ function collate(workbook, lang) {
       return {
         name: "styles.css",
         language: "css",
-        code: defns.map((b) => b.text).join("\n/****/\n\n"),
+        code: defns.map((b) => b[2]).join("\n/****/\n\n"),
       };
     default:
       return {
         name: `data.${lang}`,
         language: lang,
-        code: defns.join("\n"),
+        code: defns.map((b) => b[2]).join("\n"),
       };
   }
 }
@@ -157,14 +159,19 @@ function genExposeModel(shape) {
 }
 
 function genView(block) {
-  return block
-    ? `<li key="${block.id}" id="${block.id}">
-       ${block.text.split("\n").join("\n        ")}
-     </li>
-    `
-    : "<li></li>";
+  if (!block) {
+    return "<li></li>"
+  }
+
+  const [_, attrs, code] = block
+
+  return (
+    `<li key="${attrs.id}" id="${attrs.id}">
+     ${code.split("\n").join("\n        ")}
+    </li>
+    `)
 }
 
 function genDefn(block) {
-  return block.text;
+  return block[2];
 }
