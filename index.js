@@ -29,6 +29,7 @@ function bind(moduleName, lang = "elm") {
 const elmDefnRegex = /^\s*(\w+)(\s*:|(\s+\w+)*\s*=)/;
 
 function classify(code, lang) {
+  console.log('Classify (elm):', lang, code)
   switch (lang) {
     case "elm":
       const elmDefnMatch = code.match(elmDefnRegex);
@@ -62,13 +63,13 @@ function collate(workbook, lang) {
       return {
         name: "styles.css",
         language: "css",
-        code: defns.map((b) => b.text).join("\n/****/\n\n"),
+        code: defns.map((b) => b[2]).join("\n/****/\n\n"),
       };
     default:
       return {
         name: `data.${lang}`,
         language: lang,
-        code: defns.join("\n"),
+        code: defns.map((b) => b[2]).join("\n"),
       };
   }
 }
@@ -207,14 +208,19 @@ function genExposeModel(shape) {
 }
 
 function genView(block) {
-  return block
-    ? `Html.li [Attr.id "${block.id}"]
-        [ ${block.text.split("\n").join("\n        ")}
-        ]
-    `
-    : "Html.li [] []";
+  if (!block) {
+    return 'Html.li [] []'
+  }
+
+  const [_, attrs, code] = block
+
+  return (
+    `Html.li [Attr.id "${attrs.id}"]
+      [ ${code.split("\n").join("\n        ")}
+      ]
+    `)
 }
 
 function genDefn(block) {
-  return block.text;
+  return block[2];
 }
