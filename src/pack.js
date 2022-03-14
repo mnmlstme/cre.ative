@@ -31,89 +31,52 @@ function sceneToMarkdown(scn) {
 }
 
 function blockToMarkdown(blk) {
-  const bqbqbq = "```";
+  const [type, { markup, block, lang }, ...rest] = blk;
+  const contents = rest ? inlineToMarkdown(rest) : ''
 
-  const { tag, html, code, lang } = blk;
-
-  if (typeof code !== 'undefined') {
-    return `${bqbqbq}${lang}\n${code}\n${bqbqbq}\n`;
-  } else {
-    return htmlToMarkdown(tag, html);
-  }
-}
-
-function htmlToMarkdown(tagName, inner) {
-  const root = parse(inner);
-  const innerMd = inlineToMarkdown(root.childNodes)
-
-  switch (tagName && tagName.toLowerCase()) {
-    case "br":
-      return "\n\n";
-    case "p":
-      return `${innerMd}\n`;
-    case "h1":
-      return `# ${innerMd}\n`;
-    case "h2":
-      return `## ${innerMd}\n`;
-    case "h3":
-      return `### ${innerMd}\n`;
-    case "ol":
-      return `${listToMarkdown("1.", root.childNodes)}\n`;
-    case "ul":
-      return `${listToMarkdown("*", root.childNodes)}\n`;
+  switch (type) {
+    case 'fence':
+      return `${markup}${lang}\n${rest[0]}\n${markup}\n`;
+    case 'bullet_list':
+    case 'ordered_list':
+      return rest
+        .filter(b => Array.isArray(b) && b.length && b[0] === 'list-item')
+        .map(blockToMarkdown).join('\n')
+    case 'paragraph':
+      return `${markup}${contents}\n\n`
+    case 'heading':
+    case 'list-item':
+      return `${markup} ${contents}\n`
+    case 'hr':
+      return `${markup}\n`
     default:
-      return inner;
+      return typeof markup === undefined || !markup
+        ? contents
+        : block
+          ? `${markup} ${contents}\n`
+          : `${markup}${contents}${markup}`
   }
+
 }
 
-function inlineToMarkdown(nodelist) {
-  return nodelist.map(inlineNodeToMarkdown).join('')
-}
-
-const inlineTagToMark = {
-  strong: '**',
-  em: '_',
-  code: '`',
-  b: '*',
-  i: '_'
+function inlineToMarkdown(list) {
+  return list ? list.map(inlineNodeToMarkdown).join('') : ''
 }
 
 function inlineNodeToMarkdown(node) {
-  const {nodeType, tagName, attributes, childNodes, rawText} = node
+  if (Array.isArray(node))  {
+    const [type, {markup, href}, ...rest] = node
+    const contents = inlineToMarkdown(rest)
+    switch( type ){
+      case 'link':
+        const parens = href ? `(${href})` : ''
 
-  if (typeof tagName !== 'undefined')  {
-    const tag = tagName.toLowerCase()
-    const contents = childNodes ? inlineToMarkdown(childNodes) : ''
-
-      switch( tag ){
-        case "strong":
-        case "em":
-        case "code":
-        case "b":
-        case "i":
-          const mark = attributes['data-mark-around'] || inlineTagToMark[tag]
-          return mark ? `${mark}${contents}${mark}` : `<${tag}>${contents}</${tag}>`
-        case "a":
-          const href = attributes['href']
-          const parens = href ? `(${href})` : ''
-          return `[${contents}]${parens}`
-        default:
-          return `<${tag}>${contents}</${tag}>`
-      }
+        return `[${inlineToMarkdown(rest)}]()`
+      default:
+        return `${markup}${contents}${markup}`
+    }
   } else {
-    return rawText
+    return node
   }
 
-}
-
-function listToMarkdown(prefix, nodelist) {
-  return nodelist
-    .filter(n => n.tagName && n.tagName.toLowerCase() === 'li')
-    .map(n => liToMarkdown(prefix, n)).join('\n')
-}
-
-function liToMarkdown(prefix, node) {
-
-  // TODO: nested lists
-  return `${prefix} ${inlineToMarkdown(node.childNodes)}`
 }

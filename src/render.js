@@ -21,8 +21,8 @@ module.exports = {
     em_close: close_element,
     link_open: open_element,
     link_close: close_element,
-    html_block: insert_text, // escaping html for now
-    html_inline: insert_text // escaping html for now
+    html_block: insert_code_block, // escaping html for now
+    html_inline: insert_code // escaping html for now
   },
   not_implemented
 }

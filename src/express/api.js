@@ -20,4 +20,4 @@ function mount(app, store) {
 
 }
 
-module.exports = {workbook}
+module.exports = { mount }
