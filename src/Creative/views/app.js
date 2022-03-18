@@ -15,14 +15,14 @@ export default function App() {
   return (
     <BrowserRouter>
       <Switch>
-        <Route path="/workbook/:path*">
+        <Route path="/app/workbook/:path*">
           <WorkbookWithParams />
         </Route>
-        <Route path="/finder">
+        <Route path="/app/finder">
           <Finder />
         </Route>
-        <Route exact path="/">
-          <Redirect to="/finder" />
+        <Route exact path="/app/">
+          <Redirect to="/app/finder" />
         </Route>
         <Route path="*">
           <NoMatch />

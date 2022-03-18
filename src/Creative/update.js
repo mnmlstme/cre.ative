@@ -67,17 +67,20 @@ export function update(state = initial, action = {}) {
     case Actions.UpdateScene: {
       console.log('update UpdateScene', action)
       const workbook = state.get('workbook') || Im.Map()
-      const { scene, block, mode, tag, text, lang } = action
-      const replacement = (mode) =>
-        mode === 'eval' || mode === 'define'
-          ? { code: text, lang }
-          : { tag, html: text }
+      const { scene, block, data } = action
+      const replacement = (old) => {
+        const [_, oldAttrs] = old
+        const [type, newAttrs, ...rest] = data
+        const attrs = Object.assign({}, oldAttrs, newAttrs)
 
-      console.log('Updating: ', replacement('discuss'))
+        return [type, attrs, ...rest]
+      }
+
+      console.log('Updating: ', scene, block, data)
 
       return state.updateIn(
         ['workbook', 'scenes', scene, 'blocks', block],
-        (blk) => Object.assign({}, blk, replacement(blk.mode))
+        (b) => replacement(b)
       )
     }
 

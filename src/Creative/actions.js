@@ -21,7 +21,7 @@ const ProjectError = 'ProjectError'
 
 export function loadProject(filepath) {
   return (dispatch) => {
-    // console.log('loadProject', filepath)
+    console.log('loadProject', filepath)
     import(`Workbooks/${filepath}/project.yaml`)
       .then((mod) => {
         // console.log('Action: LoadProject ', JSON.stringify(mod.default))
@@ -97,14 +97,12 @@ export function loadResource(filepath, loader, lang = 'js') {
 
 const UpdateScene = 'UpdateScene'
 
-export function updateScene(scene, block, tag, text, lang = 'html') {
+export function updateScene(scene, block, json) {
   return {
     type: UpdateScene,
     scene,
     block,
-    tag,
-    text,
-    lang,
+    data: json,
   }
 }
 

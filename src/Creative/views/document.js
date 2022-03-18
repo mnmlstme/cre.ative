@@ -22,10 +22,10 @@ export function Document({ workbook, doUpdate, doSave }) {
           <li key={i} className={styles.doc}>
             <ProseEditor
               blocks={discussion}
-              onChange={doUpdate}
-              onSave={doSave}
+              doUpdate={doUpdate}
+              doSave={doSave}
             />
-            <CodeEditor block={perform} onChange={doUpdate} />
+            <CodeEditor block={perform} doUpdate={doUpdate} doSave={doSave} />
           </li>
         )
       })}

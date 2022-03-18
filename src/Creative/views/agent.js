@@ -51,7 +51,7 @@ export function agentFactory(primitives, coreMode, modes) {
 export function delegateUserAction(agent, action, args = [], moreContext = {}) {
   const fn = typeof action === 'function' ? action : action.fn
 
-  console.log('calling user action:', fn.displayName || fn.name)
+  //console.log('calling user action:', fn.displayName || fn.name)
   return fn.call(agent.setContext(moreContext), ...args)
 }
 
@@ -79,21 +79,21 @@ export function delegateKeyEvent(agent, e) {
 function handlePopupKeyEvent(agent, e, options) {
   const code = keyCombo(e)
 
-  console.log('popup key event', e.type, code)
+  //console.log('popup key event', e.type, code)
 
   const chosen =
     options.find((opt) => opt.key === code) ||
     (e.key === 'Escape' && { key: e.key, action: agent.doNothing })
 
   if (chosen) {
-    console.log('User Selected', chosen.key, e.type)
+    //console.log('User Selected', chosen.key, e.type)
     invokeOnEvent(agent, e, chosen.action, 'keyup')
   }
 
   switch (e.type) {
     case 'keyup':
       if (!chosen) {
-        console.log('!!! Invalid key, try again')
+        //console.log('!!! Invalid key, try again')
         // TODO: beep or flash the popup or something
       } else {
         agent.cancelPrompt()
@@ -125,7 +125,7 @@ function invokeOnEvent(agent, e, action, defaultOn = 'keydown') {
 function lookupKeyEvent(e, keymaps) {
   const code = keyCombo(e)
 
-  console.log('Key Event:', e.type, code)
+  //console.log('Key Event:', e.type, code)
 
   const fname = keymaps.reduce((accum, current) => accum || current[code], null)
 

@@ -1,5 +1,6 @@
 import React from 'react'
-import { Editor, Block } from './editor'
+import { Block } from './block'
+import { Editor } from './editor'
 import { CodeBlock, getMinorMode } from './codeEditor'
 import { Highlight } from './highlight'
 
@@ -8,7 +9,7 @@ import codeStyles from './code.css'
 import editorStyles from './editor.css'
 
 export function ProseEditor(props) {
-  const { blocks, onChange, onSave } = props
+  const { blocks, doUpdate, doSave } = props
   let unique = {}
 
   blocks.forEach(([type, attrs]) => type === 'fence' && unique[attrs.lang]++)
@@ -17,84 +18,39 @@ export function ProseEditor(props) {
     Object.keys(unique).map((lang) => getMinorMode(lang))
   )
 
-  const handleMarkdown = (index, tag, html) => {
-    if (onChange) {
-      if (tag === 'p') {
-        // check for markdown prefix on previously unmarked paragraph
-        const sp = html.indexOf(' ')
-        const md = sp > 0 ? html.substring(0, sp + 1) : ''
-        const newTag = markToTag(md)
-
-        if (newTag) {
-          tag = newTag
-          html = html.substring(sp + 1)
-        }
-      }
-
-      onChange(index, tag, html)
-    }
-  }
+  const handleMarkdown = (index, tag, html) => {}
 
   return (
     <Editor
       className={[styles.prose, editorStyles.discuss].join(' ')}
       modes={modes}
-      onSave={onSave}
+      onSave={doSave}
     >
-      {blocks.map(([type, attrs, ...rest]) => {
+      {blocks.map((b) => {
+        const [type, attrs, ...rest] = b
         const { index, tag, markup, lang } = attrs
+
         if (type === 'fence') {
           return (
             <CodeBlock
               key={index}
-              tagName={tag}
-              code={rest[0]}
-              lang={lang}
-              onChange={onChange && ((s) => onChange(index, tag, s, lang))}
+              block={b}
+              onChange={(b) => doUpdate && doUpdate(index, b)}
             />
           )
         } else {
           return (
             <Block
               key={index}
-              tagName={tag}
-              markBefore={!type.match(/\w+_list/) && markup}
-              html={jsonToHtml(rest)}
+              block={b}
               mode="prose-mode"
-              spellCheck={true}
-              onChange={(s) => handleMarkdown(index, tag, s)}
+              onChange={(b) => doUpdate && doUpdate(index, b)}
             />
           )
         }
       })}
     </Editor>
   )
-}
-
-function jsonToHtml(tokens) {
-  return tokens
-    .map((t) => (typeof t === 'string' ? escapeHtml(t) : tokenToHtml(t)))
-    .join('')
-}
-
-function tokenToHtml([type, attrs, ...children]) {
-  const { tag, block, markup, href } = attrs
-  const hrefPair = href && ['href', href]
-  const markPair = markup &&
-    !type.match(/\w+_list/) &&
-    markup != '' && [`data-mark-${block ? 'before' : 'around'}`, markup]
-  const htmlAttrs = [markPair, hrefPair]
-    .filter(Boolean)
-    .map(([k, v]) => ` ${k}="${v}"`)
-    .join('')
-
-  return children
-    ? `<${tag}${htmlAttrs}>${jsonToHtml(children)}</${tag}>`
-    : `<${tag}${htmlAttrs}/>`
-}
-
-function escapeHtml(unsafe) {
-  return unsafe.replace(/</g, '&lt;').replace(/>/g, '&gt;')
 }
 
 const proseMode = {
