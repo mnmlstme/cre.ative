@@ -1,28 +1,20 @@
 var path = require('path')
 const webpack = require('webpack')
 const nodeExternals = require('webpack-node-externals')
+const docroot = path.resolve(__dirname, 'workbooks')
 
 const frontend = {
   name: 'frontend',
 
   entry: {
-    app: './src/index.js',
+    client: './src/Creative/index.js',
   },
 
-  plugins: [
-    new webpack.HotModuleReplacementPlugin(), // Enable HMR
-  ],
-
-  devServer: {
-    port: 9000,
-    historyApiFallback: true,
-    hot: true, // Tell the dev-server we're using HMR
-    proxy: {
-      '/api': {
-        target: 'http://localhost:3000',
-        secure: false,
-      },
-    },
+  output: {
+    filename: '[name].bundle.js',
+    chunkFilename: 'chunk.[id].js',
+    path: path.resolve(__dirname, 'dist'),
+    libraryTarget: 'umd'
   },
 
   module: {
@@ -58,21 +50,6 @@ const frontend = {
         },
       },
       {
-        test: /.elm$/,
-        include: [path.resolve(__dirname, 'src')],
-        use: [
-          {
-            loader: 'babel-loader',
-            options: {
-              plugins: ['module:elm-css-modules-plugin'],
-              //   presets: ["@babel/preset-env"],
-              // plugins: [elmCssModulesPlugin]
-            },
-          },
-          { loader: 'elm-webpack-loader' },
-        ],
-      },
-      {
         test: /\.css$/i,
         include: [
           path.resolve(__dirname, 'src'),
@@ -102,64 +79,6 @@ const frontend = {
           },
         },
       },
-      {
-        test: /project\.yaml$/,
-        include: [path.resolve(__dirname, 'workbooks')],
-        type: 'json', // Required by Webpack v4
-        use: 'yaml-loader',
-      },
-      {
-        test: /\.kr$/,
-        include: [path.resolve(__dirname, 'workbooks')],
-        use: {
-          loader: 'kram',
-          options: {
-            root: path.resolve(__dirname, 'workbooks'),
-            output: path.resolve(__dirname, 'kram_modules'),
-            defaults: {
-              platform: 'elm',
-              language: 'elm',
-            },
-            platforms: [
-              {
-                name: 'react-redux',
-                description: 'React (JSX) for Views and Redux for data model',
-                modules: [
-                  {
-                    language: 'jsx',
-                    use: 'babel-loader?{presets:["@babel/preset-react"]}',
-                  },
-                  {
-                    language: 'svg',
-                    use: 'svg-inline-loader',
-                  },
-                  {
-                    language: 'css',
-                    use: 'css-loader',
-                  },
-                ],
-                plugin: require('kram-react-redux'),
-              },
-              {
-                name: 'elm',
-                description:
-                  'The Elm Architecture: a pure functional language with ADTs and an MVU architecture',
-                modules: [
-                  {
-                    language: 'elm',
-                    use: 'elm-webpack-loader',
-                  },
-                  {
-                    language: 'css',
-                    use: 'css-loader',
-                  },
-                ],
-                plugin: require('kram-elm'),
-              },
-            ],
-          },
-        },
-      },
     ],
   },
 }
@@ -175,32 +94,20 @@ const backend = {
     filename: '[name].js',
     path: path.resolve(__dirname, './dist'),
   },
+
   target: 'node',
   externals: [nodeExternals()],
+
+  plugins: [
+    new webpack.BannerPlugin({
+      raw: true,
+      banner: '#!/usr/bin/env node\n',
+    }),
+  ],
 }
 
 const common = {
   mode: 'development',
-
-  resolve: {
-    alias: {
-      Workbooks: path.resolve(__dirname, 'workbooks'),
-    },
-    modules: ['node_modules'],
-    extensions: ['.js'],
-  },
-
-  resolveLoader: {
-    modules: ['node_modules'],
-    extensions: ['.js'],
-    mainFields: ['loader', 'main'],
-  },
-
-  output: {
-    filename: '[name].bundle.js',
-    chunkFilename: 'chunk.[id].js',
-    publicPath: '/',
-  },
 }
 
 module.exports = [

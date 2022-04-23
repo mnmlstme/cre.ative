@@ -20,9 +20,10 @@ const LoadProject = 'LoadProject'
 const ProjectError = 'ProjectError'
 
 export function loadProject(filepath) {
-  return (dispatch) => {
+  return (dispatch, getState, { importModule }) => {
     console.log('loadProject', filepath)
-    import(`Workbooks/${filepath}/project.yaml`)
+
+    importModule(`${filepath}/project.yaml`)
       .then((mod) => {
         // console.log('Action: LoadProject ', JSON.stringify(mod.default))
         return dispatch({
@@ -46,9 +47,10 @@ const LoadWorkbook = 'LoadWorkbook'
 const WorkbookError = 'WorkbookError'
 
 export function loadWorkbook(filepath) {
-  return (dispatch) => {
+  return (dispatch, getState, { importModule }) => {
     console.log('loadModule', filepath)
-    import(`Workbooks/${filepath}`)
+
+    importModule(filepath)
       .then((mod) => {
         console.log('Action: LoadWorkbook ', JSON.stringify(mod.default))
         return dispatch({

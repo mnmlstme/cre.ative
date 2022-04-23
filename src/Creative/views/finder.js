@@ -13,7 +13,7 @@ function Finder({ project, workbooks, selected, dispatch }) {
   let history = useHistory()
 
   const doLoadWorkbook = (event) => {
-    history.push(`/workbook/${project}/${selected.replace(/\.\w+$/, '')}`)
+    history.push(`./workbook/${project}/${selected.replace(/\.\w+$/, '')}`)
   }
 
   const doChangeFile = (event) => dispatch(changeFile(event.target.value))
