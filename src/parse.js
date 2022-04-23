@@ -1,50 +1,35 @@
-const hash = require("object-hash");
-const MarkdownIt = require("markdown-it");
-const frontMatter = require("front-matter");
-const { rules } = require("./render");
-
-const defaultPlugin = {
-  collate: function (workbook, lang) {
-    const chunks = Kr.extract(workbook, lang)
-    return chunks.map(t => t.text).join('\n')
-  },
-  classify: function (code, lang) {
-    switch (lang) {
-      case 'html':
-        return {mode: "eval"}
-
-      default:
-        return {mode: "define"}
-    }
-  }
-}
+const hash = require('object-hash')
+const MarkdownIt = require('markdown-it')
+const frontMatter = require('front-matter')
+const { rules } = require('./render')
 
 module.exports = {
   parse,
-  defaultPlugin
-};
+}
 
 const mdit = MarkdownIt('commonmark')
 
 Object.assign(mdit.renderer.rules, rules)
 
-function parse(md, basename, getPlugin ) {
-  const { body, attributes } = frontMatter(md);
-  const defaultLang = attributes.lang || "text"
+function parse(md, basename) {
+  const { body, attributes } = frontMatter(md)
+  const defaultLang = attributes.lang || 'text'
   const tokens = mdit.parse(body)
   const flat = tokens.reduce(
-    (l, r) => r.type === 'inline' ? l.concat(r.children) : l.concat([r]),
-    [] )
-  const unhandled = flat.filter(t => t.type !== 'inline' && typeof rules[t.type] !== 'function')
+    (l, r) => (r.type === 'inline' ? l.concat(r.children) : l.concat([r])),
+    []
+  )
+  const unhandled = flat.filter(
+    (t) => t.type !== 'inline' && typeof rules[t.type] !== 'function'
+  )
   const json = `[{}${mdit.render(body)}]`
 
-  if (unhandled.length > 0){
+  if (unhandled.length > 0) {
     console.log('Unhandled Tokens:', unhandled)
   }
 
   const blocks = JSON.parse(json).slice(1)
-  const { title, platform, model, imports } = attributes;
-  const plugin = getPlugin && getPlugin(platform) || defaultPlugin;
+  const { title, platform, model, imports } = attributes
 
   let result = {
     title,
@@ -54,121 +39,115 @@ function parse(md, basename, getPlugin ) {
     init: model,
     shape: getShapeOf(model),
     imports: getImportSpecs(imports),
-    scenes: paginate(blocks)
-      .map(scene => classify(scene, plugin.classify)),
-  };
+    scenes: paginate(blocks),
+  }
 
-  console.log('Workbook:', JSON.stringify(result))
+  // console.log('Workbook:', JSON.stringify(result))
 
-  const hashkey = hashcode(result);
-  const moduleName = `Kram_${hashkey}_${basename}`;
+  const hashkey = hashcode(result)
+  const moduleName = `Kram_${hashkey}_${basename}`
 
-  return Object.assign({ hashkey, moduleName }, result);
+  return Object.assign({ hashkey, moduleName }, result)
 }
 
 function paginate(blocks) {
-  const isBreak = b =>
+  const isBreak = (b) =>
     Array.isArray(b) && b.length === 2 && b[0] === 'hr' && b[1].markup === '---'
   let breaks = blocks
     .map((b, i) => (isBreak(b) ? i : false))
-    .filter((i) => i !== false);
+    .filter((i) => i !== false)
 
-  breaks.unshift(-1);
+  breaks.unshift(-1)
 
-  return breaks.map((b, i) => blocks.slice(b + 1, breaks[i + 1]));
+  return breaks
+    .map((b, i) => blocks.slice(b + 1, breaks[i + 1]))
+    .map(blocksToScene)
 }
 
-const defaultClassifier = (s) => ({mode: "define"})
-
-function classify(scene, classifier = defaultClassifier) {
-  const out = scene.map((b, i) => {
-    //console.log('Classify:', b)
-    const [type, attrs, ...rest] = b
-
-    if (type === "fence") {
-      const { lang } = attrs
-      const [code] = rest
-
-      return [type, Object.assign(attrs, classifier(code, lang)), ...rest]
-    } else {
-      return b
-    }
-  });
-
-  const headings = out.filter(b => b[0] === 'heading')
-
-  return Object.assign({blocks: out}, headings.length ? {title: textContent(headings[0])} : {})
+function blocksToScene(blocks) {
+  const headings = blocks.filter((b) => b[0] === 'heading')
+  
+  return Object.assign(
+    { blocks },
+    headings.length ? { title: textContent(headings[0]) } : {}
+  )
 }
 
 function textContent(t) {
-  return typeof t === 'string' ? t :
-    Array.isArray(t) ? t.slice(1).map(s => textContent(s)).join('') : ''
+  return typeof t === 'string'
+    ? t
+    : Array.isArray(t)
+    ? t
+        .slice(1)
+        .map((s) => textContent(s))
+        .join('')
+    : ''
 }
 
 function getLanguages(tokens) {
   return tokens
-    .filter(([type]) => type === "fence")
+    .filter(([type]) => type === 'fence')
     .map(([_, attrs]) => attrs.lang)
     .reduce(
       (accum, next) => (accum.includes(next) ? accum : accum.concat([next])),
       []
-    );
+    )
 }
 
 function getImportSpecs(imports) {
   switch (getTypeOf(imports)) {
-    case "array":
-      return imports.map(importSpec);
-    case "record":
-      return Object.entries(imports || {}).map(([k, v]) => importSpec(k, v));
-    case "string":
-      return [importSpec(imports)];
+    case 'array':
+      return imports.map(importSpec)
+    case 'record':
+      return Object.entries(imports || {}).map(([k, v]) => importSpec(k, v))
+    case 'string':
+      return [importSpec(imports)]
     default:
-      return [];
+      return []
   }
 }
 
 function importSpec(pkg, spec) {
   switch (getTypeOf(spec)) {
-    case "record":
-      return Object.assign(spec, { as: pkg });
-    case "string":
-      return { from: spec, as: pkg };
+    case 'record':
+      return Object.assign(spec, { as: pkg })
+    case 'string':
+      return { from: spec, as: pkg }
     default:
-      return { from: pkg, as: pkg };
+      return { from: pkg, as: pkg }
   }
 }
 
 function getShapeOf(model) {
-  const type = getTypeOf(model);
+  const type = getTypeOf(model)
 
   switch (type) {
-    case "array":
-      return { [type]: getShapeOf(model[1]) };
-    case "record":
-      fields = Object.entries(model).map(([k, v]) => [k, getShapeOf(v)]);
-      return { [type]: Object.fromEntries(fields) };
+    case 'array':
+      return { [type]: getShapeOf(model[1]) }
+    case 'record':
+      fields = Object.entries(model).map(([k, v]) => [k, getShapeOf(v)])
+      return { [type]: Object.fromEntries(fields) }
     default:
-      return type;
+      return type
   }
 }
 
 function getTypeOf(value) {
-  const type = typeof value;
+  const type = typeof value
 
   switch (type) {
-    case "object":
-      return Array.isArray(value) ? "array" : "record";
-    case "number":
-      return Number.isInteger(value) ? "int" : "float";
+    case 'object':
+      return Array.isArray(value) ? 'array' : 'record'
+    case 'number':
+      return Number.isInteger(value) ? 'int' : 'float'
     default:
-      return type;
+      return type
   }
 }
 
 function hashcode({ platform, imports, shape, scenes }, lang) {
-  const code = scenes.map((scn) => scn.code);
-  const views = scenes.map((scn) => scn.view || {});
+  const code = scenes.map((scn) => scn.code)
+  const views = scenes.map((scn) => scn.view || {})
 
-  return hash({ platform, imports, shape, code, views }).substr(-8);
+  return hash({ platform, imports, shape, code, views }).substr(-8)
 }

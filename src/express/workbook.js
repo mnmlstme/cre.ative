@@ -6,7 +6,7 @@ const kramExt = (id) => `${id}.kr`
 
 function getById(store, req, res) {
   const { prjId, wbkId } = req.params
-  const filepath = path.join(store.prjDir, prjId, kramExt(wbkId))
+  const filepath = path.join(store.projectDir, prjId, kramExt(wbkId))
 
   fs.readFile(filepath, 'utf8', (err, data) => {
     if (err) {
@@ -19,7 +19,7 @@ function getById(store, req, res) {
 
 function update(store, req, res) {
   const { prjId, wbkId } = req.params
-  const filepath = path.join(store.prjDir, prjId, kramExt(wbkId))
+  const filepath = path.join(store.projectDir, prjId, kramExt(wbkId))
   const wb = req.body
 
   fs.writeFile(filepath, Kr.pack(wb), (err) => {
@@ -33,7 +33,7 @@ function update(store, req, res) {
 
 function updateScene(store, req, res) {
   const { prjId, wbkId, scnId } = req.params
-  const filepath = path.join(store.prjDir, prjId, kramExt(wbkId))
+  const filepath = path.join(store.projectDir, prjId, kramExt(wbkId))
   const json = req.body
 
   fs.readFile(filepath, 'utf8', (err, data) => {
@@ -46,7 +46,7 @@ function updateScene(store, req, res) {
         if (err) {
           res.status(500).send(err)
         } else {
-          res.status(200).send()
+          res.status(200).json(wb.scenes[scnId])
         }
       })
     }

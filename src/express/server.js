@@ -1,11 +1,7 @@
 const express = require('express')
-const {mount} = require('./api')
+const { mount } = require('./api')
 
-const store = {
-  prjDir: './workbooks',
-}
-
-function create() {
+function create(config) {
   const app = express()
 
   app.use(function (err, req, res, next) {
@@ -15,15 +11,22 @@ function create() {
 
   app.use(express.json())
 
+  const store = Object.assign(
+    {
+      projectDir: './projects',
+    },
+    config
+  )
+
   mount(app, store)
 
   return app
 }
 
-function start(app, port =3000) {
+function start(app, port = 3000) {
   app.listen(port, () =>
     console.log(`Kram server listening at http://localhost:${port}`)
   )
 }
 
-module.exports = {create, start}
+module.exports = { create, start }
