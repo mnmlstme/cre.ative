@@ -11,7 +11,8 @@ start(create(setup(args)))
 function setup(args) {
   const [projectsDir] = args
   const basedir = cwd
-  const approot = path.resolve(basedir, './node_modules/cre-a-tive/public')
+  const approot = 
+    path.resolve(basedir, './node_modules/@cre.ative/cre-a-tive/public')
   const docroot = path.resolve(basedir, projectsDir || './projects')
   const indexFile = path.resolve(docroot, './index.yaml')
 

@@ -1,7 +1,7 @@
 import express from 'express'
 import webpack from 'webpack'
 import middleware from 'webpack-dev-middleware'
-const { server } = require('kram/src/express')
+const { server } = require('@cre.ative/kram/src/express')
 import { configure } from './configure'
 const path = require('path')
 

@@ -47,7 +47,7 @@ function kramRules({ basedir, docroot, platforms }) {
     test: /\.kr$/,
     include: [docroot],
     use: {
-      loader: 'kram',
+      loader: '@cre.ative/kram',
       options: {
         root: docroot,
         output: buildDir,

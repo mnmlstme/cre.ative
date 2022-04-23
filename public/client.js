@@ -1,4 +1,4 @@
-import { Creative } from 'cre-a-tive'
+import { Creative } from '@cre.ative/cre-a-tive'
 
 Creative(
   {

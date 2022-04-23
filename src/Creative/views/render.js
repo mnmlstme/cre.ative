@@ -1,5 +1,5 @@
 import React from 'react'
-import Kr from 'kram'
+import Kr from '@cre.ative/kram'
 const path = require('path')
 import styles from './workbook.css'
 
