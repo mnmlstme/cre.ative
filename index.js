@@ -1,80 +1,76 @@
 const Kr = require("kram");
 
 module.exports = {
-  collate,
-  bind,
-  classify,
+  name: 'elm',
+  description:
+    'The Elm Architecture: a pure functional language with ADTs and an MVU architecture',
+  languages: {
+    elm: 'Elm',
+    css: 'Cascading Style Sheets'
+  },
+  register
 };
 
-function bind(moduleName, lang = "elm") {
-  switch (lang) {
-    case "elm":
-      return `function(resource, container, initial){
-      let { Elm } = resource
-      let dummy = document.createElement('div')
-      container.appendChild(dummy)
-      let app = Elm.${moduleName}.init({ node: dummy, flags: initial })
-    }`;
-    case "css":
-      return `function(resource, container) {
-        let sheet = document.createElement('style')
-        sheet.innerHTML = resource.default
-        container.appendChild(sheet);
-      }`;
-    default:
-      return null;
-  }
-}
+function register({providesLanguage}) {
+  providesLanguage('elm', {
+    use: () =>
+      'elm-webpack-loader',
+    bind: (moduleName) =>
+      `function(resource, container, initial){
+        let { Elm } = resource
+        let dummy = document.createElement('div')
+        container.appendChild(dummy)
+        let app = Elm.${moduleName}.init({ node: dummy, flags: initial })
+      }`,
+    classify: classifyElm,
+    collate: (workbook) => {
+      const evals = Kr.extract(workbook, "eval", 'elm')
+      const defns = Kr.extract(workbook, "define", 'elm')
 
-const elmDefnRegex = /^\s*(\w+)(\s*:|(\s+\w+)*\s*=)/;
-
-function classify(code, lang) {
-  console.log('Classify (elm):', lang, code)
-  switch (lang) {
-    case "elm":
-      const elmDefnMatch = code.match(elmDefnRegex);
-      if (elmDefnMatch) {
-        return {
-          mode: "define",
-          type: "function",
-          name: elmDefnMatch[1],
-        };
-      } else {
-        return { mode: "eval" };
-      }
-    default:
-      return { mode: "define" };
-  }
-}
-
-function collate(workbook, lang) {
-  // generates Elm module
-  const evals = Kr.extract(workbook, "eval", lang);
-  const defns = Kr.extract(workbook, "define", lang);
-
-  switch (lang) {
-    case "elm":
       return {
         name: "Main.elm",
         language: "elm",
-        code: generateElm(evals, defns, workbook),
-      };
-    case "css":
+        code: generateElm(workbook, defns, evals),
+      }
+    }
+  })
+
+  providesLanguage('css', {
+    use: () =>
+      'css-loader',
+    bind: (moduleName) =>
+      `function(resource, container) {
+          let sheet = document.createElement('style')
+          sheet.innerHTML = resource.default
+          container.appendChild(sheet);
+      }`,
+    collate: workbook => {
+      const defns = Kr.extract(workbook, "define", 'css')
+
       return {
         name: "styles.css",
         language: "css",
         code: defns.map((b) => b[2]).join("\n/****/\n\n"),
       };
-    default:
-      return {
-        name: `data.${lang}`,
-        language: lang,
-        code: defns.map((b) => b[2]).join("\n"),
-      };
-  }
+    }
+  })
 }
 
-function generateElm(evals, defns, { moduleName, init, imports, shape }) {
+const elmDefnRegex = /^\s*(\w+)(\s*:|(\s+\w+)*\s*=)/;
+
+function classifyElm(code) {
+  const elmDefnMatch = code.match(elmDefnRegex);
+
+  return elmDefnMatch ?
+    {
+      mode: "define",
+      type: "function",
+      name: elmDefnMatch[1],
+    } :
+    { mode: "eval" };
+}
+
+function generateElm({ moduleName, init, imports, shape }, defns, evals) {
   // generates Elm module
   return `port module ${moduleName} exposing (main)
 import Browser
