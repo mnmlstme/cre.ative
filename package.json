@@ -1,5 +1,5 @@
 {
-  "name": "kram-elm",
+  "name": "@cre.ative/kram-elm",
   "version": "1.1.0",
   "description": "kram platform for the Elm language and architecture",
   "main": "index.js",
@@ -9,9 +9,9 @@
   "author": "ken@mnmlst.me",
   "license": "BSD-3-Clause",
   "dependencies": {
+    "@cre.ative/kram": "^1.1.0",
     "elm": "^0.19.1-5",
     "elm-css-modules-plugin": "^1.0.2",
-    "elm-webpack-loader": "^8.0.0",
-    "kram": "file:.yalc/kram"
+    "elm-webpack-loader": "^8.0.0"
   }
 }
