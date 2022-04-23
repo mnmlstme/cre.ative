@@ -1,26 +1,67 @@
 const Kr = require("kram");
 
 module.exports = {
-  collate,
-  bind,
-  classify,
+  name: 'react-redux',
+  description: 'React (JSX) for Views and Redux for data model',
+  languages: {
+    jsx: 'Javascript (React)',
+    js: 'Javascript (ES6)',
+    svg: 'Scalable Vector Graphics',
+    css: 'Cascading Style Sheets'
+  },
+  register
 };
 
-function bind(moduleName, lang) {
-  switch (lang) {
-    case "jsx":
-      return `function(resource, container, initial) {
-        resource.mount(container, initial)
-      }`;
-    case "css":
-      return `function(resource, container) {
-        let sheet = document.createElement('style')
-        sheet.innerHTML = resource.default
-        container.appendChild(sheet);
-      }`;
-    default:
-      return null;
-  }
+function register({providesLanguage}) {
+  providesLanguage('jsx', {
+    use: () =>
+      'babel-loader?{presets:["@babel/preset-react"]}',
+    classify: classifyJavascript,
+    collate: (workbook, lang) => {
+      const evals = Kr.extract(workbook, "eval", lang);
+      const defns = Kr.extract(workbook, "define", lang);
+
+      return {
+        name: "index.jsx",
+        language: lang,
+        code: generateJsx(workbook, defns, evals),
+      }
+    },
+  })
+
+  providesLanguage('js', {
+    use: () =>
+      'babel-loader?{presets:["@babel/preset-es6"]}',
+    classify: classifyJavascript,
+    collate: (workbook, lang) => {
+      const defns = Kr.extract(workbook, "define", lang);
+
+      return {
+        name: "index.js",
+        language: lang,
+        code: generateJavascript(workbook, defns),
+      }
+    },
+  })
+
+  providesLanguage('svg', {
+    use: () =>
+      'svg-inline-loader',
+  })
+
+  providesLanguage('css', {
+    use: () =>
+      'css-loader',
+    collate: (workbook, lang) => {
+      const defns = Kr.extract(workbook, "define", lang);
+
+      return {
+        name: "styles.css",
+        language: lang,
+        code: defns.map((b) => b[2]).join("\n/****/\n\n"),
+      };
+    }
+  })
 }
 
 const jsxDefnRegex = /^\s*(function|let|const|var)\s+(\w+)/;
@@ -31,53 +72,27 @@ const keywordToType = {
   let: "variable",
 };
 
-function classify(code, lang) {
-  console.log('Classify (react-redux):', lang, code)
-  switch (lang) {
-    case "jsx":
-      const jsxDefnMatch = code.match(jsxDefnRegex);
-      if (jsxDefnMatch) {
-        return {
-          mode: "define",
-          type: keywordToType[jsxDefnMatch[1]],
-          name: jsxDefnMatch[2],
-        };
-      } else {
-        return { mode: "eval" };
-      }
-    default:
-      return { mode: "define" };
+function classifyJavascript(code) {
+  const jsxDefnMatch = code.match(jsxDefnRegex);
+  if (jsxDefnMatch) {
+    return {
+      mode: "define",
+      type: keywordToType[jsxDefnMatch[1]],
+      name: jsxDefnMatch[2],
+    };
+  } else {
+    return { mode: "eval" };
   }
 }
 
-function collate(workbook, lang) {
-  const evals = Kr.extract(workbook, "eval", lang);
-  const defns = Kr.extract(workbook, "define", lang);
-  console.log('Collate (react-redux):', lang, defns, evals)
-
-  switch (lang) {
-    case "jsx":
-      return {
-        name: "index.jsx",
-        language: "jsx",
-        code: generateJsx(evals, defns, workbook),
-      };
-    case "css":
-      return {
-        name: "styles.css",
-        language: "css",
-        code: defns.map((b) => b[2]).join("\n/****/\n\n"),
-      };
-    default:
-      return {
-        name: `data.${lang}`,
-        language: lang,
-        code: defns.map((b) => b[2]).join("\n"),
-      };
-  }
+function generateJavascript({moduleName, imports}, defns ) {
+  // generates JSX module
+  return `// module ${moduleName} (JSX)
+  ${imports.map(genImport).join("\n")}
+  `
 }
 
-function generateJsx(evals, defns, { moduleName, imports, shape }) {
+function generateJsx({ moduleName, imports, shape }, defns, evals) {
   // generates JSX module
   return `// module ${moduleName} (JSX)
 import React from 'react'
