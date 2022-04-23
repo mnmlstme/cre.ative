@@ -1,4 +1,4 @@
-const Kr = require("kram");
+const Kr = require("@cre.ative/kram");
 
 module.exports = {
   name: 'react-redux',
