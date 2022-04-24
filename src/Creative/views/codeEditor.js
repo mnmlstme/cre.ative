@@ -64,8 +64,15 @@ export function getMinorMode(lang) {
 }
 
 const major = {
-  keymap: {},
-  bindings: [],
+  keymap: {
+    Enter: insert_newline
+  },
+  bindings: [insert_newline],
+}
+
+function insert_newline() {
+  this.insert_chars('\n')  
 }
 
 const minorModes = {}
+

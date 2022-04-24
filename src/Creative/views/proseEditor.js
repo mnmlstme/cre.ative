@@ -12,10 +12,17 @@ export function ProseEditor(props) {
   const { blocks, doUpdate, doSave } = props
   let unique = {}
 
-  blocks.forEach(([type, attrs]) => type === 'fence' && unique[attrs.lang]++)
+  blocks.forEach( b => {
+    const [type, {lang}] = b
+    //console.log('Checking mode of block', b)
+    if ( type === 'fence' ) {
+      unique[lang] = lang
+    }
+  })
 
+  //console.log('Building editor to support these languages:', unique, blocks)
   const modes = [proseMode].concat(
-    Object.keys(unique).map((lang) => getMinorMode(lang))
+    Object.keys(unique).map(getMinorMode)
   )
 
   const handleMarkdown = (index, tag, html) => {}

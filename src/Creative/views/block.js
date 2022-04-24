@@ -42,6 +42,14 @@ export class Block extends React.Component {
     }
   }
 
+  componentDidMount() {
+    this.root.current.addEventListener('block:change', this.handleChange);
+  }
+  
+  componentWillUnmount() {
+    this.root.current.removeEventListener('block:change', this.handleChange);
+  }
+  
   render() {
     const { className, block, mode, disabled } = this.props
     const [type, attrs, ...rest] = block

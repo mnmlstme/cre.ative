@@ -98,6 +98,13 @@ export class Editor extends React.Component {
     this.setSelection(pos)
   }
 
+  didChange(pos) {
+    const root = this.getActiveBlock(pos)
+    const event = new Event('block:change')
+
+    root.dispatchEvent(event)
+  }
+
   setSelection(anchor, caret) {
     let range = this._range
 
@@ -156,17 +163,20 @@ export class Editor extends React.Component {
       case Node.COMMENT_NODE:
         node.insertData(offset, s)
         this.forwardChars(s.length)
-        return true
+        break
       default:
         const ref = node.childNodes.item(offset)
         const text = document.createTextNode(s)
         node.insertBefore(text, ref)
-        return true
+        break
     }
-  }
+    
+    this.didChange({ node, offset })
+  } 
 
   deleteSelection() {
     this._range && this._range.deleteContents()
+    this.didChange( this.getCaretPos() )
   }
 
   surroundSelection(tag, mark) {
@@ -185,6 +195,7 @@ export class Editor extends React.Component {
     this._range.insertNode(markup)
 
     this.setCaret({ node: inside, offset: 0 })
+    this.didChange({ node: markup })
   }
 
   saveExcursion(thunk) {
