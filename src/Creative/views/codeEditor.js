@@ -9,7 +9,7 @@ import editorStyles from './editor.css'
 export function CodeEditor(props) {
   const { block, doUpdate, doSave } = props
   const [type, attrs, code] = block
-  const { index, mode, tag, lang } = attrs
+  const { mode, tag, lang } = attrs
   const minorMode = getMinorMode(lang)
 
   return (
@@ -18,11 +18,7 @@ export function CodeEditor(props) {
       modes={[minorMode]}
       onSave={doSave}
     >
-      <CodeBlock
-        tagName={tag}
-        block={block}
-        onChange={doUpdate && ((b) => doUpdate(index, b))}
-      />
+      <CodeBlock tagName={tag} block={block} onUpdate={doUpdate} />
       <footer>
         <dl className={styles.specs}>
           <dt>Language</dt>
@@ -33,7 +29,7 @@ export function CodeEditor(props) {
   )
 }
 
-export function CodeBlock({ block, onChange }) {
+export function CodeBlock({ block, index, onUpdate }) {
   const [_, { lang }, code] = block
   return (
     <pre lang={lang} className={`language-${lang}`}>
@@ -41,7 +37,7 @@ export function CodeBlock({ block, onChange }) {
         className={styles.code}
         block={block}
         mode={languageMinorMode(lang)}
-        onChange={onChange}
+        onUpdate={onUpdate}
       />
       <Highlight code={code} language={lang} />
     </pre>
@@ -65,14 +61,13 @@ export function getMinorMode(lang) {
 
 const major = {
   keymap: {
-    Enter: insert_newline
+    Enter: insert_newline,
   },
   bindings: [insert_newline],
 }
 
 function insert_newline() {
-  this.insert_chars('\n')  
+  this.insert_chars('\n')
 }
 
 const minorModes = {}
-

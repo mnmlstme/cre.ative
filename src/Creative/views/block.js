@@ -7,20 +7,43 @@ export class Block extends React.Component {
 
     this.root = React.createRef()
     this.handleChange = this.handleChange.bind(this)
+    this.handleInsertion = this.handleInsertion.bind(this)
+    this.handleReplacement = this.handleReplacement.bind(this)
   }
 
   handleChange(e) {
+    const { block, onUpdate } = this.props
     const children = e.target.childNodes
-    const { block, onChange } = this.props
-    const [type, attrs, ...rest] = block
+    const [type, attrs] = block
+    const { uniqueId } = attrs
+    const token = [type, attrs].concat(nodesToTokens(children))
 
-    onChange && onChange([type, attrs].concat(nodesToTokens(children)))
+    onUpdate && onUpdate(uniqueId, 1, token)
+  }
+
+  handleInsertion(e) {
+    const { block, onUpdate } = this.props
+    const [_, { uniqueId }] = block
+    const { node } = e.detail
+    const token = elementToToken(node)
+
+    onUpdate && onUpdate(uniqueId, 0, token)
+  }
+
+  handleReplacement(e) {
+    const { block, onUpdate } = this.props
+    const [_, { uniqueId }] = block
+    const { replacements } = e.detail
+    const idOfNode = (n) => (n === this.root.current ? { uniqueId } : {})
+    const blocks = replacements.map((n) => elementToToken(n, idOfNode(n)))
+
+    onUpdate && onUpdate(uniqueId, 1, ...blocks)
   }
 
   shouldComponentUpdate(nextProps) {
     const { className, block, disabled } = nextProps
     const [type, attrs, ...rest] = block
-    const { tag, markup, lang } = attrs
+    const { uniqueId, tag, markup, lang } = attrs
     const el = this.root.current
     const inner = jsonToHtml(rest)
 
@@ -28,13 +51,19 @@ export class Block extends React.Component {
       return true
     }
 
+    //console.log('ShouldComponentUpdate?', uniqueId)
+
     if (inner !== el.innerHTML) {
-      console.log('Content changed from outside, must update', inner)
+      console.log(
+        `Content changed from outside, must update ${uniqueId}:`,
+        inner
+      )
       return true
     } else {
       return (
         className !== this.props.className ||
         disabled !== this.props.disabled ||
+        uniqueId !== this.props.block[1].uniqueId ||
         tag !== this.props.block[1].tag ||
         markup !== this.props.block[1].markup ||
         lang !== this.props.block[1].lang
@@ -43,13 +72,20 @@ export class Block extends React.Component {
   }
 
   componentDidMount() {
-    this.root.current.addEventListener('block:change', this.handleChange);
+    this.root.current.addEventListener('block:change', this.handleChange)
+    this.root.current.addEventListener('block:insert', this.handleInsertion)
+    this.root.current.addEventListener('block:replace', this.handleReplacement)
   }
-  
+
   componentWillUnmount() {
-    this.root.current.removeEventListener('block:change', this.handleChange);
+    this.root.current.removeEventListener(
+      'block:replace',
+      this.handleReplacement
+    )
+    this.root.current.removeEventListener('block:insert', this.handleInsertion)
+    this.root.current.removeEventListener('block:change', this.handleChange)
   }
-  
+
   render() {
     const { className, block, mode, disabled } = this.props
     const [type, attrs, ...rest] = block
@@ -104,24 +140,28 @@ function escapeHtml(unsafe) {
   return unsafe.replace(/</g, '&lt;').replace(/>/g, '&gt;')
 }
 
+function elementToToken(node, moreAttrs) {
+  const block = isBlock(node)
+  const attrEntries = [
+    ['tag', node.tagName && node.tagName.toLowerCase()],
+    ['block', block],
+    ['markup', block ? node.dataset.markBefore : node.dataset.markAround],
+    ['lang', node.getAttribute('lang')],
+    ['href', node.getAttribute('href')],
+  ]
+    .concat(Object.entries(moreAttrs || {}))
+    .filter((pair) => typeof pair[1] === 'string' && pair[1] !== '')
+  const rest = node.hasChildNodes() ? nodesToTokens(node.childNodes) : []
+
+  return [tokenType(node), Object.fromEntries(attrEntries)].concat(rest)
+}
+
 function nodesToTokens(children) {
   return Array.prototype.map.call(children, (node) => {
     switch (node.nodeType) {
       case Node.ELEMENT_NODE:
-        const block = isBlock(node)
-        const attrEntries = [
-          ['tag', node.tagName && node.tagName.toLowerCase()],
-          ['block', block],
-          ['markup', block ? node.dataset.markBefore : node.dataset.markAround],
-          ['lang', node.getAttribute('lang')],
-          ['href', node.getAttribute('href')],
-        ].filter((pair) => typeof pair[1] === 'string' && pair[1] !== '')
-        const rest = node.hasChildNodes() ? nodesToTokens(node.childNodes) : []
-
-        return [tokenType(node), Object.fromEntries(attrEntries)].concat(rest)
-
+        return elementToToken(node)
       case Node.TEXT_NODE:
-
       default:
         return he.encode(node.nodeValue, {
           useNamedReferences: true,

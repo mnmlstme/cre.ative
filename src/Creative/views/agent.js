@@ -51,7 +51,7 @@ export function agentFactory(primitives, coreMode, modes) {
 export function delegateUserAction(agent, action, args = [], moreContext = {}) {
   const fn = typeof action === 'function' ? action : action.fn
 
-  //console.log('calling user action:', fn.displayName || fn.name)
+  console.log('calling user action:', fn.displayName || fn.name)
   return fn.call(agent.setContext(moreContext), ...args)
 }
 

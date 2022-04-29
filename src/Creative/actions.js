@@ -99,12 +99,13 @@ export function loadResource(filepath, loader, lang = 'js') {
 
 const UpdateScene = 'UpdateScene'
 
-export function updateScene(scene, block, json) {
+export function updateScene(scene, block, remove, ...blocks) {
   return {
     type: UpdateScene,
     scene,
     block,
-    data: json,
+    remove,
+    data: blocks,
   }
 }
 

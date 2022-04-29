@@ -27,14 +27,13 @@ export class Editor extends React.Component {
       forward_select_chars: this.forwardSelectChars.bind(this),
       backward_select_chars: this.backwardSelectChars.bind(this),
       surround_selection: this.surroundSelection.bind(this),
+      extract_selection: this.extractSelection.bind(this),
+      duplicate_block: this.duplicateBlock.bind(this),
       insert_markup: this.insertMarkup.bind(this),
       delete_selection: this.deleteSelection.bind(this),
       selection_is_empty: this.selectionIsEmpty.bind(this),
+      select_to_end_of_block: this.selectToEndOfBlock.bind(this),
       save_content: () => onSave && onSave(),
-      save_excursion: this.saveExcursion.bind(this),
-
-      // promptWithOptions: this.promptWithOptions.bind(this),
-      // cancelPrompt: this.cancelPrompt.bind(this),
     }
 
     this._factory = agentFactory(primitives, coreMode, props.modes)
@@ -43,10 +42,42 @@ export class Editor extends React.Component {
       const modeName = e.target.dataset.modeName
       delegateKeyEvent(this.getAgent(modeName), e)
     }
-    this.handleBlur = this.handleBlur.bind(this)
     this.handleSelectionChange = this.handleSelectionChange.bind(this)
-    // this.handlePopupSelection = this.handlePopupSelection.bind(this)
   }
+
+  render() {
+    const { className, children } = this.props
+    const { popup } = this.state
+    const options = popup && popup.options
+    const classes = [styles.editor].concat(className ? [className] : [])
+
+    return (
+      <section
+        className={classes.join(' ')}
+        onKeyDown={this.handleKeyEvent}
+        onKeyUp={this.handleKeyEvent}
+        ref={this.root}
+      >
+        {children}
+        <Popup
+          isOpen={Boolean(options)}
+          options={options}
+          onSelect={this.handlePopupSelection}
+          onClose={() => this.setState({ popup: null })}
+        />
+      </section>
+    )
+  }
+
+  componentDidMount() {
+    document.addEventListener('selectionchange', this.handleSelectionChange)
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('selectionchange', this.handleSelectionChange)
+  }
+
+  componentDidUpdate(prevProps, prevState) {}
 
   getAgent(modeName) {
     return this._factory(modeName)
@@ -83,9 +114,30 @@ export class Editor extends React.Component {
     return node.closest('[contenteditable]')
   }
 
+  getStartOfBlock(pos) {
+    let root = this.getActiveBlock(pos)
+
+    return { node: root, offset: 0 }
+  }
+
+  getEndOfBlock(pos) {
+    let el = this.getActiveBlock(pos)
+    let last = el.lastChild
+
+    while (last && last.nodeType === Node.ELEMENT_NODE) {
+      last = last.lastChild
+    }
+
+    return {
+      node: last || el,
+      offset:
+        last && last.nodeType === Node.TEXT_NODE ? last.nodeValue.length : 0,
+    }
+  }
+
   getPositionInBlock(pos) {
     const { node, offset } = pos
-    const root = getActiveBlock(pos)
+    const root = this.getActiveBlock(pos)
 
     return offset + countCharsBefore(node, root)
   }
@@ -100,7 +152,23 @@ export class Editor extends React.Component {
 
   didChange(pos) {
     const root = this.getActiveBlock(pos)
-    const event = new Event('block:change')
+    const event = new CustomEvent('block:change')
+
+    root.dispatchEvent(event)
+  }
+
+  didInsert(node, pos) {
+    const root = this.getActiveBlock(pos)
+    const event = new CustomEvent('block:insert', { detail: { node } })
+
+    root.dispatchEvent(event)
+  }
+
+  didReplace(replacements, pos) {
+    const root = this.getActiveBlock(pos)
+    const event = new CustomEvent('block:replace', {
+      detail: { replacements },
+    })
 
     root.dispatchEvent(event)
   }
@@ -112,7 +180,8 @@ export class Editor extends React.Component {
       range.setStart(anchor.node, anchor.offset)
       range.setEnd(caret.node, caret.offset)
     } else if (
-      getPositionInBlock(anchor) > getPositionInBlock(this.getCaretPos())
+      this.getPositionInBlock(anchor) >=
+      this.getPositionInBlock(this.getCaretPos())
     ) {
       range.setEnd(anchor.node, anchor.offset)
     } else {
@@ -122,6 +191,10 @@ export class Editor extends React.Component {
 
   selectionIsEmpty() {
     return this._range.collapsed
+  }
+
+  selectToEndOfBlock(pos) {
+    this.setSelection(this.getEndOfBlock(pos))
   }
 
   forwardChars(n = 1) {
@@ -170,13 +243,13 @@ export class Editor extends React.Component {
         node.insertBefore(text, ref)
         break
     }
-    
+
     this.didChange({ node, offset })
-  } 
+  }
 
   deleteSelection() {
     this._range && this._range.deleteContents()
-    this.didChange( this.getCaretPos() )
+    this.didChange(this.getCaretPos())
   }
 
   surroundSelection(tag, mark) {
@@ -184,6 +257,29 @@ export class Editor extends React.Component {
 
     mark && markup.setAttribute('data-mark-around', mark)
     this._range.surroundContents(markup)
+  }
+
+  extractSelection() {
+    const node = this.getActiveBlock()
+    const frag = this._range.extractContents()
+    const remains = node.cloneNode(true)
+    const pos = this.getStartOfBlock({ node })
+
+    // the remains will be inserted before on next render
+    // node.before(remains)
+    node.replaceChildren(frag)
+
+    this.setCaret(pos)
+    this.didReplace([remains, node], pos)
+  }
+
+  duplicateBlock(pos, deep = true) {
+    const node = this.getActiveBlock(pos)
+    const dup = node.cloneNode(deep)
+
+    // the duplicate will be placed before on next render
+    // node.before(dup)
+    this.didInsert(dup)
   }
 
   insertMarkup(tag, mark) {
@@ -198,57 +294,6 @@ export class Editor extends React.Component {
     this.didChange({ node: markup })
   }
 
-  saveExcursion(thunk) {
-    // run the function (usually to side-effect the DOM)
-    // and then clean up the state to get the user back
-
-    let selection = document.getSelection()
-    let range = this._range
-
-    let frozen = document.createElement('i')
-    range.surroundContents(frozen)
-
-    if (selection.rangeCount > 0) {
-      selection.removeAllRanges()
-    }
-
-    console.log('Save Excursion start', range)
-
-    thunk.call(null)
-
-    if (selection.rangeCount > 0) {
-      selection.removeAllRanges()
-    }
-
-    range.selectNode(frozen)
-    selection.addRange(range)
-
-    while (frozen.firstChild) {
-      frozen.before(frozen.firstChild)
-    }
-
-    frozen.remove()
-
-    // updateFocusForRange(range, this.root.current)
-
-    console.log('Save Excursion end', range)
-
-    this.setState({
-      // content: getHTML(this.root.current),
-      range,
-    })
-  }
-  /*
-  promptWithOptions(options) {
-    this.getAgent().setContext({ options })
-    this.setState({ popup: { options } })
-  }
-
-  cancelPrompt() {
-    this.setState({ popup: null })
-    this.getAgent().clearContext('options')
-  }
-*/
   handleSelectionChange(e) {
     const el = this.root.current
     const newRange = getSelectionWithin(el)
@@ -258,19 +303,6 @@ export class Editor extends React.Component {
     }
   }
 
-  handleBlur(e) {
-    // const el = this.root.current
-    // const range = getSelectionWithin(el)
-    //
-    // updateFocusForRange(range, el)
-  }
-
-  /*
-  handlePopupSelection(opt) {
-    this.closePrompt()
-    opt && delegateUserAction(this.getAgent(), opt.action)
-  }
-*/
   shouldComponentUpdate(nextProps, nextState) {
     const { popup, range } = this.state
 
@@ -278,11 +310,7 @@ export class Editor extends React.Component {
       (nextState.range && nextState.range.commonAncestorContainer) !==
       (range && range.commonAncestorContainer)
     ) {
-      // console.log(
-      //   'Selector range changed, should update',
-      //   nextState.range,
-      //   range
-      // )
+      // Selector range changed, should update?
       // return true
     }
 
@@ -293,40 +321,6 @@ export class Editor extends React.Component {
 
     return true
   }
-
-  render() {
-    const { className, children } = this.props
-    const { popup } = this.state
-    const options = popup && popup.options
-    const classes = [styles.editor].concat(className ? [className] : [])
-
-    return (
-      <section
-        className={classes.join(' ')}
-        onKeyDown={this.handleKeyEvent}
-        onKeyUp={this.handleKeyEvent}
-        ref={this.root}
-      >
-        {children}
-        <Popup
-          isOpen={Boolean(options)}
-          options={options}
-          onSelect={this.handlePopupSelection}
-          onClose={() => this.setState({ popup: null })}
-        />
-      </section>
-    )
-  }
-
-  componentDidMount() {
-    document.addEventListener('selectionchange', this.handleSelectionChange)
-  }
-
-  componentWillUnmount() {
-    document.removeEventListener('selectionchange', this.handleSelectionChange)
-  }
-
-  componentDidUpdate(prevProps, prevState) {}
 }
 
 function countCharsIn(node) {
@@ -345,12 +339,18 @@ function countCharsIn(node) {
 }
 
 function countCharsBefore(node, rootEl) {
+  const prev = node.previousSibling
+  const parent = node.parentNode
+
   if (node === rootEl) {
     return 0
-  } else {
-    const prev = node.previousSibling || node.parentNode
+  }
+
+  if (prev) {
     return countCharsIn(prev) + countCharsBefore(prev, rootEl)
   }
+
+  return countCharsBefore(parent, rootEl)
 }
 
 function advancePosition(n, pos, rootEl) {

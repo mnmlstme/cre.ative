@@ -13,7 +13,7 @@ export function Document({ workbook, doUpdate, doSave }) {
         const blocks = scn.get('blocks')
         const perform = blocks.find(
           ([type, attrs]) => type === 'fence' && attrs.mode === 'eval'
-        )
+        ) || ['fence', { mode: 'eval' }, '']
         const discussion = blocks.filter(
           ([type, attrs]) => type !== 'fence' || attrs.mode !== 'eval'
         )

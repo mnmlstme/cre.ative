@@ -12,20 +12,14 @@ export function ProseEditor(props) {
   const { blocks, doUpdate, doSave } = props
   let unique = {}
 
-  blocks.forEach( b => {
-    const [type, {lang}] = b
-    //console.log('Checking mode of block', b)
-    if ( type === 'fence' ) {
+  blocks.forEach((b) => {
+    const [type, { lang }] = b
+    if (type === 'fence') {
       unique[lang] = lang
     }
   })
 
-  //console.log('Building editor to support these languages:', unique, blocks)
-  const modes = [proseMode].concat(
-    Object.keys(unique).map(getMinorMode)
-  )
-
-  const handleMarkdown = (index, tag, html) => {}
+  const modes = [proseMode].concat(Object.keys(unique).map(getMinorMode))
 
   return (
     <Editor
@@ -33,25 +27,18 @@ export function ProseEditor(props) {
       modes={modes}
       onSave={doSave}
     >
-      {blocks.map((b) => {
-        const [type, attrs, ...rest] = b
-        const { index, tag, markup, lang } = attrs
+      {blocks.map((b, i) => {
+        const [type, { uniqueId }, ...rest] = b
 
         if (type === 'fence') {
-          return (
-            <CodeBlock
-              key={index}
-              block={b}
-              onChange={(b) => doUpdate && doUpdate(index, b)}
-            />
-          )
+          return <CodeBlock key={uniqueId} block={b} onUpdate={doUpdate} />
         } else {
           return (
             <Block
-              key={index}
+              key={uniqueId}
               block={b}
               mode="prose-mode"
-              onChange={(b) => doUpdate && doUpdate(index, b)}
+              onUpdate={doUpdate}
             />
           )
         }
@@ -67,20 +54,26 @@ const proseMode = {
     {
       '*': hyper_star,
       Backspace: hyper_backspace,
+      Enter: hyper_enter,
     },
   ],
-  bindings: [hyper_star],
+  bindings: [hyper_backspace, hyper_enter, hyper_star],
 }
 
 function hyper_star() {
-  if (!this.selection_is_empty()) {
-    this.surround_selection('em', '*')
-  } else {
+  if (this.selection_is_empty()) {
     this.insert_markup('em', '*')
+  } else {
+    this.surround_selection('em', '*')
   }
 }
 
 function hyper_backspace() {
   this.backward_select_chars(1)
   this.delete_selection()
+}
+
+function hyper_enter() {
+  this.select_to_end_of_block()
+  this.extract_selection()
 }

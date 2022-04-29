@@ -67,20 +67,11 @@ export function update(state = initial, action = {}) {
     case Actions.UpdateScene: {
       console.log('update UpdateScene', action)
       const workbook = state.get('workbook') || Im.Map()
-      const { scene, block, data } = action
-      const replacement = (old) => {
-        const [_, oldAttrs] = old
-        const [type, newAttrs, ...rest] = data
-        const attrs = Object.assign({}, oldAttrs, newAttrs)
+      const { scene, block, remove, data } = action
+      const matchingBlock = ([_, { uniqueId }]) => uniqueId === block
 
-        return [type, attrs, ...rest]
-      }
-
-      console.log('Updating: ', scene, block, data)
-
-      return state.updateIn(
-        ['workbook', 'scenes', scene, 'blocks', block],
-        (b) => replacement(b)
+      return state.updateIn(['workbook', 'scenes', scene, 'blocks'], (list) =>
+        list.splice(list.findIndex(matchingBlock), remove, ...data).map(idBlock)
       )
     }
 
@@ -156,13 +147,30 @@ function immutableScene(scene) {
     blocks: Im.List(
       blocks
         .filter(([type, attrs, content]) => type !== 'fence' || content !== '')
-        .map(consumeBlock)
+        .map(idBlock)
     ),
   })
+}
 
-  function consumeBlock(blk, index) {
-    const [type, attrs, ...rest] = blk
+function idBlock(blk, index) {
+  const [type, attrs, ...rest] = blk
 
-    return [type, Object.assign(attrs, { index }), ...rest]
-  }
+  return attrs.uniqueId
+    ? blk
+    : [type, Object.assign(attrs, { uniqueId: genId('b') }), ...rest]
+}
+
+let nextInSequence = 1
+
+function genId(prefix = 'id', len = 8) {
+  const s = nextInSequence.toString()
+  const pad =
+    s.length >= len
+      ? ''
+      : Array(len - s.length)
+          .fill('0')
+          .join('')
+
+  nextInSequence = nextInSequence + 1
+  return `${prefix}${pad}${s}`
 }
