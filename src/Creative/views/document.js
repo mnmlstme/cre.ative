@@ -11,12 +11,18 @@ export function Document({ workbook, doUpdate, doSave }) {
     <ol>
       {scenes.map((scn, i) => {
         const blocks = scn.get('blocks')
-        const perform = blocks.find(
-          ([type, attrs]) => type === 'fence' && attrs.mode === 'eval'
-        ) || ['fence', { mode: 'eval' }, '']
-        const discussion = blocks.filter(
-          ([type, attrs]) => type !== 'fence' || attrs.mode !== 'eval'
-        )
+        const performance = blocks.filter((b) => {
+          const type = b.get(0)
+          const mode = b.get(1)['mode']
+
+          return type === 'fence' && mode === 'eval'
+        })
+        const discussion = blocks.filter((b) => {
+          const type = b.get(0)
+          const mode = b.get(1)['mode']
+
+          return type !== 'fence' || mode !== 'eval'
+        })
 
         return (
           <li key={i} className={styles.doc}>
@@ -25,7 +31,11 @@ export function Document({ workbook, doUpdate, doSave }) {
               doUpdate={doUpdate}
               doSave={doSave}
             />
-            <CodeEditor block={perform} doUpdate={doUpdate} doSave={doSave} />
+            <CodeEditor
+              blocks={performance}
+              doUpdate={doUpdate}
+              doSave={doSave}
+            />
           </li>
         )
       })}

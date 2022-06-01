@@ -13,7 +13,8 @@ export function ProseEditor(props) {
   let unique = {}
 
   blocks.forEach((b) => {
-    const [type, { lang }] = b
+    const blk = b.toArray()
+    const [type, { lang }] = blk
     if (type === 'fence') {
       unique[lang] = lang
     }
@@ -27,24 +28,52 @@ export function ProseEditor(props) {
       modes={modes}
       onSave={doSave}
     >
-      {blocks.map((b, i) => {
-        const [type, { uniqueId }, ...rest] = b
-
-        if (type === 'fence') {
-          return <CodeBlock key={uniqueId} block={b} onUpdate={doUpdate} />
-        } else {
-          return (
-            <Block
-              key={uniqueId}
-              block={b}
-              mode="prose-mode"
-              onUpdate={doUpdate}
-            />
-          )
-        }
-      })}
+      {blocks.map((b) => (
+        <Node block={b.toArray()} onUpdate={doUpdate} />
+      ))}
     </Editor>
   )
+}
+
+function Node(props) {
+  const { block, path, onUpdate } = props
+  const [type, { tag, uniqueId }, ...rest] = block
+  const childPath = (path || []).concat([uniqueId])
+
+  switch (type) {
+    case 'fence':
+      return <CodeBlock key={uniqueId} block={block} onUpdate={onUpdate} />
+    case 'bullet_list':
+    case 'ordered_list':
+    case 'list_item':
+      return React.createElement(
+        tag,
+        { key: uniqueId, path: childPath },
+        rest.map((b) => {
+          const block = b.toArray()
+          const [_, { uniqueId }] = block
+
+          return (
+            <Node
+              key={uniqueId}
+              block={block}
+              path={childPath}
+              onUpdate={onUpdate}
+            />
+          )
+        })
+      )
+    default:
+      return (
+        <Block
+          key={uniqueId}
+          path={childPath}
+          block={block}
+          mode="prose-mode"
+          onUpdate={onUpdate}
+        />
+      )
+  }
 }
 
 const proseMode = {

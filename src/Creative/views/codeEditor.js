@@ -7,7 +7,11 @@ import styles from './code.css'
 import editorStyles from './editor.css'
 
 export function CodeEditor(props) {
-  const { block, doUpdate, doSave } = props
+  const { blocks, doUpdate, doSave } = props
+  // TODO: handle more than one code block (e.g., with editor tabs)
+  const block = blocks.size
+    ? blocks.first().toArray()
+    : ['fence', { mode: 'eval', lang: 'html' }, '']
   const [type, attrs, code] = block
   const { mode, tag, lang } = attrs
   const minorMode = getMinorMode(lang)

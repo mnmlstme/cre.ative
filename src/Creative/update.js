@@ -68,10 +68,15 @@ export function update(state = initial, action = {}) {
       console.log('update UpdateScene', action)
       const workbook = state.get('workbook') || Im.Map()
       const { scene, block, remove, data } = action
-      const matchingBlock = ([_, { uniqueId }]) => uniqueId === block
+      const path = Array.isArray(block) ? block : [block]
+      const top = ['workbook', 'scenes', scene, 'blocks']
+      const vector = pathToVector(path, state.getIn(top))
+      const rest = data.map(immutableBlock).map(idBlock)
 
-      return state.updateIn(['workbook', 'scenes', scene, 'blocks'], (list) =>
-        list.splice(list.findIndex(matchingBlock), remove, ...data).map(idBlock)
+      console.log('updating block(s)', top, vector, remove, rest)
+
+      return state.updateIn(top.concat(vector.slice(0, -1)), (list) =>
+        list.splice(vector.at(-1), remove, ...rest)
       )
     }
 
@@ -141,29 +146,76 @@ export function update(state = initial, action = {}) {
 function immutableScene(scene) {
   const { title, blocks } = scene
   const parser = new DOMParser()
+  console.log('immutableScene', scene)
 
   return Im.Map({
     title,
     blocks: Im.List(
       blocks
         .filter(([type, attrs, content]) => type !== 'fence' || content !== '')
+        .map(immutableBlock)
         .map(idBlock)
     ),
   })
 }
 
-function idBlock(blk, index) {
-  const [type, attrs, ...rest] = blk
+function immutableBlock(block) {
+  console.log('immutableBlock', block)
 
-  return attrs.uniqueId
-    ? blk
-    : [type, Object.assign(attrs, { uniqueId: genId('b') }), ...rest]
+  if (typeof block === 'string') {
+    return block
+  }
+
+  const [type, attrs, ...rest] = block
+  const head = Im.List([type, attrs])
+
+  switch (type) {
+    case 'bullet_list':
+    case 'ordered_list':
+    case 'list_item':
+      // children are also immutable
+      return head.concat(rest.map(immutableBlock))
+    default:
+      // children are not immutable
+      return head.concat(rest)
+  }
 }
 
-let nextInSequence = 1
+function idBlock(blk, index) {
+  const type = blk.get(0)
+  const attrs = blk.get(1)
+  const rest = blk.slice(2)
+
+  switch (type) {
+    case 'bullet_list':
+    case 'ordered_list':
+    case 'list_item':
+      return Im.List([
+        type,
+        Object.assign(attrs, { uniqueId: genId('g') }),
+        ...rest.map(idBlock),
+      ])
+    default:
+      return attrs.uniqueId
+        ? blk
+        : Im.List([
+            type,
+            Object.assign(attrs, { uniqueId: genId('b') }),
+            ...rest,
+          ])
+  }
+}
+
+const generators = {}
+
+function getNext(prefix) {
+  const next = generators[prefix] || 1
+  generators[prefix] = next + 1
+  return next
+}
 
 function genId(prefix = 'id', len = 8) {
-  const s = nextInSequence.toString()
+  const s = getNext(prefix).toString()
   const pad =
     s.length >= len
       ? ''
@@ -171,6 +223,21 @@ function genId(prefix = 'id', len = 8) {
           .fill('0')
           .join('')
 
-  nextInSequence = nextInSequence + 1
   return `${prefix}${pad}${s}`
+}
+
+function pathToVector(path, list, partial = [], offset = 0) {
+  console.log('pathToVector', path, list, partial)
+  const [key, ...rest] = path
+  const index = list.findIndex(([_, { uniqueId }]) => uniqueId === key)
+  const vector = partial.concat([index + offset])
+
+  if (rest.length && index >= 0) {
+    const group = list.get(index)
+    const sublist = group.slice(2)
+
+    return pathToVector(rest, sublist, vector, 2)
+  } else {
+    return vector
+  }
 }

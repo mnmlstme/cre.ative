@@ -19,7 +19,7 @@
   margin-left: 2rem;
 }
 
-.prose > *:focus-within {
+.prose > [contenteditable]:focus-within {
   background: black;
   outline: none;
 }
@@ -70,10 +70,9 @@
 }
 
 .prose ul > li,
-.prose ol > li{
+.prose ol > li {
   position: relative;
 }
-
 
 .prose > :not(pre) code {
   color: #74ec70;

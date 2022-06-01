@@ -12,32 +12,32 @@ export class Block extends React.Component {
   }
 
   handleChange(e) {
-    const { block, onUpdate } = this.props
+    const { block, path, onUpdate } = this.props
     const children = e.target.childNodes
     const [type, attrs] = block
     const { uniqueId } = attrs
     const token = [type, attrs].concat(nodesToTokens(children))
 
-    onUpdate && onUpdate(uniqueId, 1, token)
+    onUpdate && onUpdate(path || [uniqueId], 1, token)
   }
 
   handleInsertion(e) {
-    const { block, onUpdate } = this.props
+    const { block, path, onUpdate } = this.props
     const [_, { uniqueId }] = block
     const { node } = e.detail
     const token = elementToToken(node)
 
-    onUpdate && onUpdate(uniqueId, 0, token)
+    onUpdate && onUpdate(path || [uniqueId], 0, token)
   }
 
   handleReplacement(e) {
-    const { block, onUpdate } = this.props
+    const { block, path, onUpdate } = this.props
     const [_, { uniqueId }] = block
     const { replacements } = e.detail
     const idOfNode = (n) => (n === this.root.current ? { uniqueId } : {})
     const blocks = replacements.map((n) => elementToToken(n, idOfNode(n)))
 
-    onUpdate && onUpdate(uniqueId, 1, ...blocks)
+    onUpdate && onUpdate(path || [uniqueId], 1, ...blocks)
   }
 
   shouldComponentUpdate(nextProps) {
@@ -91,6 +91,7 @@ export class Block extends React.Component {
     const [type, attrs, ...rest] = block
     const { tag, markup, lang } = attrs
     const spellCheck = type !== 'fence'
+    console.log('Block#render', block)
     const inner = jsonToHtml(rest)
 
     return React.createElement(
