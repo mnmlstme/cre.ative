@@ -53,7 +53,7 @@ export class Block extends React.Component {
 
     //console.log('ShouldComponentUpdate?', uniqueId)
 
-    if (inner !== el.innerHTML) {
+    if (inner !== normalizeInnerHtml(el.innerHTML, true)) {
       console.log(
         `Content changed from outside, must update ${uniqueId}:`,
         inner
@@ -115,10 +115,24 @@ export class Block extends React.Component {
   }
 }
 
+function normalizeInnerHtml(html, block = false) {
+  // Undo the various effects of setting/getting innerHTML in browser
+  const noBrHtml = block ? html.replace(/<br>$/, '') : html
+
+  return noBrHtml.replaceAll('"', '&quot;').replaceAll("'", '&apos;')
+}
+
 function jsonToHtml(tokens) {
   return tokens
-    .map((t) => (typeof t === 'string' ? escapeHtml(t) : tokenToHtml(t)))
+    .map((t) => (typeof t === 'string' ? encodeAsHtml(t) : tokenToHtml(t)))
     .join('')
+}
+
+function encodeAsHtml(text) {
+  return he.encode(text, {
+    useNamedReferences: true,
+    decimal: true,
+  })
 }
 
 function tokenToHtml([type, attrs, ...children]) {
@@ -137,10 +151,6 @@ function tokenToHtml([type, attrs, ...children]) {
     : `<${tag}${htmlAttrs}/>`
 }
 
-function escapeHtml(unsafe) {
-  return unsafe.replace(/</g, '&lt;').replace(/>/g, '&gt;')
-}
-
 function elementToToken(node, moreAttrs) {
   const block = isBlock(node)
   const attrEntries = [
@@ -152,21 +162,34 @@ function elementToToken(node, moreAttrs) {
   ]
     .concat(Object.entries(moreAttrs || {}))
     .filter((pair) => typeof pair[1] === 'string' && pair[1] !== '')
-  const rest = node.hasChildNodes() ? nodesToTokens(node.childNodes) : []
+  const rest = node.hasChildNodes() ? nodesToTokens(node.childNodes, block) : []
 
   return [tokenType(node), Object.fromEntries(attrEntries)].concat(rest)
 }
 
-function nodesToTokens(children) {
-  return Array.prototype.map.call(children, (node) => {
+function nodesToTokens(nodeList, block = true) {
+  const children = Array.from(nodeList)
+  // Browser may add <br> elements at end of blocks; if so, elide them
+  const last = children.length - 1
+  const legitChildren = block
+    ? children.filter(
+        (node, i) =>
+          i !== last ||
+          node.nodeType !== Node.ELEMENT_NODE ||
+          !node.tagName ||
+          node.tagName.toLowerCase() !== 'br'
+      )
+    : children
+
+  console.log('nodesToTokens, legitChildren:', legitChildren)
+
+  return legitChildren.map((node) => {
     switch (node.nodeType) {
       case Node.ELEMENT_NODE:
         return elementToToken(node)
       case Node.TEXT_NODE:
       default:
-        return he.encode(node.nodeValue, {
-          useNamedReferences: true,
-        })
+        return encodeAsHtml(node.nodeValue)
     }
   })
 }
@@ -178,7 +201,7 @@ function isBlock(node) {
     return false
   }
 
-  if (tag.toLowerCase === 'code') {
+  if (tag.toLowerCase() === 'code') {
     const parent = node.parentNode
 
     return parent.tagName && parent.tagName.toLowerCase() === 'pre'
@@ -194,7 +217,7 @@ function tokenType(node) {
     return 'paragraph'
   }
 
-  if (tag.toLowerCase === 'code') {
+  if (tag.toLowerCase() === 'code') {
     return isBlock(node) ? 'fence' : 'code_inline'
   }
 
