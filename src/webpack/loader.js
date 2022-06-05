@@ -31,19 +31,19 @@ function loader(content) {
         if (err) {
           reject(err)
         } else {
-          resolve( require(result) )
+          resolve(require(result))
         }
       })
     })
   }
-  
+
   // initial parse of markdown and frontMatter
 
   parse(content, basename)
     .then((wb) => providePlugin(wb, requirePlugin, options.platforms))
-    .then(([ wb, plugin ]) => classify(wb, plugin))
-    .then(([ wb, plugin ]) => dekram(wb, emit, plugin))
-    .then(([ wb, plugin ]) => collect(wb, plugin))
+    .then(([wb, plugin]) => classify(wb, plugin))
+    .then(([wb, plugin]) => dekram(wb, emit, plugin))
+    .then(([wb, plugin]) => collect(wb, plugin))
     .then((component) => callback(null, component))
     .catch(callback)
 }
@@ -73,28 +73,30 @@ function parse(content, basename) {
 function providePlugin(wb, requirePlugin, platforms = {}) {
   const name = wb.platform
   const platform = platforms[name] || name
-  
+
   // console.log('Loading plugin:', name, platforms[name])
-  
-  if ( platform ) {
-    return requirePlugin(platforms[name] || name)
-        .then( plugin => ([wb, Kr.register(plugin, name)]) )
+
+  if (platform) {
+    return requirePlugin(platforms[name] || name).then((plugin) => [
+      wb,
+      Kr.register(plugin, name),
+    ])
   } else {
     return [wb, Kr.defaultPlugin]
   }
 }
 
 function classify(wb, plugin) {
-  console.log('Classifying with plugin:', plugin)
-  
-  return [ Kr.classify(wb, plugin.modules), plugin ]
+  // console.log('Classifying with plugin:', plugin)
+
+  return [Kr.classify(wb, plugin.modules), plugin]
 }
 
 function dekram(workbook, emitter, plugin = Kr.defaultPlugin) {
   const { moduleName, languages } = workbook
 
   // console.log('Dekram: ', workbook, plugin)
-  
+
   const emit = (module) => {
     // console.log('Emit module:', module )
     const { language, name, code } = module.collate(workbook, module.language)
@@ -113,7 +115,7 @@ function dekram(workbook, emitter, plugin = Kr.defaultPlugin) {
       })
     )
 
-  return [ {modules, ...workbook}, plugin ]
+  return [{ modules, ...workbook }, plugin]
 }
 
 function collect(workbook, config) {
