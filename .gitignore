@@ -1,10 +1,9 @@
-package-lock.json
-elm-stuff/
-kram_modules/
-node_modules/
+/package-lock.json
+/elm-stuff
+/kram_modules
+/node_modules
 .cache/
 .parcel-cache/
-.yalc
-yalc.lock
-.nova
+/.yalc
+/yalc.lock
 /.nova
