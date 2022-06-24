@@ -14,7 +14,7 @@ const frontend = {
     filename: '[name].bundle.js',
     chunkFilename: 'chunk.[id].js',
     path: path.resolve(__dirname, 'dist'),
-    libraryTarget: 'umd'
+    libraryTarget: 'umd',
   },
 
   module: {
@@ -85,6 +85,7 @@ const frontend = {
 
 const backend = {
   name: 'backend',
+  target: 'node',
 
   entry: {
     server: './src/server/main.js',
@@ -95,7 +96,6 @@ const backend = {
     path: path.resolve(__dirname, './dist'),
   },
 
-  target: 'node',
   externals: [nodeExternals()],
 
   plugins: [

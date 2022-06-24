@@ -1,5 +1,4 @@
 import React from 'react'
-import Kr from '@cre.ative/kram'
 const path = require('path')
 import styles from './workbook.css'
 
@@ -19,7 +18,7 @@ export class Render extends React.Component {
 
     console.log('Rendering Workbook', workbook)
 
-    modules.forEach(({ language, load }) => doLoadResource(load, language))
+    modules.forEach(doLoadResource)
   }
 
   componentDidUpdate(prevProps) {

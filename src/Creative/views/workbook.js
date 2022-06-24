@@ -12,14 +12,28 @@ import {
 } from '../actions'
 import styles from './workbook.css'
 
-function Workbook({ workbook, filepath, resources, scene, urlpath, dispatch }) {
-  if (!filepath || filepath.replace(/\.\w+$/, '') !== urlpath) {
-    filepath = urlpath + '.kr'
-    dispatch(loadWorkbook(filepath))
+function Workbook({
+  workbook,
+  projectId,
+  workbookId,
+  resources,
+  scene,
+  urlpath,
+  dispatch,
+}) {
+  if (
+    !projectId ||
+    !workbookId ||
+    [projectId, workbookId].join('/') !== urlpath
+  ) {
+    let path = urlpath.split('/')
+    workbookId = path.pop()
+    projectId = path.pop()
+    dispatch(loadWorkbook(projectId, workbookId))
   }
 
   if (!workbook) {
-    return <h1>Loading {filepath} ...</h1>
+    return <h1>Loading {workbookId} ...</h1>
   }
 
   const title = workbook.get('title')
@@ -30,8 +44,7 @@ function Workbook({ workbook, filepath, resources, scene, urlpath, dispatch }) {
   const doUpdateDocument = (blockId, rmNum, ...blocks) =>
     dispatch(updateScene(scene - 1, blockId, rmNum, ...blocks))
   const doSaveDocument = () => dispatch(saveScene(scene - 1))
-  const doLoadResource = (loader, lang) =>
-    dispatch(loadResource(filepath, loader, lang))
+  const doLoadResource = (module) => dispatch(loadResource(module))
 
   return (
     <article className={styles.workbook}>
@@ -51,7 +64,7 @@ function Workbook({ workbook, filepath, resources, scene, urlpath, dispatch }) {
         />
       </section>
       <footer>
-        <h6>{title || filepath}</h6>
+        <h6>{title || workbookId}</h6>
         <span>
           <button disabled={scene - 1 < 1} onClick={doPrevScene}>
             &lt;
@@ -78,7 +91,8 @@ function mapStateToProps(state) {
   const workbook = state.get('workbook')
 
   return {
-    filepath: workbook.get('filepath'),
+    projectId: workbook.get('projectId'),
+    workbookId: workbook.get('workbookId'),
     workbook: workbook.get('isLoaded') ? workbook : undefined,
     resources: state.get('resources'),
     scene: state.get('current'),

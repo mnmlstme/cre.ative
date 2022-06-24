@@ -43,11 +43,12 @@ export function update(state = initial, action = {}) {
         'workbook',
         Im.Map({
           basename,
-          filepath: action.filepath,
+          projectId: action.projectId,
+          workbookId: action.workbookId,
           isLoaded: true,
           title,
           scenes: Im.List(scenes).map(immutableScene),
-          modules,
+          modules: Im.List(modules || []),
           init,
         })
       )
@@ -58,7 +59,8 @@ export function update(state = initial, action = {}) {
       return state.set(
         'workbook',
         Im.Map({
-          filepath: action.filepath,
+          ProjectErrorId: action.projectId,
+          workbookId: action.workbookId,
           isLoaded: false,
           error: action.error,
         })
@@ -95,6 +97,8 @@ export function update(state = initial, action = {}) {
         scene,
       ].join('/')
 
+      let changes = null
+
       fetch(endpoint, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -102,13 +106,20 @@ export function update(state = initial, action = {}) {
       })
         .then((response) => response.json())
         .then((data) => {
-          console.log('Saved:', data)
+          console.log('Response from saving:', data)
+          const { title, modules } = data
+          changes = Im.Map({
+            title: data.title || workbook.title,
+            modules: data.modules
+              ? workbook.modules.merge(data.modules)
+              : workbook.modules,
+          })
         })
         .catch((error) => {
           console.error('Error:', error)
         })
 
-      return state
+      return changes ? state.set('workbook', workbook.merge(changes)) : state
     }
 
     case Actions.LoadResource: {
@@ -160,7 +171,7 @@ function immutableScene(scene) {
 }
 
 function immutableBlock(block) {
-  console.log('immutableBlock', block)
+  // console.log('immutableBlock', block)
 
   if (typeof block === 'string') {
     return block
@@ -227,7 +238,7 @@ function genId(prefix = 'id', len = 8) {
 }
 
 function pathToVector(path, list, partial = [], offset = 0) {
-  console.log('pathToVector', path, list, partial)
+  // console.log('pathToVector', path, list, partial)
   const [key, ...rest] = path
   const index = list.findIndex(([_, { uniqueId }]) => uniqueId === key)
   const vector = partial.concat([index + offset])

@@ -1,6 +1,6 @@
 {
   "name": "@cre.ative/cre-a-tive",
-  "version": "1.1.2",
+  "version": "1.2.0",
   "description": "A framework-agnostic creative programming environment",
   "browser": "dist/client.bundle.js",
   "bin": {
@@ -33,7 +33,6 @@
     "redux": "^4.1.0",
     "redux-thunk": "^2.3.0",
     "webpack": "^4.16.1",
-    "webpack-dev-middleware": "^5.3.1",
     "webpack-dev-server": "^4.0.0-rc.1",
     "yaml-loader": "^0.6.0"
   },

@@ -54,10 +54,10 @@ export class Block extends React.Component {
     //console.log('ShouldComponentUpdate?', uniqueId)
 
     if (inner !== normalizeInnerHtml(el.innerHTML, true)) {
-      console.log(
-        `Content changed from outside, must update ${uniqueId}:`,
-        inner
-      )
+      // console.log(
+      //  `Content changed from outside, must update ${uniqueId}:`,
+      //  inner
+      // )
       return true
     } else {
       return (
@@ -91,8 +91,8 @@ export class Block extends React.Component {
     const [type, attrs, ...rest] = block
     const { tag, markup, lang } = attrs
     const spellCheck = type !== 'fence'
-    console.log('Block#render', block)
     const inner = jsonToHtml(rest)
+    // console.log('Block#render', block)
 
     return React.createElement(
       tag || 'div',
@@ -181,7 +181,7 @@ function nodesToTokens(nodeList, block = true) {
       )
     : children
 
-  console.log('nodesToTokens, legitChildren:', legitChildren)
+  // console.log('nodesToTokens, legitChildren:', legitChildren)
 
   return legitChildren.map((node) => {
     switch (node.nodeType) {

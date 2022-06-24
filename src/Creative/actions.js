@@ -46,16 +46,19 @@ export function loadProject(filepath) {
 const LoadWorkbook = 'LoadWorkbook'
 const WorkbookError = 'WorkbookError'
 
-export function loadWorkbook(filepath) {
+export function loadWorkbook(projectId, workbookId) {
+  const filepath = `${projectId}/${workbookId}.md`
+
   return (dispatch, getState, { importModule }) => {
-    console.log('loadModule', filepath)
+    console.log('loadWorkbook', projectId, workbookId)
 
     importModule(filepath)
       .then((mod) => {
         console.log('Action: LoadWorkbook ', JSON.stringify(mod.default))
         return dispatch({
           type: LoadWorkbook,
-          filepath,
+          projectId,
+          workbookId,
           data: mod.default,
         })
       })
@@ -63,7 +66,8 @@ export function loadWorkbook(filepath) {
         console.log('Action: WorkbookError ', error)
         return dispatch({
           type: WorkbookError,
-          filepath,
+          projectId,
+          workbookId,
           error,
         })
       })
@@ -73,16 +77,18 @@ export function loadWorkbook(filepath) {
 const LoadResource = 'LoadResource'
 const ResourceError = 'ResourceError'
 
-export function loadResource(filepath, loader, lang = 'js') {
-  return (dispatch) => {
-    console.log('loadResource', filepath, lang)
+export function loadResource(module) {
+  const { use, filepath, loader, language = 'js' } = module
+
+  return (dispatch, getState, { importResource }) => {
+    console.log('loadResource for module', module)
 
     loader(filepath)
       .then((mod) => {
-        // console.log('Action: LoadResource ', filepath, lang, mod)
+        console.log('Action: LoadResource ', language, mod)
         return dispatch({
           type: LoadResource,
-          lang,
+          lang: language,
           data: mod,
         })
       })
@@ -90,7 +96,7 @@ export function loadResource(filepath, loader, lang = 'js') {
         // console.log('Action: LoadError ', error)
         return dispatch({
           type: ResourceError,
-          lang,
+          lang: language,
           error,
         })
       })

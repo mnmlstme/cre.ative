@@ -18,14 +18,11 @@ function Main({ store }) {
   )
 }
 
-export function Creative(options) {
-  const { importModule } = options
-
+export function Creative({ importModule }) {
   const store = createStore(
     update,
     applyMiddleware(thunk.withExtraArgument({ importModule }))
   )
-
   return {
     render: (node) =>
       ReactDOM.render(React.createElement(Main, { store }), node),
