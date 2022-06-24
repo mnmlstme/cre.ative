@@ -11,7 +11,7 @@ const mdit = MarkdownIt('commonmark')
 
 Object.assign(mdit.renderer.rules, rules)
 
-function parse(md, basename) {
+function parse(md, basename, updaterFn = (wb) => wb) {
   const { body, attributes } = frontMatter(md)
   const defaultLang = attributes.lang || 'text'
   const tokens = mdit.parse(body)
@@ -31,7 +31,7 @@ function parse(md, basename) {
   const blocks = JSON.parse(json).slice(1)
   const { title, platform, model, imports } = attributes
 
-  let result = {
+  const result = updaterFn({
     title,
     basename,
     platform,
@@ -40,8 +40,7 @@ function parse(md, basename) {
     shape: getShapeOf(model),
     imports: getImportSpecs(imports),
     scenes: paginate(blocks),
-  }
-
+  })
   // console.log('Workbook:', JSON.stringify(result))
 
   const hashkey = hashcode(result)
@@ -66,7 +65,7 @@ function paginate(blocks) {
 
 function blocksToScene(blocks) {
   const headings = blocks.filter((b) => b[0] === 'heading')
-  
+
   return Object.assign(
     { blocks },
     headings.length ? { title: textContent(headings[0]) } : {}
