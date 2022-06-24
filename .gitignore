@@ -1,9 +1,9 @@
 package-lock.json
 elm-stuff/
-dist/
 kram_modules/
 node_modules/
 .cache/
 .parcel-cache/
 .yalc
 yalc.lock
+.nova
