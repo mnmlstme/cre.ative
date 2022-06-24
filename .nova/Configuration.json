@@ -1,7 +1,0 @@
-{
-  "index.ignored_file_patterns" : [
-    "\/node_modules",
-    "\/dist"
-  ],
-  "index.symbolicate" : false
-}
