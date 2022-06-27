@@ -1,19 +1,13 @@
-export function collect(workbook, loadFn) {
+export function collect(workbook, loadFn = defaultLoadFn, epilog = '') {
   const { modules } = workbook
-  const json = JSON.stringify(Object.assign(workbook, { modules: 'TBD' }))
-
-  const defaultLoadFn = (path, using) => {
-    const target = using ? `!${using}!${path}` : path
-
-    return `function () { return import('${target}') }`
-  }
+  const json = JSON.stringify(Object.assign(workbook, { modules: [] }))
 
   const resourceDefn = (m) => `{
-	language: '${m.language}',
-	filepath: '${m.filepath}',
-	use: '${m.use}',
-	bind: ${m.bind},
-	loader: ${(loadFn || defaultLoadFn)(m.filepath, m.use)}
+	  language: '${m.language}',
+	  filepath: '${m.filepath}',
+	  use: '${m.use}',
+	  bind: ${m.bind},
+	  loader: ${loadFn(m)}
   }`
 
   // console.log('Kram modules: ', modules)
@@ -22,5 +16,11 @@ export function collect(workbook, loadFn) {
 
   // console.log('Kram resource definitions: ', definitions)
 
-  return `export default Object.assign(${json},{modules: [${definitions}]})`
+  return `export default Object.assign(${json},{modules: [${definitions}]});${epilog}`
+}
+
+function defaultLoadFn({ filepath, use }) {
+  const target = use ? `!${use}!${filepath}` : filepath
+
+  return `function () { return import('${target}') }`
 }
