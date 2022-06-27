@@ -44,7 +44,7 @@ function Workbook({
   const doUpdateDocument = (blockId, rmNum, ...blocks) =>
     dispatch(updateScene(scene - 1, blockId, rmNum, ...blocks))
   const doSaveDocument = () => dispatch(saveScene(scene - 1))
-  const doLoadResource = (module) => dispatch(loadResource(module))
+  const doLoadResource = (defn) => dispatch(loadResource(defn))
 
   return (
     <article className={styles.workbook}>

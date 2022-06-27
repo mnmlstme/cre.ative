@@ -77,13 +77,18 @@ export function loadWorkbook(projectId, workbookId) {
 const LoadResource = 'LoadResource'
 const ResourceError = 'ResourceError'
 
-export function loadResource(module) {
-  const { use, filepath, loader, language = 'js' } = module
+export function loadResource(defn) {
+  const { use, filepath, loader, language = 'js' } = defn
 
   return (dispatch, getState, { importResource }) => {
-    console.log('loadResource for module', module)
+    console.log('loadResource for module', filepath)
 
-    loader(filepath)
+    const onHotSwap = () => {
+      console.log('Hot swap notification for', defn)
+      dispatch(loadResource(defn))
+    }
+
+    loader(onHotSwap)
       .then((mod) => {
         console.log('Action: LoadResource ', language, mod)
         return dispatch({
