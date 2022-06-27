@@ -1,3 +1,5 @@
 /node_modules
 /.nova
 /package-lock.json
+/.yalc
+/yalc.lock

@@ -1,12 +1,14 @@
 import express from "express";
 import webpack from "webpack";
-import middleware from "webpack-dev-middleware";
+import devServer from "webpack-dev-middleware";
+import hmrServer from "webpack-hot-middleware";
 import { configure } from "./configure";
 import { mount } from "./api";
 
 export function create(options) {
   const app = express();
   const webpack_config = configure(options);
+  const compiler = webpack(webpack_config);
 
   app.use(function (err, req, res, next) {
     console.error(err.stack);
@@ -17,8 +19,18 @@ export function create(options) {
 
   app.use(
     // Webpack devserver
-    middleware(webpack(webpack_config), {
+    devServer(compiler, {
       // middleware options
+    })
+  );
+
+  app.use(
+    // Webpack HMR devserver
+    hmrServer(compiler, {
+      // middleware options
+      log: console.log,
+      path: "/__webpack_hmr",
+      heartbeat: 10 * 1000,
     })
   );
 

@@ -1,4 +1,5 @@
 const path = require("path");
+const webpack = require("webpack");
 
 export function configure(options) {
   const { basedir, approot, docroot, platforms, entry } = options;
@@ -10,7 +11,10 @@ export function configure(options) {
     name: "dev-server",
     context: basedir,
     entry: {
-      client: entry || path.resolve(approot, "./client.js"),
+      client: [
+        entry || path.resolve(approot, "./client.js"),
+        "webpack-hot-middleware/client.js?path=/__webpack_hmr&timeout=20000",
+      ],
     },
     mode: "development",
     module: {
@@ -37,7 +41,9 @@ export function configure(options) {
     },
     devServer: {
       overlay: true,
+      hot: true,
     },
+    plugins: [new webpack.HotModuleReplacementPlugin()],
   };
 }
 
@@ -45,7 +51,7 @@ function kramRules({ docroot, platforms, kramdir }) {
   const projectYaml = {
     test: /\.yaml$/,
     include: [docroot],
-    type: "json", // Required by Webpack v4
+    // type: "json", // Required by Webpack v4
     use: "yaml-loader",
   };
 
