@@ -2,7 +2,7 @@ const path = require("path");
 const webpack = require("webpack");
 
 export function configure(options) {
-  const { basedir, approot, docroot, platforms, entry } = options;
+  const { basedir, approot, docroot, plugins, entry } = options;
   const moduledir = path.resolve(basedir, "./node_modules");
   const kramdir = path.resolve(basedir, "./kram_modules");
   const projdir = path.resolve(basedir, "./projects");
@@ -18,7 +18,7 @@ export function configure(options) {
     },
     mode: "development",
     module: {
-      rules: kramRules({ docroot, platforms, kramdir }),
+      rules: kramRules({ docroot, plugins, kramdir }),
     },
     output: {
       filename: "[name].bundle.js",
@@ -47,7 +47,7 @@ export function configure(options) {
   };
 }
 
-function kramRules({ docroot, platforms, kramdir }) {
+function kramRules({ docroot, plugins, kramdir }) {
   const projectYaml = {
     test: /\.yaml$/,
     include: [docroot],
@@ -61,11 +61,24 @@ function kramRules({ docroot, platforms, kramdir }) {
     use: {
       loader: "@cre.ative/kram-express-webpack",
       options: {
-        platforms,
+        platforms: Object.fromEntries(
+          plugins.map(({ name, modules }) => [name, { modules }])
+        ),
         output: kramdir,
       },
     },
   };
 
-  return [projectYaml, workbookMd];
+  const pluginRules = plugins.map((plugin) => {
+    const platform = plugin.name;
+    return plugin.modules.map(({ language, use }) => {
+      return {
+        test: RegExp(`\.${language}\$`),
+        include: [`${kramdir}/${platform}`],
+        use: use(),
+      };
+    });
+  });
+
+  return [projectYaml, workbookMd].concat(...pluginRules);
 }

@@ -17,80 +17,41 @@ function loader(content) {
   const callback = this.async();
 
   const workbook = Kr.parse(content, basename);
-  const platform = workbook.platform || "web";
+  const platform = workbook.platform || "web-standard";
+  const plugin = platforms[platform] || Kr.defaultPlugin;
   const dir = path.join(platform, projname, basename);
   const outdir = output ? path.join(output, dir) : dir;
 
-  const requirePlugin = new Promise((resolve, reject) => {
-    const moduleSpecifier = platforms[platform] || platform;
+  const epilog = ""; //if (module.hot) { module.hot.decline() }";
 
-    if (moduleSpecifier === "web") {
-      resolve(Kr.defaultPlugin);
-    }
+  console.log("Kram loader, using plugin:", platform, plugin);
 
-    this.resolve(this.rootContext, moduleSpecifier, (err, result) => {
-      if (err) {
-        reject(err);
-      } else {
-        const plugin = Kr.register(require(result), platform);
-        // console.log("kram plugin loaded:", platform, plugin);
-        resolve(plugin);
-      }
-    });
-  });
-
-  const epilog = ""; //if (module.hot) { module.hot.accept() }";
-
-  requirePlugin
-    .then((plugin) => [plugin, Kr.classify(workbook, plugin.modules)])
-    .then(([plugin, wb]) => Kr.dekram(wb, emitter(outdir), plugin))
+  return new Promise((resolve, reject) => resolve(workbook))
+    .then((wb) => Kr.classify(wb, plugin.modules))
+    .then((wb) => Kr.dekram(wb, emitter(outdir), plugin))
     .then((wb) => Kr.collect(wb, loadFn, epilog))
-    .then((module) => callback(null, module))
+    .then((mod) => callback(null, mod))
     .catch(callback);
 
-  const loadResolver = (loader) =>
-    new Promise((resolve, reject) => {
-      this.resolve(this.rootContext, loader, (err, result) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(path.relative(root, result));
-        }
-      });
-    });
-
-  function loadFn({ filepath, use }) {
+  function loadFn({ filepath }) {
     const targetPath = path.relative(projpath, filepath);
-    const target = use ? `${use}!${targetPath}` : targetPath;
-
-    loadResolver(use).then((resolvedLoader) =>
-      console.log("loader resolved:", use, resolvedLoader)
-    );
-    console.log("waiting for loader resolution");
-
-    // HMR needs the loader resolved
-    const resolvedUsing =
-      use &&
-      use.replace(/^css-loader/, "./node_modules/css-loader/dist/cjs.js");
-
     const acceptPath = path.relative(root, filepath);
-    const accept = use ? `${resolvedUsing}!./${acceptPath}` : `./{acceptPath}`;
 
     return `function ( onHotSwap ) { 
-      const target = '${accept}';
+      const accept = './${acceptPath}';
       const enableHMR = (mod) => {
         if (module.hot) {
           if (onHotSwap) { 
-            module.hot.accept(target, onHotSwap);
-            console.log('Enabled Hot-Swap on module:', target, mod);
+            module.hot.accept(accept, onHotSwap);
+            console.log('Enabled Hot-Swap on module:', accept, mod);
           } else {
-            console.log('Hot-Swap available but declined for module:', target);
-            module.hot.decline(target)
+            console.log('Hot-Swap available but declined for module:', accept);
+            module.hot.decline(accept)
           }
         }
         return mod;
       }
-      return import( /* webpackMode: "lazy" */ '${target}' )
+      return import( /* webpackMode: "lazy" */ '${targetPath}' )
         .then(enableHMR)
     }`;
   }
