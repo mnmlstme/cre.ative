@@ -152,6 +152,7 @@ function tokenToHtml([type, attrs, ...children]) {
 }
 
 function elementToToken(node, moreAttrs) {
+  const type = tokenType(node)
   const block = isBlock(node)
   const attrEntries = [
     ['tag', node.tagName && node.tagName.toLowerCase()],
@@ -162,12 +163,15 @@ function elementToToken(node, moreAttrs) {
   ]
     .concat(Object.entries(moreAttrs || {}))
     .filter((pair) => typeof pair[1] === 'string' && pair[1] !== '')
-  const rest = node.hasChildNodes() ? nodesToTokens(node.childNodes, block) : []
 
-  return [tokenType(node), Object.fromEntries(attrEntries)].concat(rest)
+  const rest = node.hasChildNodes()
+    ? nodesToTokens(node.childNodes, block, type === 'fence')
+    : []
+
+  return [type, Object.fromEntries(attrEntries)].concat(rest)
 }
 
-function nodesToTokens(nodeList, block = true) {
+function nodesToTokens(nodeList, block = true, preformatted = false) {
   const children = Array.from(nodeList)
   // Browser may add <br> elements at end of blocks; if so, elide them
   const last = children.length - 1
@@ -181,15 +185,13 @@ function nodesToTokens(nodeList, block = true) {
       )
     : children
 
-  // console.log('nodesToTokens, legitChildren:', legitChildren)
-
   return legitChildren.map((node) => {
     switch (node.nodeType) {
       case Node.ELEMENT_NODE:
         return elementToToken(node)
       case Node.TEXT_NODE:
       default:
-        return encodeAsHtml(node.nodeValue)
+        return node.nodeValue
     }
   })
 }

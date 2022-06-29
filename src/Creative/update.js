@@ -67,7 +67,7 @@ export function update(state = initial, action = {}) {
       )
 
     case Actions.UpdateScene: {
-      console.log('update UpdateScene', action)
+      //console.log('update UpdateScene', action)
       const workbook = state.get('workbook') || Im.Map()
       const { scene, block, remove, data } = action
       const path = Array.isArray(block) ? block : [block]
@@ -75,7 +75,7 @@ export function update(state = initial, action = {}) {
       const vector = pathToVector(path, state.getIn(top))
       const rest = data.map(immutableBlock).map(idBlock)
 
-      console.log('updating block(s)', top, vector, remove, rest)
+      //console.log('updating block(s)', top, vector, remove, rest)
 
       return state.updateIn(top.concat(vector.slice(0, -1)), (list) =>
         list.splice(vector.at(-1), remove, ...rest)

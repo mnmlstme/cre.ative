@@ -4,7 +4,7 @@ import { ProseEditor } from './proseEditor'
 import { CodeEditor } from './codeEditor'
 
 export function Document({ workbook, doUpdate, doSave }) {
-  console.log('Document:', workbook.toObject())
+  //console.log('Document:', workbook.toObject())
   const scenes = workbook.get('scenes')
 
   return (

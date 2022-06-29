@@ -7,19 +7,20 @@ const PORT = 3000
 const args = process.argv.slice(2)
 const cwd = process.cwd()
 const options = setup(args)
-const app = create(options)
 
-app.use(['/app', '/app/*'], function (req, res, next) {
-  // all routes send the same HTML
-  const htmlfile = path.join(options.approot, 'index.html')
-  res.sendFile(htmlfile)
+create(options).then((app) => {
+  app.use(['/app', '/app/*'], function (req, res, next) {
+    // all routes send the same HTML
+    const htmlfile = path.join(options.approot, 'index.html')
+    res.sendFile(htmlfile)
+  })
+
+  app.get('/', function (req, res) {
+    res.redirect('/app')
+  })
+
+  start(app, options.port || PORT)
 })
-
-app.get('/', function (req, res) {
-  res.redirect('/app')
-})
-
-start(app, options.port || PORT)
 
 function setup(args) {
   const [projectsDir] = args
