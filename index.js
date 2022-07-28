@@ -1,20 +1,28 @@
 const Kr = require("@cre.ative/kram");
 
 module.exports = {
-  name: 'elm',
+  name: "elm",
   description:
-    'The Elm Architecture: a pure functional language with ADTs and an MVU architecture',
+    "The Elm Architecture: a pure functional language with ADTs and an MVU architecture",
   languages: {
-    elm: 'Elm',
-    css: 'Cascading Style Sheets'
+    elm: "Elm",
+    css: "Cascading Style Sheets",
+    svg: "Scalable Vector Graphics",
   },
-  register
+  register,
 };
 
-function register({providesLanguage}) {
-  providesLanguage('elm', {
-    use: () =>
-      'elm-webpack-loader',
+function register({ providesLanguage }) {
+  providesLanguage("elm", {
+    use: () => [
+      {
+        loader: "babel-loader",
+        options: {
+          plugins: ["module:elm-css-modules-plugin"],
+        },
+      },
+      { loader: "elm-webpack-loader" },
+    ],
     bind: (moduleName) =>
       `function(resource, container, initial){
         let { Elm } = resource
@@ -24,54 +32,65 @@ function register({providesLanguage}) {
       }`,
     classify: classifyElm,
     collate: (workbook) => {
-      const evals = Kr.extract(workbook, "eval", 'elm')
-      const defns = Kr.extract(workbook, "define", 'elm')
+      const evals = Kr.extract(workbook, "eval", "elm");
+      const defns = Kr.extract(workbook, "define", "elm");
 
       return {
         name: "Main.elm",
         language: "elm",
         code: generateElm(workbook, defns, evals),
-      }
-    }
-  })
+      };
+    },
+  });
 
-  providesLanguage('css', {
-    use: () =>
-      'css-loader',
+  providesLanguage("css", {
+    use: () => ({
+      loader: "css-loader",
+      options: {
+        modules: {
+          localIdentName: "[local]--[hash:base64:5]",
+        },
+      },
+    }),
     bind: (moduleName) =>
       `function(resource, container) {
           let sheet = document.createElement('style')
           sheet.innerHTML = resource.default
           container.appendChild(sheet);
       }`,
-    collate: workbook => {
-      const defns = Kr.extract(workbook, "define", 'css')
+    collate: (workbook) => {
+      const defns = Kr.extract(workbook, "define", "css");
 
       return {
         name: "styles.css",
         language: "css",
         code: defns.map((b) => b[2]).join("\n/****/\n\n"),
       };
-    }
-  })
+    },
+  });
+
+  providesLanguage("svg", {
+    use: () => "svg-sprite-loader",
+  });
 }
 
-const elmDefnRegex = /^\s*(\w+)(\s*:|(\s+\w+)*\s*=)/;
+const elmDefnRegex = /^\s*(?!let)(\w+)(\s*:|(\s+\w+)*\s*=)/;
 
 function classifyElm(code) {
   const elmDefnMatch = code.match(elmDefnRegex);
 
-  return elmDefnMatch ?
-    {
-      mode: "define",
-      type: "function",
-      name: elmDefnMatch[1],
-    } :
-    { mode: "eval" };
+  return elmDefnMatch
+    ? {
+        mode: "define",
+        type: "function",
+        name: elmDefnMatch[1],
+      }
+    : { mode: "eval" };
 }
 
 function generateElm({ moduleName, init, imports, shape }, defns, evals) {
   // generates Elm module
+  console.log("generateElm with imports:", JSON.stringify(imports));
   return `port module ${moduleName} exposing (main)
 import Browser
 import Html
@@ -131,6 +150,7 @@ ${defns.map(genDefn).join("\n")}
 }
 
 function genImport(spec) {
+  console.log("genImport: ", JSON.stringify(spec));
   return `import ${spec.from} as ${spec.as}`;
 }
 
@@ -205,16 +225,15 @@ function genExposeModel(shape) {
 
 function genView(block) {
   if (!block) {
-    return 'Html.li [] []'
+    return "Html.li [] []";
   }
 
-  const [_, attrs, code] = block
+  const [_, attrs, code] = block;
 
-  return (
-    `Html.li [Attr.id "${attrs.id}"]
+  return `Html.li [Attr.id "${attrs.id}"]
       [ ${code.split("\n").join("\n        ")}
       ]
-    `)
+    `;
 }
 
 function genDefn(block) {
