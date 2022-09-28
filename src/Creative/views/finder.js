@@ -2,9 +2,39 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { useHistory } from 'react-router-dom'
 
-import { changeFile, loadWorkbook, loadProject } from '../actions'
+import {
+  changeFile,
+  changeProject,
+  loadIndex,
+  loadWorkbook,
+  loadProject,
+} from '../actions'
 
-function Finder({ project, workbooks, selected, dispatch }) {
+function Finder({ projects, project, workbooks, selected, dispatch }) {
+  if (!projects || projects.length == 0) {
+    dispatch(loadIndex())
+    return <h1>Loading Project Index ...</h1>
+  }
+
+  if (!project) {
+    const doChangeProject = (event) =>
+      dispatch(changeProject(event.target.value))
+
+    return (
+      <section>
+        <ul>
+          {projects.map((p) => (
+            <li>
+              <button key={p.name} onClick={doChangeProject} value={p.name}>
+                {p.name}
+              </button>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
+
   if (!workbooks) {
     dispatch(loadProject(project))
     return <h1>Loading Project {project} ...</h1>
@@ -45,9 +75,11 @@ function Finder({ project, workbooks, selected, dispatch }) {
 
 function mapStateToProps(state) {
   console.log('Finder state:', state.get('finder').toObject())
-  const { project, workbooks, selected } = state.get('finder').toObject()
+  const { projects, project, workbooks, selected } = state
+    .get('finder')
+    .toObject()
 
-  return { project, workbooks, selected }
+  return { projects, project, workbooks, selected }
 }
 
 export default connect(mapStateToProps)(Finder)

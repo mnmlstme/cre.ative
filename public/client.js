@@ -1,5 +1,13 @@
-import { Creative } from '@cre.ative/cre-a-tive'
+var client
 
-Creative({
-  importModule: (path) => import(`PROJECTS/${path}`),
-}).render(document.getElementById('lets-be-cre-at-ive'))
+try {
+  client = require('@cre.ative/cre-a-tive')
+} catch {
+  client = require('../dist/client.bundle.js')
+}
+
+client
+  .Creative({
+    importModule: (path) => import(`PROJECTS/${path}`),
+  })
+  .render(document.getElementById('lets-be-cre-at-ive'))

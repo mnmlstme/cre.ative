@@ -16,6 +16,42 @@ export function changeScene(number) {
   }
 }
 
+const LoadIndex = 'LoadIndex'
+const IndexError = 'IndexError'
+
+export function loadIndex() {
+  return (dispatch, getState, { importModule }) => {
+    console.log('loadIndex')
+
+    importModule(`index.yaml`)
+      .then((mod) => {
+        return dispatch({
+          type: LoadIndex,
+          data: mod.default,
+        })
+      })
+      .catch((error) => {
+        return dispatch({
+          type: IndexError,
+          error,
+        })
+      })
+  }
+}
+
+const ChangeProject = 'ChangeProject'
+
+export function changeProject(projectId) {
+  return (dispatch) => {
+    console.log('changeProject', projectId)
+
+    return dispatch({
+      type: ChangeProject,
+      data: projectId,
+    })
+  }
+}
+
 const LoadProject = 'LoadProject'
 const ProjectError = 'ProjectError'
 
@@ -132,6 +168,9 @@ export function saveScene(scene) {
 export default {
   ChangeFile,
   ChangeScene,
+  LoadIndex,
+  IndexError,
+  ChangeProject,
   LoadProject,
   ProjectError,
   LoadWorkbook,

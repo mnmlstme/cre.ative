@@ -58,6 +58,7 @@ function Workbook({
           doSave={doSaveDocument}
         />
         <Render
+          scene={scene}
           workbook={workbook}
           resources={resources}
           doLoadResource={doLoadResource}

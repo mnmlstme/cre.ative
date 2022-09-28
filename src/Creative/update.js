@@ -21,6 +21,35 @@ export function update(state = initial, action = {}) {
       console.log('update ChangeScene', action.number)
       return state.set('current', Number.parseInt(action.number))
 
+    case Actions.ChangeProject:
+      console.log('update ChangeProject', action.data)
+      const finder = state.get('finder') || Im.Map()
+
+      return state.set('finder', finder.set('project', action.data))
+
+    case Actions.LoadIndex: {
+      console.log('update LoadIndex', action.data)
+      const finder = state.get('finder') || Im.Map()
+
+      return state.set(
+        'finder',
+        finder.set(
+          'projects',
+          Object.entries(action.data.projects).map(([name, path]) => ({
+            name,
+            path,
+          }))
+        )
+      )
+    }
+
+    case Actions.IndexError: {
+      console.log('update IndexError', action.error)
+      const finder = state.get('finder') || Im.Map()
+
+      return state.set('finder', finder.set('projects', []))
+    }
+
     case Actions.LoadProject: {
       console.log('update LoadProject', action.data)
       const finder = state.get('finder') || Im.Map()

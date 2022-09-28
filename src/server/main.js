@@ -1,12 +1,14 @@
 const path = require('path')
-import fs from 'fs'
-import { create, start } from '@cre.ative/kram-express-webpack'
-import { parse } from 'yaml'
+const fs = require('fs')
+const { create, start } = require('@cre.ative/kram-express-webpack')
+const { parse } = require('yaml')
 
 const PORT = 3000
 const args = process.argv.slice(2)
 const cwd = process.cwd()
 const options = setup(args)
+
+console.log('server options:', options)
 
 create(options).then((app) => {
   app.use(['/app', '/app/*'], function (req, res, next) {
@@ -22,13 +24,27 @@ create(options).then((app) => {
   start(app, options.port || PORT)
 })
 
+function getAppRoot() {
+  const pkg = '@cre.ative/cre-a-tive'
+  let modulepath = path.join('./node_modules', pkg)
+
+  try {
+    console.log(`Looking for ${pkg}`)
+    modulepath = require.resolve(pkg)
+    console.log(`Found ${pkg}:`, modulepath)
+  } catch (e) {
+    if (!fs.existsSync(modulepath)) {
+      modulepath = '.'
+    }
+  }
+
+  return path.join(modulepath, 'public')
+}
+
 function setup(args) {
   const [projectsDir] = args
   const basedir = cwd
-  const approot = path.resolve(
-    basedir,
-    './node_modules/@cre.ative/cre-a-tive/public'
-  )
+  const approot = path.resolve(basedir, getAppRoot())
   const docroot = path.resolve(basedir, projectsDir || './projects')
   const indexFile = path.resolve(docroot, './index.yaml')
 

@@ -88,15 +88,25 @@
 /************************************************************************/
 /******/ ({
 
+/***/ "./src/server sync recursive":
+/*!*************************!*\
+  !*** ./src/server sync ***!
+  \*************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+eval("function webpackEmptyContext(req) {\n\tvar e = new Error(\"Cannot find module '\" + req + \"'\");\n\te.code = 'MODULE_NOT_FOUND';\n\tthrow e;\n}\nwebpackEmptyContext.keys = function() { return []; };\nwebpackEmptyContext.resolve = webpackEmptyContext;\nmodule.exports = webpackEmptyContext;\nwebpackEmptyContext.id = \"./src/server sync recursive\";\n\n//# sourceURL=webpack:///./src/server_sync?");
+
+/***/ }),
+
 /***/ "./src/server/main.js":
 /*!****************************!*\
   !*** ./src/server/main.js ***!
   \****************************/
-/*! no exports provided */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var fs__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! fs */ \"fs\");\n/* harmony import */ var fs__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(fs__WEBPACK_IMPORTED_MODULE_0__);\n/* harmony import */ var _cre_ative_kram_express_webpack__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @cre.ative/kram-express-webpack */ \"@cre.ative/kram-express-webpack\");\n/* harmony import */ var _cre_ative_kram_express_webpack__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_cre_ative_kram_express_webpack__WEBPACK_IMPORTED_MODULE_1__);\n/* harmony import */ var yaml__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! yaml */ \"yaml\");\n/* harmony import */ var yaml__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(yaml__WEBPACK_IMPORTED_MODULE_2__);\nconst path = __webpack_require__(/*! path */ \"path\")\n\n\n\n\nconst PORT = 3000\nconst args = process.argv.slice(2)\nconst cwd = process.cwd()\nconst options = setup(args)\n\nObject(_cre_ative_kram_express_webpack__WEBPACK_IMPORTED_MODULE_1__[\"create\"])(options).then((app) => {\n  app.use(['/app', '/app/*'], function (req, res, next) {\n    // all routes send the same HTML\n    const htmlfile = path.join(options.approot, 'index.html')\n    res.sendFile(htmlfile)\n  })\n\n  app.get('/', function (req, res) {\n    res.redirect('/app')\n  })\n\n  Object(_cre_ative_kram_express_webpack__WEBPACK_IMPORTED_MODULE_1__[\"start\"])(app, options.port || PORT)\n})\n\nfunction setup(args) {\n  const [projectsDir] = args\n  const basedir = cwd\n  const approot = path.resolve(\n    basedir,\n    './node_modules/@cre.ative/cre-a-tive/public'\n  )\n  const docroot = path.resolve(basedir, projectsDir || './projects')\n  const indexFile = path.resolve(docroot, './index.yaml')\n\n  const { projects, platforms } = readIndex(indexFile)\n\n  return {\n    basedir,\n    approot,\n    docroot,\n    projects,\n    platforms,\n  }\n}\n\nfunction readIndex(filename) {\n  const file = fs__WEBPACK_IMPORTED_MODULE_0___default.a.readFileSync(filename, 'utf8')\n\n  console.log('=== Index file ===\\n', file)\n  return Object.assign({}, { projects: [], platforms: {} }, Object(yaml__WEBPACK_IMPORTED_MODULE_2__[\"parse\"])(file))\n}\n\n\n//# sourceURL=webpack:///./src/server/main.js?");
+eval("const path = __webpack_require__(/*! path */ \"path\")\nconst fs = __webpack_require__(/*! fs */ \"fs\")\nconst { create, start } = __webpack_require__(/*! @cre.ative/kram-express-webpack */ \"@cre.ative/kram-express-webpack\")\nconst { parse } = __webpack_require__(/*! yaml */ \"yaml\")\n\nconst PORT = 3000\nconst args = process.argv.slice(2)\nconst cwd = process.cwd()\nconst options = setup(args)\n\nconsole.log('server options:', options)\n\ncreate(options).then((app) => {\n  app.use(['/app', '/app/*'], function (req, res, next) {\n    // all routes send the same HTML\n    const htmlfile = path.join(options.approot, 'index.html')\n    res.sendFile(htmlfile)\n  })\n\n  app.get('/', function (req, res) {\n    res.redirect('/app')\n  })\n\n  start(app, options.port || PORT)\n})\n\nfunction getAppRoot() {\n  const pkg = '@cre.ative/cre-a-tive'\n  let modulepath = path.join('./node_modules', pkg)\n\n  try {\n    console.log(`Looking for ${pkg}`)\n    modulepath = /*require.resolve*/(__webpack_require__(\"./src/server sync recursive\").resolve(pkg))\n    console.log(`Found ${pkg}:`, modulepath)\n  } catch (e) {\n    if (!fs.existsSync(modulepath)) {\n      modulepath = '.'\n    }\n  }\n\n  return path.join(modulepath, 'public')\n}\n\nfunction setup(args) {\n  const [projectsDir] = args\n  const basedir = cwd\n  const approot = path.resolve(basedir, getAppRoot())\n  const docroot = path.resolve(basedir, projectsDir || './projects')\n  const indexFile = path.resolve(docroot, './index.yaml')\n\n  const { projects, platforms } = readIndex(indexFile)\n\n  return {\n    basedir,\n    approot,\n    docroot,\n    projects,\n    platforms,\n  }\n}\n\nfunction readIndex(filename) {\n  const file = fs.readFileSync(filename, 'utf8')\n\n  console.log('=== Index file ===\\n', file)\n  return Object.assign({}, { projects: [], platforms: {} }, parse(file))\n}\n\n\n//# sourceURL=webpack:///./src/server/main.js?");
 
 /***/ }),
 
