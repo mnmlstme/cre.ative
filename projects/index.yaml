@@ -1,0 +1,4 @@
+projects:
+  ReactProject: ./ReactProject
+platforms:
+  react-redux: "this-platform"

@@ -1,21 +1,20 @@
 const Kr = require("@cre.ative/kram");
 
 module.exports = {
-  name: 'react-redux',
-  description: 'React (JSX) for Views and Redux for data model',
+  name: "react-redux",
+  description: "React (JSX) for Views and Redux for data model",
   languages: {
-    jsx: 'Javascript (React)',
-    js: 'Javascript (ES6)',
-    svg: 'Scalable Vector Graphics',
-    css: 'Cascading Style Sheets'
+    jsx: "Javascript (React)",
+    js: "Javascript (ES6)",
+    svg: "Scalable Vector Graphics",
+    css: "Cascading Style Sheets",
   },
-  register
+  register,
 };
 
-function register({providesLanguage}) {
-  providesLanguage('jsx', {
-    use: () =>
-      'babel-loader?{presets:["@babel/preset-react"]}',
+function register({ providesLanguage }) {
+  providesLanguage("jsx", {
+    use: () => 'babel-loader?{presets:["@babel/preset-react"]}',
     classify: classifyJavascript,
     collate: (workbook, lang) => {
       const evals = Kr.extract(workbook, "eval", lang);
@@ -25,13 +24,12 @@ function register({providesLanguage}) {
         name: "index.jsx",
         language: lang,
         code: generateJsx(workbook, defns, evals),
-      }
+      };
     },
-  })
+  });
 
-  providesLanguage('js', {
-    use: () =>
-      'babel-loader?{presets:["@babel/preset-es6"]}',
+  providesLanguage("js", {
+    use: () => 'babel-loader?{presets:["@babel/preset-es6"]}',
     classify: classifyJavascript,
     collate: (workbook, lang) => {
       const defns = Kr.extract(workbook, "define", lang);
@@ -40,18 +38,23 @@ function register({providesLanguage}) {
         name: "index.js",
         language: lang,
         code: generateJavascript(workbook, defns),
-      }
+      };
     },
-  })
+  });
 
-  providesLanguage('svg', {
-    use: () =>
-      'svg-inline-loader',
-  })
+  providesLanguage("svg", {
+    use: () => "svg-inline-loader",
+  });
 
-  providesLanguage('css', {
-    use: () =>
-      'css-loader',
+  providesLanguage("css", {
+    use: () => ({
+      loader: "css-loader",
+      options: {
+        modules: {
+          localIdentName: "[local]--[hash:base64:5]",
+        },
+      },
+    }),
     collate: (workbook, lang) => {
       const defns = Kr.extract(workbook, "define", lang);
 
@@ -60,8 +63,8 @@ function register({providesLanguage}) {
         language: lang,
         code: defns.map((b) => b[2]).join("\n/****/\n\n"),
       };
-    }
-  })
+    },
+  });
 }
 
 const jsxDefnRegex = /^\s*(function|let|const|var)\s+(\w+)/;
@@ -85,11 +88,11 @@ function classifyJavascript(code) {
   }
 }
 
-function generateJavascript({moduleName, imports}, defns ) {
+function generateJavascript({ moduleName, imports }, defns) {
   // generates JSX module
   return `// module ${moduleName} (JSX)
   ${imports.map(genImport).join("\n")}
-  `
+  `;
 }
 
 function generateJsx({ moduleName, imports, shape }, defns, evals) {
@@ -100,33 +103,32 @@ import ReactDOM from 'react-dom'
 const Redux = require('redux')
 import Im from 'immutable'
 import { Provider, connect } from 'react-redux'
+import CssModule from './styles.css'
 ${imports.map(genImport).join("\n")}
-
-let Styles = {}
 
 ${defns.map(genDefn).join("\n")}
 
-const Program = (${genProps(shape)}) =>
-  (<ol>
-      ${evals.map(genView).join("\n")}
-  </ol>)
+const Program = (${genProps(shape)}) => ({
+  ${evals.map(genView).join(",\n")}
+})
 
 const mapStateToProps = state =>
   ( ${genExposeModel(shape)} )
 
-function mount (mountpoint, initial) {
+export function mount (mountpoint, initial) {
 
   const init = Im.Map(initial)
   const store = Redux.createStore(update)
   const props = Object.assign(
     mapStateToProps(store.getState()),
-    {dispatch: store.dispatch}
+    {dispatch: store.dispatch, css: CssModule.locals}
   )
 
-  ReactDOM.render(
-    React.createElement(Program, props),
-    mountpoint
-  )
+  const krumbs = Program(props)
+
+  return (n, container) => {
+     ReactDOM.render(React.createElement(krumbs[n-1]), container)
+  }
 
   function update (state = init, action = {}) {
       let value = state.get('value')
@@ -142,11 +144,6 @@ function mount (mountpoint, initial) {
       }
   }
 }
-
-export {
-    Program,
-    mount
-}
 `;
 }
 
@@ -156,7 +153,8 @@ function genImport(spec) {
 
 function genProps(shape) {
   const record = Kr.recordType(shape);
-  if (record) return `{ ${Object.keys(record).join(", ")} }`;
+  const propNames = Object.keys(record).concat(['css'])
+  if (record) return `{ ${propNames.join(", ")} }`;
 
   return "";
 }
@@ -173,18 +171,14 @@ function genExposeModel(shape) {
   return "{}";
 }
 
-function genView(block) {
+function genView(block, i) {
   if (!block) {
-    return "<li></li>"
+    return `${i}: () => null`
   }
 
-  const [_, attrs, code] = block
+  const [_, attrs, code] = block;
 
-  return (
-    `<li key="${attrs.id}" id="${attrs.id}">
-     ${code.split("\n").join("\n        ")}
-    </li>
-    `)
+  return `${i}: () => (<>${code}</>)`;
 }
 
 function genDefn(block) {
