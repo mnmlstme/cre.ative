@@ -5,32 +5,52 @@ imports: []
 model:
   count: 0
   tenth: 0.1
-  hello: Hello, world
+  myName: React
+---
+
+# Hello, React
+
+```jsx
+<h1 style={{
+    fontFamily: "Impact",
+    textAlign: "center",
+    color: "orange",
+    width: "100%",
+    fontSize: 96}}>
+    Hello, {myName}
+</h1>
+```
+
+
+React is a Javascript library for dynamically rendering pages
+on the client, i.e., the browser.
+
+JSX is an extension to Javascript which lets us build pages
+using a syntax similar to HTML. To make the HTML dynamic,
+we can insert Javascript inside of curly braces.
+
+In this example, you can see the familiar `<h1>` tag, with
+the standard `style` attribute as we have in HTML.
+However, since this is JSX, the inline style is coded as
+a Javascript object, and the name is being stored in a
+string variable `myName`.
+
 ---
 
 ```jsx
-<p className={css.hi}>{hello}</p>
+<h1 className="hi">
+    Hello, {myName}
+</h1>
 ```
 
-# Hello, World
+# Using CSS
 
-This is React.
+We typically don't want to inline styles, even if we can store them
+as JS objects. We want to write our styles as classes in CSS, and then
+reference them in JSX.
 
-Here is a sentence.
-And another in the same paragraph.
-
-There is some code over on the right side,
-which gets rendered above.
-
-We can write documentation alongside the
-code to discuss what we're doing.
-
-## File Format: Kram
-
-All code and documentation for the workbook
-is maintained in a single file using `kram`,
-a text-based format that supports
-multiple languages of code in the same file.
+Here's a CSS class that encapsulates the style of the previous
+example:
 
 ```css
 .hi {
@@ -42,28 +62,60 @@ multiple languages of code in the same file.
 }
 ```
 
-The `react-redux` platform supports the following languages:
-
-- HTML5
-- CSS3
-- Javascript (ES6)
-- JSX (Javascript/React)
-- SVG 1.1
+To reference this class from our JSX, we use the `className` attribute.
+(This is the same as the HTML `class` attribute.)
+So, adding `className="hi"` to the `h1` element will apply our CSS class.
 
 ---
 
+# Components
+
 ```jsx
-<input type="number" defaultValue={asString(count)} />
+<Hello name={myName} />
 ```
 
-## Functions
 
-We can put lots of views in the same file like this. We
-can also define helper functions. All helper functions in the
-workbook are available to every view.
+React also lets you define new elements that can be used in JSX
+instead of the standard HTML and SVG tags. These new elements are
+called _components_.
+
+Basically, if a tag name begins with a capital
+letter, React will look for a Javascript function with that
+name and call it. The function must return a JSX expression,
+which it then renders.
+
 
 ```jsx
-function asString(n) {
-  return String(n);
+function Hello ( {name} ) {
+    return <h1 className="hi">
+        Hello, {name}
+    </h1>
+}
+```
+
+---
+
+# SVG in React
+
+```jsx
+<svg viewBox="0 0 100 100">
+    <circle className="c1" r={50} cx={50} cy={50}/>
+</svg>
+```
+
+
+React handles SVG elements just like HTML does. This example looks
+like SVG code, but it's been coded in JSX. (Notice the curly braces.)
+Later we will make this more interesting by computing `r`, `cx`, and
+`cy` using Javascript. This is the main reason for using React/JSX instead of
+plain HTML and SVG.
+
+Of course, we can also apply CSS to SVG.
+
+
+```css
+.c1 {
+  fill: red;
+  stroke: black;
 }
 ```

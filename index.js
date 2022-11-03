@@ -48,12 +48,7 @@ function register({ providesLanguage }) {
 
   providesLanguage("css", {
     use: () => ({
-      loader: "css-loader",
-      options: {
-        modules: {
-          localIdentName: "[local]--[hash:base64:5]",
-        },
-      },
+      loader: "css-loader"
     }),
     collate: (workbook, lang) => {
       const defns = Kr.extract(workbook, "define", lang);
@@ -96,7 +91,7 @@ function generateJavascript({ moduleName, imports }, defns) {
 }
 
 function generateJsx({ moduleName, imports, shape }, defns, evals) {
-  // generates JSX module
+
   return `// module ${moduleName} (JSX)
 import React from 'react'
 import ReactDOM from 'react-dom'
@@ -171,14 +166,11 @@ function genExposeModel(shape) {
   return "{}";
 }
 
-function genView(block, i) {
-  if (!block) {
-    return `${i}: () => null`
-  }
-
+function genView(block) {
   const [_, attrs, code] = block;
+  const { scene } = attrs;
 
-  return `${i}: () => (<>${code}</>)`;
+  return `${scene}: () => (<>${code}</>)`;
 }
 
 function genDefn(block) {
