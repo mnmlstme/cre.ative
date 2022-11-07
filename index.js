@@ -23,22 +23,31 @@ function register({ providesLanguage }) {
       },
       { loader: "elm-webpack-loader" },
     ],
-    bind: (moduleName) =>
-      `function(resource, container, initial){
+    bind: (moduleName, lang) =>
+      `function(resource, mountpoint, initial){
         let { Elm } = resource
-        let dummy = document.createElement('div')
-        container.appendChild(dummy)
-        let app = Elm.${moduleName}.init({ node: dummy, flags: initial })
+        let safety = mountpoint.appendChild(document.createElement('div'))
+        let elmNode = safety.appendChild(document.createElement('div'))
+        let app = 
+          Elm.${moduleName}.init({ node: elmNode, flags: initial })
+        return (n, container) => {
+          console.log('Elm rendering scene ', n)
+          app.ports.kram_render.send(n-1) /* render the scene */
+          container.appendChild(safety) /* move it into the scene */
+        }
       }`,
     classify: classifyElm,
     collate: (workbook) => {
+      const { basename, project } = workbook;
+      const moduleName = `${project}.${basename}.Main`;
       const evals = Kr.extract(workbook, "eval", "elm");
       const defns = Kr.extract(workbook, "define", "elm");
 
       return {
+        moduleName,
         name: "Main.elm",
         language: "elm",
-        code: generateElm(workbook, defns, evals),
+        code: generateElm(moduleName, workbook, defns, evals),
       };
     },
   });
@@ -46,31 +55,21 @@ function register({ providesLanguage }) {
   providesLanguage("css", {
     use: () => ({
       loader: "css-loader",
-      options: {
-        modules: {
-          localIdentName: "[local]--[hash:base64:5]",
-        },
-      },
     }),
-    bind: (moduleName) =>
-      `function(resource, container) {
-          let sheet = document.createElement('style')
-          sheet.innerHTML = resource.default
-          container.appendChild(sheet);
-      }`,
-    collate: (workbook) => {
-      const defns = Kr.extract(workbook, "define", "css");
+    collate: (workbook, lang) => {
+      const defns = Kr.extract(workbook, "define", lang);
 
       return {
         name: "styles.css",
-        language: "css",
+        moduleName: "Styles",
+        language: "lang",
         code: defns.map((b) => b[2]).join("\n/****/\n\n"),
       };
     },
   });
 
   providesLanguage("svg", {
-    use: () => "svg-sprite-loader",
+    use: () => "svg-inline-loader",
   });
 }
 
@@ -88,11 +87,12 @@ function classifyElm(code) {
     : { mode: "eval" };
 }
 
-function generateElm({ moduleName, init, imports, shape }, defns, evals) {
+function generateElm(moduleName, { init, imports, shape }, defns, evals) {
   // generates Elm module
   console.log("generateElm with imports:", JSON.stringify(imports));
   return `port module ${moduleName} exposing (main)
 import Browser
+import Debug exposing (log)
 import Html
 import Html.Attributes as Attr exposing (class)
 import Json.Decode as Json
@@ -107,43 +107,50 @@ main =
     , subscriptions = subscriptions
     }
 
-port kram_input : (Json.Value -> msg) -> Sub msg
+port kram_render : (Int -> msg) -> Sub msg
 
-type alias Model =
+type alias Scope = 
   ${genModel(shape)}
+  
+type alias Model =
+  { scope: Scope
+  , scene__: Maybe Int
+  }
 
 init : Json.Value -> ( Model, Cmd msg )
 init json =
   let
     initial =
       ${genInitModel(init)}
+    scope = Result.withDefault initial <| Json.decodeValue decoder json
   in
-  ( Result.withDefault initial <| Json.decodeValue decoder json , Cmd.none )
+  ({scope = scope, scene__ = Nothing}, Cmd.none )
 
 type Msg
-  = Incoming Json.Value
+  = Scene Int
 
 update : Msg -> Model -> ( Model, Cmd msg )
 update msg model =
   case msg of
-    Incoming json ->
-      ( Result.withDefault model <| Json.decodeValue decoder json, Cmd.none )
+    Scene n ->
+      ( { model | scene__ = log "render Scene: " <| Just n }, Cmd.none )
 
-decoder : Json.Decoder Model
+decoder : Json.Decoder Scope
 decoder =
   ${genDecoder(shape)}
 
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-  kram_input Incoming
+  kram_render Scene
 
 view : Model -> Html.Html Msg
 view model =
   ${genExposeModel(shape)}
-  Html.ol []
-    [ ${evals.map(genView).join("\n    , ")}
-    ]
+  case model.scene__ of
+    ${evals.map(genView).join("\n    ")}
+    _ -> 
+      Html.text ""
 
 ${defns.map(genDefn).join("\n")}
 `;
@@ -202,7 +209,7 @@ function genDecoder(shape) {
   t = Kr.recordType(shape);
   if (t) {
     const n = Object.keys(t).length;
-    return `Json.map${n} Model
+    return `Json.map${n} Scope
     ${Object.entries(t)
       .map(([k, sh]) => field(k, sh))
       .join("\n    ")}`;
@@ -213,7 +220,7 @@ function genDecoder(shape) {
 
 function genExposeModel(shape) {
   const record = Kr.recordType(shape);
-  const expose = (k) => `${k} = model.${k}`;
+  const expose = (k) => `${k} = model.scope.${k}`;
 
   if (record)
     return `let
@@ -224,16 +231,12 @@ function genExposeModel(shape) {
 }
 
 function genView(block) {
-  if (!block) {
-    return "Html.li [] []";
-  }
-
   const [_, attrs, code] = block;
+  const { scene } = attrs;
 
-  return `Html.li [Attr.id "${attrs.id}"]
-      [ ${code.split("\n").join("\n        ")}
-      ]
-    `;
+  return `Just ${scene} ->
+      ${code.split("\n").join("\n        ")}
+  `;
 }
 
 function genDefn(block) {

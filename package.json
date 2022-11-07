@@ -1,20 +1,27 @@
 {
   "name": "@cre.ative/kram-elm",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "kram platform for the Elm language and architecture",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack"
+    "build": "webpack",
+    "start": "cre-a-tive ./projects",
+    "clean": "rm -rf package-lock.json elm_stuff node_modules .yalc kram_modules dist"
   },
   "author": "ken@mnmlst.me",
   "license": "BSD-3-Clause",
   "devDependencies": {
+    "@cre.ative/cre-a-tive": "file:.yalc/@cre.ative/cre-a-tive",
+    "this-platform": "file:./",
     "webpack": "^4.16.1",
     "webpack-cli": "^4.10.0"
   },
   "dependencies": {
-    "@cre.ative/kram": "^1.2.3",
+    "@cre.ative/kram": "file:.yalc/@cre.ative/kram",
+    "@cre.ative/kram-express-webpack": "file:.yalc/@cre.ative/kram-express-webpack",
+    "babel-loader": "^8.2.2",
+    "css-loader": "^5.2.6",
     "elm": "^0.19.1-5",
     "elm-css-modules-plugin": "^1.0.2",
     "elm-webpack-loader": "^8.0.0"
