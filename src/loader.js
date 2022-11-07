@@ -24,9 +24,11 @@ function loader(content) {
 
   const epilog = ""; //if (module.hot) { module.hot.decline() }";
 
-  console.log("Kram loader, using plugin:", platform, plugin);
+  console.log("Kram loader, using plugin:", platform, projname, basename);
 
-  return new Promise((resolve, reject) => resolve(workbook))
+  return new Promise((resolve, reject) =>
+    resolve({ project: projname, ...workbook })
+  )
     .then((wb) => Kr.classify(wb, plugin.modules))
     .then((wb) => Kr.dekram(wb, emitter(outdir), plugin))
     .then((wb) => Kr.collect(wb, loadFn, epilog))
