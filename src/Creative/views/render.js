@@ -61,28 +61,31 @@ export class Render extends React.Component {
         })
     }
 
-    if (scene && !this.rendered[scene - 1]) {
+    if (scene) {
       const mountpoint = this.scenes.current
       const container = mountpoint.children[scene - 1]
-      const scenes = workbook.get('scenes')
-      const blocks = scenes.get(scene - 1).get('blocks')
-      const performance = blocks.filter((b) => {
-        const type = b.get(0)
-        const mode = b.get(1)['mode']
 
-        return type === 'fence' && mode === 'eval'
-      })
+      if (container.childNodes.length === 0 || !this.rendered[scene - 1]) {
+        const scenes = workbook.get('scenes')
+        const blocks = scenes.get(scene - 1).get('blocks')
+        const performance = blocks.filter((b) => {
+          const type = b.get(0)
+          const mode = b.get(1)['mode']
 
-      if (performance.size) {
-        const evalblk = performance.get(0)
-        const lang = evalblk.get(1)['lang']
-        const render = this.renderFn[lang]
+          return type === 'fence' && mode === 'eval'
+        })
 
-        if (render) {
-          console.log('Rendering scene:', scene, lang, container)
+        if (performance.size) {
+          const evalblk = performance.get(0)
+          const lang = evalblk.get(1)['lang']
+          const render = this.renderFn[lang]
 
-          render(scene, container)
-          this.rendered[scene - 1] = container
+          if (render) {
+            console.log('Rendering scene:', scene, lang, container)
+
+            render(scene, container)
+            this.rendered[scene - 1] = container
+          }
         }
       }
     }

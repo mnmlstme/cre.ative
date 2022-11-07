@@ -1,6 +1,6 @@
 {
   "name": "@cre.ative/cre-a-tive",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "description": "A framework-agnostic creative programming environment",
   "browser": "dist/client.bundle.js",
   "bin": {
@@ -19,8 +19,8 @@
   "author": "ken@mnmlst.me",
   "license": "BSD-3-Clause",
   "dependencies": {
-    "@cre.ative/kram": "^1.3.0",
-    "@cre.ative/kram-express-webpack": "^1.3.0",
+    "@cre.ative/kram": "^1.3.1",
+    "@cre.ative/kram-express-webpack": "^1.3.1",
     "file-system": "^2.2.2",
     "he": "^1.2.0",
     "immutable": "^4.0.0-rc.12",
