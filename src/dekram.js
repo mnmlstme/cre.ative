@@ -1,18 +1,19 @@
 export function dekram(workbook, emitter, plugin) {
-  const { moduleName, languages } = workbook
+  const { languages } = workbook
+  const hashedName = workbook.moduleName
 
   // console.log('Dekram: ', workbook)
 
   const emit = (module) => {
-    console.log('Emit module:', module)
-    const { language, name, code } = module.collate(workbook, module.language)
+    const collated = module.collate(workbook, module.language)
+    const { moduleName, language, name, code } = collated
     const filepath = emitter(name, code)
     const use = module.use(module.language)
     return {
       language,
       filepath,
       use,
-      bind: module.bind(moduleName, module.language) || 'null',
+      bind: module.bind(moduleName || hashedName, module.language) || 'null',
     }
   }
 
