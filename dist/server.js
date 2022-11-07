@@ -106,7 +106,7 @@ eval("function webpackEmptyContext(req) {\n\tvar e = new Error(\"Cannot find mod
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-eval("const path = __webpack_require__(/*! path */ \"path\")\nconst fs = __webpack_require__(/*! fs */ \"fs\")\nconst { create, start } = __webpack_require__(/*! @cre.ative/kram-express-webpack */ \"@cre.ative/kram-express-webpack\")\nconst { parse } = __webpack_require__(!(function webpackMissingModule() { var e = new Error(\"Cannot find module 'yaml'\"); e.code = 'MODULE_NOT_FOUND'; throw e; }()))\n\nconst PORT = 3000\nconst args = process.argv.slice(2)\nconst cwd = process.cwd()\nconst options = setup(args)\n\nconsole.log('server options:', options)\n\ncreate(options).then((app) => {\n  app.use(['/app', '/app/*'], function (req, res, next) {\n    // all routes send the same HTML\n    const htmlfile = path.join(options.approot, 'index.html')\n    res.sendFile(htmlfile)\n  })\n\n  app.get('/', function (req, res) {\n    res.redirect('/app')\n  })\n\n  start(app, options.port || PORT)\n})\n\nfunction getAppRoot() {\n  const pkg = '@cre.ative/cre-a-tive'\n  let modulepath = path.join('./node_modules', pkg)\n\n  try {\n    console.log(`Looking for ${pkg}`)\n    modulepath = /*require.resolve*/(__webpack_require__(\"./src/server sync recursive\").resolve(pkg))\n    console.log(`Found ${pkg}:`, modulepath)\n  } catch (e) {\n    if (!fs.existsSync(modulepath)) {\n      modulepath = '.'\n    }\n  }\n\n  return path.join(modulepath, 'public')\n}\n\nfunction setup(args) {\n  const [projectsDir] = args\n  const basedir = cwd\n  const approot = path.resolve(basedir, getAppRoot())\n  const docroot = path.resolve(basedir, projectsDir || './projects')\n  const indexFile = path.resolve(docroot, './index.yaml')\n\n  const { projects, platforms } = readIndex(indexFile)\n\n  return {\n    basedir,\n    approot,\n    docroot,\n    projects,\n    platforms,\n  }\n}\n\nfunction readIndex(filename) {\n  const file = fs.readFileSync(filename, 'utf8')\n\n  console.log('=== Index file ===\\n', file)\n  return Object.assign({}, { projects: [], platforms: {} }, parse(file))\n}\n\n\n//# sourceURL=webpack:///./src/server/main.js?");
+eval("const path = __webpack_require__(/*! path */ \"path\")\nconst fs = __webpack_require__(/*! fs */ \"fs\")\nconst { create, start } = __webpack_require__(/*! @cre.ative/kram-express-webpack */ \"@cre.ative/kram-express-webpack\")\nconst { parse } = __webpack_require__(/*! yaml */ \"yaml\")\n\nconst PORT = 3000\nconst args = process.argv.slice(2)\nconst cwd = process.cwd()\nconst options = setup(args)\n\nconsole.log('server options:', options)\n\ncreate(options).then((app) => {\n  app.use(['/app', '/app/*'], function (req, res, next) {\n    // all routes send the same HTML\n    const htmlfile = path.join(options.approot, 'index.html')\n    res.sendFile(htmlfile)\n  })\n\n  app.get('/', function (req, res) {\n    res.redirect('/app')\n  })\n\n  start(app, options.port || PORT)\n})\n\nfunction getAppRoot() {\n  const pkg = '@cre.ative/cre-a-tive'\n  let modulepath = path.join('./node_modules', pkg)\n\n  try {\n    console.log(`Looking for ${pkg}`)\n    modulepath = /*require.resolve*/(__webpack_require__(\"./src/server sync recursive\").resolve(pkg))\n    console.log(`Found ${pkg}:`, modulepath)\n  } catch (e) {\n    if (!fs.existsSync(modulepath)) {\n      modulepath = '.'\n    }\n  }\n\n  return path.join(modulepath, 'public')\n}\n\nfunction setup(args) {\n  const [projectsDir] = args\n  const basedir = cwd\n  const approot = path.resolve(basedir, getAppRoot())\n  const docroot = path.resolve(basedir, projectsDir || './projects')\n  const indexFile = path.resolve(docroot, './index.yaml')\n\n  const { projects, platforms } = readIndex(indexFile)\n\n  return {\n    basedir,\n    approot,\n    docroot,\n    projects,\n    platforms,\n  }\n}\n\nfunction readIndex(filename) {\n  const file = fs.readFileSync(filename, 'utf8')\n\n  console.log('=== Index file ===\\n', file)\n  return Object.assign({}, { projects: [], platforms: {} }, parse(file))\n}\n\n\n//# sourceURL=webpack:///./src/server/main.js?");
 
 /***/ }),
 
@@ -140,6 +140,17 @@ eval("module.exports = require(\"fs\");\n\n//# sourceURL=webpack:///external_%22
 /***/ (function(module, exports) {
 
 eval("module.exports = require(\"path\");\n\n//# sourceURL=webpack:///external_%22path%22?");
+
+/***/ }),
+
+/***/ "yaml":
+/*!***********************!*\
+  !*** external "yaml" ***!
+  \***********************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+eval("module.exports = require(\"yaml\");\n\n//# sourceURL=webpack:///external_%22yaml%22?");
 
 /***/ })
 
