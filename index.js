@@ -48,7 +48,7 @@ function register({ providesLanguage }) {
 
   providesLanguage("css", {
     use: () => ({
-      loader: "css-loader"
+      loader: "css-loader",
     }),
     collate: (workbook, lang) => {
       const defns = Kr.extract(workbook, "define", lang);
@@ -91,7 +91,6 @@ function generateJavascript({ moduleName, imports }, defns) {
 }
 
 function generateJsx({ moduleName, imports, shape }, defns, evals) {
-
   return `// module ${moduleName} (JSX)
 import React from 'react'
 import ReactDOM from 'react-dom'
@@ -143,12 +142,26 @@ export function mount (mountpoint, initial) {
 }
 
 function genImport(spec) {
-  return `import ${spec.as} from '${spec.from}'`;
+  console.log("Generating import statement from spec:", spec);
+
+  if (spec.expose) {
+    const list =
+      spec.expose === "*" ? spec.expose : "{ " + spec.expose.join(", ") + " }";
+    const maybeDefault = spec.as ? spec.as + ", " : "";
+
+    return `import ${maybeDefault}${list} from '${spec.from}'`;
+  }
+
+  if (spec.as) {
+    return `import ${spec.as} from '${spec.from}'`;
+  }
+
+  return `import '${spec.from}'`;
 }
 
 function genProps(shape) {
   const record = Kr.recordType(shape);
-  const propNames = Object.keys(record).concat(['css'])
+  const propNames = Object.keys(record).concat(["css"]);
   if (record) return `{ ${propNames.join(", ")} }`;
 
   return "";
