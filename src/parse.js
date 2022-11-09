@@ -107,12 +107,12 @@ function getImportSpecs(imports) {
   }
 }
 
-function importSpec(pkg, spec) {
+function importSpec(spec, pkg) {
   switch (getTypeOf(spec)) {
     case 'record':
-      return Object.assign(spec, { as: pkg })
+      return pkg ? Object.assign(spec, { from: pkg }) : spec
     case 'string':
-      return { from: spec, as: pkg }
+      return { from: pkg || spec, as: spec }
     default:
       return { from: pkg, as: pkg }
   }
