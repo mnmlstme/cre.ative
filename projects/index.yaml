@@ -1,0 +1,4 @@
+projects:
+  ReactNativeProject: ./ReactNativeProject
+platforms:
+  react-native: "this-platform"
