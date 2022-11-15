@@ -1,5 +1,5 @@
 import React from 'react'
-import ReactDOM from 'react-dom'
+import { createRoot } from 'react-dom/client'
 import { createStore, applyMiddleware } from 'redux'
 import thunk from 'redux-thunk'
 import { Provider } from 'react-redux'
@@ -24,7 +24,9 @@ export function Creative({ importModule }) {
     applyMiddleware(thunk.withExtraArgument({ importModule }))
   )
   return {
-    render: (node) =>
-      ReactDOM.render(React.createElement(Main, { store }), node),
+    render: (node) => {
+      const root = createRoot(node)
+      root.render(React.createElement(Main, { store }))
+    },
   }
 }
