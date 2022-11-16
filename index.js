@@ -48,7 +48,12 @@ function register({ providesLanguage }) {
 
   providesLanguage("css", {
     use: () => ({
-      loader: "css-loader"
+      loader: "css-loader",
+      options: {
+        modules: {
+          localIdentName: "[local]--[hash:base64:5]",
+        },
+      },
     }),
     collate: (workbook, lang) => {
       const defns = Kr.extract(workbook, "define", lang);
@@ -56,7 +61,7 @@ function register({ providesLanguage }) {
       return {
         name: "styles.css",
         language: lang,
-        code: defns.map((b) => b[2]).join("\n/****/\n\n"),
+        code: defns.map((b) => b[2]).join("\n\n/****/\n\n"),
       };
     },
   });
@@ -90,22 +95,26 @@ function generateJavascript({ moduleName, imports }, defns) {
   `;
 }
 
-function generateJsx({ moduleName, imports, shape }, defns, evals) {
+function generateJsx(workbook, defns, evals) {
+  const { moduleName, imports, shape } = workbook;
+  const cssDefns = Kr.extract(workbook, "define", "css");
 
   return `// module ${moduleName} (JSX)
 import React from 'react'
-import ReactDOM from 'react-dom'
+import { createRoot } from 'react-dom/client'
 const Redux = require('redux')
 import Im from 'immutable'
 import { Provider, connect } from 'react-redux'
-import CssModule from './styles.css'
+${cssDefns && cssDefns.length ? "import CssModule from './styles.css'" : ""}
 ${imports.map(genImport).join("\n")}
 
-${defns.map(genDefn).join("\n")}
+export function Program (css) {
+  ${defns.map(genDefn).join("\n")}
 
-const Program = (${genProps(shape)}) => ({
-  ${evals.map(genView).join(",\n")}
-})
+  return (${genProps(shape)}) => ({
+    ${evals.map(genView).join(",\n")}
+  })
+}
 
 const mapStateToProps = state =>
   ( ${genExposeModel(shape)} )
@@ -116,13 +125,15 @@ export function mount (mountpoint, initial) {
   const store = Redux.createStore(update)
   const props = Object.assign(
     mapStateToProps(store.getState()),
-    {dispatch: store.dispatch, css: CssModule.locals}
+    { dispatch: store.dispatch }
   )
+  const css = typeof CssModule !== "undefined" ? CssModule.locals : {}
 
-  const krumbs = Program(props)
+  const krumbs = Program(css)(props)
 
   return (n, container) => {
-     ReactDOM.render(React.createElement(krumbs[n-1]), container)
+    const root = createRoot(container)
+    root.render(React.createElement(krumbs[n-1]), container)
   }
 
   function update (state = init, action = {}) {
@@ -143,12 +154,16 @@ export function mount (mountpoint, initial) {
 }
 
 function genImport(spec) {
-  return `import ${spec.as} from '${spec.from}'`;
+  const symbols = [spec.as, spec.expose && `{${spec.expose.join(",")}}`].filter(
+    Boolean
+  );
+
+  return `import ${symbols.join(",")} from '${spec.from}'`;
 }
 
 function genProps(shape) {
   const record = Kr.recordType(shape);
-  const propNames = Object.keys(record).concat(['css'])
+  const propNames = Object.keys(record);
   if (record) return `{ ${propNames.join(", ")} }`;
 
   return "";

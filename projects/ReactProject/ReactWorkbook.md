@@ -11,16 +11,18 @@ model:
 # Hello, React
 
 ```jsx
-<h1 style={{
+<h1
+  style={{
     fontFamily: "Impact",
     textAlign: "center",
     color: "orange",
     width: "100%",
-    fontSize: 96}}>
-    Hello, {myName}
+    fontSize: 96,
+  }}
+>
+  Hello, {myName}
 </h1>
 ```
-
 
 React is a Javascript library for dynamically rendering pages
 on the client, i.e., the browser.
@@ -38,9 +40,7 @@ string variable `myName`.
 ---
 
 ```jsx
-<h1 className="hi">
-    Hello, {myName}
-</h1>
+<h1 className={css.hi}>Hello, {myName}</h1>
 ```
 
 # Using CSS
@@ -74,7 +74,6 @@ So, adding `className="hi"` to the `h1` element will apply our CSS class.
 <Hello name={myName} />
 ```
 
-
 React also lets you define new elements that can be used in JSX
 instead of the standard HTML and SVG tags. These new elements are
 called _components_.
@@ -84,12 +83,9 @@ letter, React will look for a Javascript function with that
 name and call it. The function must return a JSX expression,
 which it then renders.
 
-
 ```jsx
-function Hello ( {name} ) {
-    return <h1 className="hi">
-        Hello, {name}
-    </h1>
+function Hello({ name }) {
+  return <h1 className={css.hi}>Hello, {name}</h1>;
 }
 ```
 
@@ -99,10 +95,9 @@ function Hello ( {name} ) {
 
 ```jsx
 <svg viewBox="0 0 100 100">
-    <circle className="c1" r={50} cx={50} cy={50}/>
+  <circle className={css.c1} r={50} cx={50} cy={50} />
 </svg>
 ```
-
 
 React handles SVG elements just like HTML does. This example looks
 like SVG code, but it's been coded in JSX. (Notice the curly braces.)
@@ -111,7 +106,6 @@ Later we will make this more interesting by computing `r`, `cx`, and
 plain HTML and SVG.
 
 Of course, we can also apply CSS to SVG.
-
 
 ```css
 .c1 {
