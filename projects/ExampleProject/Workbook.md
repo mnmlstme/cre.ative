@@ -13,8 +13,8 @@ And here is some CSS to style it:
 ```css
 .hi {
   font-family: Impact;
-  color: red;
-  font-size: 48px;
+  color: purple;
+  font-size: 6rem;
 }
 ```
 

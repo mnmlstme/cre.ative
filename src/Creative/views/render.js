@@ -18,8 +18,8 @@ export class Render extends React.Component {
     return (
       <div className={styles.container}>
         <ol ref={this.scenes}>
-          {scenes.map(() => (
-            <li />
+          {scenes.map((_, i) => (
+            <li key={`scene_${i}`} />
           ))}
         </ol>
         <div ref={this.resources} />
@@ -45,7 +45,14 @@ export class Render extends React.Component {
     if (resources !== prevProps.resources) {
       const readyToBind = resources
         .filter((r) => r.isLoaded)
-        .filterNot((_, k) => this.renderFn[k])
+        .filter(
+          prevProps.resources.isEmpty()
+            ? () => true
+            : (r, lang) => {
+                const previously = prevProps.resources.get(lang)
+                return !previously || r.module !== previously.module
+              }
+        )
         .map((r) => r.module)
 
       console.log('Resources bound:', this.bound)
@@ -58,6 +65,7 @@ export class Render extends React.Component {
 
           console.log('Binding resource: ', language, r)
           this.renderFn[language] = bind(r, mountpoint, init)
+          this.rendered.map((lang) => (lang === language ? false : lang))
         })
     }
 
@@ -84,7 +92,7 @@ export class Render extends React.Component {
             console.log('Rendering scene:', scene, lang, container)
 
             render(scene, container)
-            this.rendered[scene - 1] = container
+            this.rendered[scene - 1] = lang
           }
         }
       }

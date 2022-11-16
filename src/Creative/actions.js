@@ -84,11 +84,17 @@ const WorkbookError = 'WorkbookError'
 
 export function loadWorkbook(projectId, workbookId) {
   const filepath = `${projectId}/${workbookId}.md`
+  const defn = { filepath }
 
   return (dispatch, getState, { importModule }) => {
     console.log('loadWorkbook', projectId, workbookId)
 
-    importModule(filepath)
+    const onHotSwap = () => {
+      console.log('Hot swap notification for', filepath)
+      dispatch(loadWorkbook(projectId, workbookId))
+    }
+
+    importModule(filepath, onHotSwap)
       .then((mod) => {
         console.log('Action: LoadWorkbook ', JSON.stringify(mod.default))
         return dispatch({
