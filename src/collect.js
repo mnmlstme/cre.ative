@@ -1,4 +1,4 @@
-export function collect(workbook, loadFn = defaultLoadFn, epilog = '') {
+export function collect(workbook, loadFn, epilog = '') {
   const { modules } = workbook
   const json = JSON.stringify(Object.assign(workbook, { modules: [] }))
 
@@ -7,7 +7,7 @@ export function collect(workbook, loadFn = defaultLoadFn, epilog = '') {
 	  filepath: '${m.filepath}',
 	  use: '${m.use}',
 	  bind: ${m.bind},
-	  loader: ${loadFn(m)}
+	  loader: ${loadFn ? loadFn(m) : 'undefined'}
   }`
 
   // console.log('Kram modules: ', modules)
@@ -17,10 +17,4 @@ export function collect(workbook, loadFn = defaultLoadFn, epilog = '') {
   // console.log('Kram resource definitions: ', definitions)
 
   return `export default Object.assign(${json},{modules: [${definitions}]});${epilog}`
-}
-
-function defaultLoadFn({ filepath, use }) {
-  const target = use ? `!${use}!${filepath}` : filepath
-
-  return `function () { return import('${target}') }`
 }
