@@ -18,10 +18,10 @@ function Main({ store }) {
   )
 }
 
-export function Creative({ importModule }) {
+export function Creative(loaders) {
   const store = createStore(
     update,
-    applyMiddleware(thunk.withExtraArgument({ importModule }))
+    applyMiddleware(thunk.withExtraArgument(loaders))
   )
   return {
     render: (node) => {

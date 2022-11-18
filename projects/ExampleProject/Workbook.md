@@ -2,18 +2,18 @@
 title: Web Workbook
 ---
 
-```html
-<p class="hi">Hello, world.</p>
-```
-
 # Hello world
+
+```html
+<p class="hi">Hello, creative world.</p>
+```
 
 And here is some CSS to style it:
 
 ```css
 .hi {
-  font-family: Impact;
-  color: purple;
+  font-family: Georgia;
+  color: darkorange;
   font-size: 6rem;
 }
 ```

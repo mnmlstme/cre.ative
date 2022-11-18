@@ -65,7 +65,9 @@ export class Render extends React.Component {
 
           console.log('Binding resource: ', language, r)
           this.renderFn[language] = bind(r, mountpoint, init)
-          this.rendered.map((lang) => (lang === language ? false : lang))
+          this.rendered = this.rendered.map((lang) =>
+            lang === language ? false : lang
+          )
         })
     }
 
@@ -91,6 +93,7 @@ export class Render extends React.Component {
           if (render) {
             console.log('Rendering scene:', scene, lang, container)
 
+            container.replaceChildren()
             render(scene, container)
             this.rendered[scene - 1] = lang
           }
