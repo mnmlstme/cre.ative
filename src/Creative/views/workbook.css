@@ -6,27 +6,15 @@
   box-sizing: border-box;
 }
 
-.workbook {
-  --fontDisplay: 'Hepta Slab', serif;
-  --fontBody: 'Inter', sans-serif;
-  --fontCode: 'Anonymous Pro', monospace;
-  font-family: var(--fontBody);
+@import './theme.css';
 
+.workbook {
+  font-family: var(--fontBody);
   position: fixed;
   width: 100vw;
   height: 100vh;
-  background: radial-gradient(circle at 75% 25%, #d38a01, #0d0841 60vw);
   padding-bottom: 2rem;
-}
-
-.workbook > header {
-  position: absolute;
-  left: 50%;
-  transform: translate(-50%, 0);
-  font-family: var(--fontDisplay);
-  background: #f2f2f2;
-  color: #999;
-  padding: 0.5rem;
+  background: var(--backgroundPage);
 }
 
 .workbook > footer {
@@ -41,9 +29,9 @@
   padding: 0 0.5rem;
   line-height: 1.5rem;
   font-size: 0.75rem;
-  border-top: 1px solid #ccc;
-  background: #282426;
-  color: #d4f8ee;
+  border-top: var(--borderFooter);
+  background: var(--backgroundFooter);
+  color: var(--textColorFooter);
 }
 
 .workbook > footer > * {
@@ -61,11 +49,11 @@
 
 .workbook > footer select,
 .workbook > footer button {
-  border: 1px solid #666;
-  background: transparent;
-  font-size: inherit;
-  font-family: inherit;
-  color: inherit;
+  border: var(--borderControl);
+  background: var(--borderBackground);
+  font-size: var(--textSizeControl);
+  font-family: var(--fontControl);
+  color: var(--textColorControl);
   padding: 0 0.5em;
   text-align: center;
 }
@@ -74,12 +62,8 @@
   width: 25em;
 }
 
-.workbook > footer select > option {
-  color: #282426;
-}
-
 .workbook > footer button:disabled {
-  opacity: 0.5;
+  opacity: var(--opacityDisabledControl);
 }
 
 .layout {
@@ -131,9 +115,9 @@
 
 .container > ol > li::before {
   content: '';
-  background: white;
-  box-shadow: 0 0 3rem rgb(40 40 40 / 50%);
-  border-radius: 2rem 2rem 0 0;
+  background: var(--backgroundRender);
+  box-shadow: var(--shadowRender);
+  border-radius: var(--borderRadiusRender) var(--borderRadiusRender) 0 0;
   margin: ;
   display: block;
   position: absolute;

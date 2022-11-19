@@ -1,17 +1,18 @@
-.eval > pre,
-.define > pre {
+@import './theme.css';
+
+pre.codeblock {
   position: relative;
-  overflow-x: visible;
+  overflow: auto;
   z-index: 0;
   padding: 0;
   flex-grow: 1;
+  font-size: var(--textSizeCode);
 }
 
-.eval > footer,
-.define > footer {
-  line-height: 1rem;
-  height: 1rem;
-  background: rgba(150, 150, 150, 0.5);
+.codeblock + footer {
+  line-height: var(--lineHeightCodeBar);
+  height: var(--lineHeightCodeBar);
+  background: var(--backgroundCodeBar);
   flex-grow: 0;
 }
 
@@ -22,18 +23,26 @@
 .highlight,
 .code {
   display: block;
+  padding: var(--spaceVerticalCode) 0;
   font-family: var(--fontCode);
-  line-height: 1.25em;
-  color: white;
+  line-height: var(--lineHeightCode);
+  color: var(--textColorCode);
+}
+
+.code {
+  margin: 0 var(--spaceHorizontalCode);
 }
 
 .highlight {
   position: absolute;
   top: 0;
   left: 0;
-  z-index: 1;
+  height: 100%;
+  width: 100%;
+  background: var(--backgroundCode);
+  /* opacity: 0; /* enable to reveal unhighlighted code below */
   pointer-events: none;
-  /* opacity: 0; */
+  z-index: 1;
 }
 
 .define code.highlight {
@@ -42,38 +51,57 @@
 }
 
 .code {
-  /* color: transparent ;*/
-  color: red;
+  /* color: red ; /* enable for testing highlight alignment */
 }
 
 .nextValue > pre {
-  min-height: calc(5 * 1.25em + 1rem);
+  min-height: calc(5 * var(--lineHeightCode) + 1rem);
 }
 
-.eval .line {
+.highlight .line {
+  position: relative;
   width: max-content;
+  padding: 0 var(--spaceHorizontalCode);
   white-space: inherit;
   background: inherit;
-  box-shadow: 0 0 0.1em 0.1em black;
+  box-shadow: var(--shadowCodeLine);
+  background: var(--backgroundCodeLine);
+}
+
+.highlight > .line::before {
+  content: ' ';
+  width: 0;
+  vertical-align: top;
 }
 
 .highlight > .line::after {
-  display: inline-block;
+  position: absolute;
+  top: 0;
+  left: 100%;
   content: '⮐';
-  opacity: 0.4;
-  font-size: 50%;
   padding: 0 0.5em;
-  vertical-align: top;
+}
+
+.highlight > .line::before,
+.highlight > .line::after {
+  display: inline-block;
+  opacity: var(--opacityVisibleWS);
+  font-size: var(--textSizeVisibleWS);
+  color: var(--textColorVisibleWS);
+}
+
+.highlight > .line:last-child:empty {
+  display: none;
 }
 
 dl.specs {
   font-family: var(--fontDisplay);
-  font-size: 0.75rem;
+  font-size: var(--textSizeCodeBar);
   line-height: inherit;
   display: inline-block;
   padding: 0 0.25rem;
-  color: #a8a8a1;
-  font-style: italic;
+  color: var(--textColorCodeBar);
+  font-style: var(--textStyleCodeBar);
 }
 
 dl.specs > * {
@@ -81,7 +109,7 @@ dl.specs > * {
 }
 
 dl.specs > dt {
-  opacity: 50%;
+  opacity: var(--opacityLabel);
 }
 
 dl.specs > dd {

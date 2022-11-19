@@ -1,15 +1,18 @@
+@import './theme.css';
+
 .prose {
   font-family: var(--fontBody);
-  font-weight: 300;
-  line-height: 1.3;
-  color: #f2f2e0;
+  font-size: var(--textSizeProse);
+  font-weight: var(--textWeightProse);
+  line-height: var(--lineHeightProse);
+  color: var(--textColorProse);
+  background: var(--backgroundProse);
   outline: none;
   padding: 10em 0 1em 0;
 }
 
 .prose > * {
   margin-left: 1.5rem;
-  width: 80%;
   position: relative;
 }
 
@@ -20,7 +23,7 @@
 }
 
 .prose > [contenteditable]:focus-within {
-  background: black;
+  background: var(--backgroundFocusProse);
   outline: none;
 }
 
@@ -35,18 +38,18 @@
 .prose > h5,
 .prose > h6 {
   font-family: var(--fontDisplay);
-  font-weight: 800;
-  color: #74ec70;
+  font-weight: var(--textWeightHeading);
+  color: var(--textColorHeading);
 }
 
 .prose > h1 {
-  font-size: 175%;
+  font-size: var(--textSizeH1);
 }
-.prose > h1 {
-  font-size: 150%%;
+.prose > h2 {
+  font-size: var(--textSizeH2);
 }
 .prose > h3 {
-  font-size: 125%;
+  font-size: var(--textSizeH3);
 }
 
 .prose > pre[class*='language-'] {
@@ -75,33 +78,34 @@
 }
 
 .prose > :not(pre) code {
-  color: #74ec70;
+  color: var(--textColorInlineCode);
   font-family: var(--fontCode);
-  background: black;
+  background: var(--backgroundInlineCode);
   padding: 0 0.25em;
 }
 
 .prose > :not(pre) a {
   color: inherit;
   text-decoration: none;
-  background: rgba(255, 255, 255, 0.4);
+
+  background: var(--backgroundLink);
   padding: 0 0.25em;
-  border: 1px solid transparent;
-  border-radius: 0.25em;
+  border: var(--borderLink);
+  border-radius: var(--borderRadiusLink);
   cursor: pointer;
 }
 
 .prose > :not(pre) a:hover {
   background: none;
-  border-color: rgba(255, 255, 255, 0.4);
+  border-color: var(--borderColorHoverLink);
 }
 
 .prose > :not(pre) strong {
-  font-weight: 600;
+  font-weight: var(--textWeightStrong);
 }
 
 .prose > :not(pre) em {
-  font-style: italic;
+  font-style: --var(textStyleEmphasis);
 }
 
 .prose > br {
@@ -114,18 +118,17 @@
 .prose > :not(pre) *::before,
 .prose > :not(pre) *::after {
   display: inline;
-  color: #fbbe49;
-  background: #ffda93db;
-  color: black;
+  color: var(--textColorMarkup);
+  background: var(--backgroundMarkup);
   font-family: var(--fontCode);
-  line-height: 0.8em;
-  font-style: normal;
-  border-radius: 0.125rem;
-  font-size: 0.8rem;
-  font-weight: 400;
-  padding: 0.125em;
+  line-height: var(--lineHeightMarkup);
+  font-style: var(--textStyleMarkup);
+  border-radius: var(--borderRadiusMarkup);
+  font-size: var(--textSizeMarkup);
+  font-weight: var(--textWeightMarkup);
+  padding: var(--borderRadiusMarkup);
   vertical-align: 0.2em;
-  border: 0.5px solid;
+  border: var(--borderMarkup);
   margin: 0 0.1rem;
 }
 

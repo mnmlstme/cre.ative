@@ -1,0 +1,91 @@
+:root {
+  --fontDisplay: 'Hepta Slab', serif;
+  --fontBody: 'Inter', sans-serif;
+  --fontCode: 'Anonymous Pro', monospace;
+  --fontControl: inherit;
+
+  --colorCanvas: #faf8fa;
+  --colorInk: #282426;
+  --colorFullInk: black;
+  --colorHighlight: yellowgreen;
+  --colorMark: #ffda93db;
+  --colorKnockout: white;
+
+  --backgroundColorBase: var(--colorCanvas);
+  --backgroundColorGlare: var(--colorKnockout);
+  --backgroundPage: radial-gradient(
+    ellipse at 15% 25%,
+    var(--backgroundColorGlare),
+    var(--backgroundColorBase) 15vw 5vw
+  );
+  --backgroundFooter: transparent;
+  --backgroundRender: var(--colorKnockout);
+  --backgroundProse: transparent;
+  --backgroundCode: rgba(0, 0, 0, 0.5);
+  --backgroundCodeLine: var(--colorInk);
+  --backgroundCodeBar: rgba(150, 150, 150, 0.5);
+  --backgroundFocusProse: var(--colorFullInk);
+  --backgroundInlineCode: var(--colorFullInk);
+  --backgroundControl: transparent;
+  --backgroundLink: rgba(255, 255, 255, 0.4);
+  --backgroundMarkup: var(--colorMark);
+  --backgroundFocusEditor: var(--colorFullInk);
+
+  --borderFooter: 1px solid #ccc;
+  --borderControl: 1px solid #666;
+  --borderLink: 1px solid transparent;
+  --borderMarkup: 0.5px solid currentColor;
+  --borderColorHoverLink: rgba(255, 255, 255, 0.4);
+
+  --borderRadiusLink: 0.25em;
+  --borderRadiusMarkup: 0.125em;
+  --borderRadiusRender: 0;
+
+  --shadowCodeLine: 0.1em 0 0.1em 0.1em var(--backgroundCodeLine);
+  --shadowRender: none;
+
+  --spaceHorizontalCode: 0.25em;
+  --spaceVerticalCode: 0.5em;
+
+  --textColorFooter: var(--colorHighlight);
+  --textColorControl: inherit;
+  --textColorProse: var(--colorInk);
+  --textColorHeading: var(--colorHighlight);
+  --textColorInlineCode: var(--colorHighlight);
+  --textColorMarkup: var(--colorFullInk);
+  --textColorCode: var(--colorKnockout);
+  --textColorCodeBar: #a8a8a1;
+  --textColorFocusEditor: var(--colorKnockout);
+  --textColorVisibleWS: var(--colorMark);
+
+  --textSizeControl: inherit;
+  --textSizeProse: 1rem;
+  --textSizeH1: 175%;
+  --textSizeH2: 150%;
+  --textSizeH3: 125%;
+  --textSizeMarkup: 0.8rem;
+  --textSizeVisibleWS: 80%;
+  --textSizeCode: 1rem;
+  --textSizeCodeBar: 0.75rem;
+
+  --cursorColorEditor: var(--colorHighlight);
+
+  --textWeightProse: 300;
+  --textWeightHeading: 800;
+  --textWeightStrong: 600;
+  --textWeightMarkup: 400;
+  --textWeightCodeBar: 400;
+
+  --textStyleEmphasis: italic;
+  --textStyleMarkup: normal;
+  --textStyleCodeBar: italic;
+
+  --lineHeightProse: 1.3em;
+  --lineHeightMarkup: 0.8em;
+  --lineHeightCode: 1.375em;
+  --lineHeightCodeBar: 1rem;
+
+  --opacityDisabledControl: 0.5;
+  --opacityVisibleWS: 1;
+  --opacityLabel: 0.5;
+}

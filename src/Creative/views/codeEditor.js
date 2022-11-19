@@ -36,7 +36,7 @@ export function CodeEditor(props) {
 export function CodeBlock({ block, index, onUpdate }) {
   const [_, { lang }, code] = block
   return (
-    <pre lang={lang} className={`language-${lang}`}>
+    <pre lang={lang} className={`${styles.codeblock} language-${lang}`}>
       <Block
         className={styles.code}
         block={block}
