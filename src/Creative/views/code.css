@@ -7,13 +7,19 @@ pre.codeblock {
   padding: 0;
   flex-grow: 1;
   font-size: var(--textSizeCode);
+  margin-top: 1.5em;
+  margin-bottom: 0;
 }
 
-.codeblock + footer {
-  line-height: var(--lineHeightCodeBar);
-  height: var(--lineHeightCodeBar);
-  background: var(--backgroundCodeBar);
-  flex-grow: 0;
+pre.codeblock::before {
+  /* place the background over whatever prism applies to the <pre> */
+  content: ' ';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background: var(--backgroundCode);
 }
 
 .define {
@@ -39,7 +45,6 @@ pre.codeblock {
   left: 0;
   height: 100%;
   width: 100%;
-  background: var(--backgroundCode);
   /* opacity: 0; /* enable to reveal unhighlighted code below */
   pointer-events: none;
   z-index: 1;
@@ -92,34 +97,4 @@ pre.codeblock {
 
 .highlight > .line:last-child:empty {
   display: none;
-}
-
-dl.specs {
-  font-family: var(--fontDisplay);
-  font-size: var(--textSizeCodeBar);
-  line-height: inherit;
-  display: inline-block;
-  padding: 0 0.25rem;
-  color: var(--textColorCodeBar);
-  font-style: var(--textStyleCodeBar);
-}
-
-dl.specs > * {
-  display: inline;
-}
-
-dl.specs > dt {
-  opacity: var(--opacityLabel);
-}
-
-dl.specs > dd {
-  font-style: italic;
-}
-
-dl.specs > dt::after {
-  content: ':';
-}
-
-dl.specs > dt + dd {
-  margin-left: 0.5em;
 }

@@ -6,36 +6,38 @@
 
   --colorCanvas: #faf8fa;
   --colorInk: #282426;
-  --colorFullInk: black;
-  --colorHighlight: yellowgreen;
-  --colorMark: #ffda93db;
   --colorKnockout: white;
+  --colorFullInk: black;
+  --colorHighlight: #99bb41;
+  --colorSubdued: #736991;
+  --colorMark: #fff1d6;
 
   --backgroundColorBase: var(--colorCanvas);
-  --backgroundColorGlare: var(--colorKnockout);
-  --backgroundPage: radial-gradient(
-    ellipse at 15% 25%,
+  --backgroundColorGlare: var(--colorMark);
+  --backgroundPage: transparent;
+  --backgroundProse: radial-gradient(
+    ellipse at 50% 25vh,
     var(--backgroundColorGlare),
-    var(--backgroundColorBase) 15vw 5vw
+    var(--backgroundColorBase) 15vw 5vh
   );
-  --backgroundFooter: transparent;
+  --backgroundFooter: var(--colorMark);
   --backgroundRender: var(--colorKnockout);
-  --backgroundProse: transparent;
   --backgroundCode: rgba(0, 0, 0, 0.5);
   --backgroundCodeLine: var(--colorInk);
-  --backgroundCodeBar: rgba(150, 150, 150, 0.5);
-  --backgroundFocusProse: var(--colorFullInk);
+  --backgroundModeline: var(--colorSubdued);
+  --backgroundFocusProse: var(--colorMark);
   --backgroundInlineCode: var(--colorFullInk);
   --backgroundControl: transparent;
-  --backgroundLink: rgba(255, 255, 255, 0.4);
+  --backgroundLink: var(--colorMark);
   --backgroundMarkup: var(--colorMark);
   --backgroundFocusEditor: var(--colorFullInk);
 
   --borderFooter: 1px solid #ccc;
-  --borderControl: 1px solid #666;
+  --borderControl: 1px solid currentColor;
   --borderLink: 1px solid transparent;
   --borderMarkup: 0.5px solid currentColor;
   --borderColorHoverLink: rgba(255, 255, 255, 0.4);
+  --borderModeline: 1px solid currentColor;
 
   --borderRadiusLink: 0.25em;
   --borderRadiusMarkup: 0.125em;
@@ -47,14 +49,15 @@
   --spaceHorizontalCode: 0.25em;
   --spaceVerticalCode: 0.5em;
 
-  --textColorFooter: var(--colorHighlight);
-  --textColorControl: inherit;
+  --textColorFooter: var(--colorSubdued);
+  --textColorControl: var(--colorSubdued);
   --textColorProse: var(--colorInk);
-  --textColorHeading: var(--colorHighlight);
+  --textColorHeading: var(--colorSubdued);
   --textColorInlineCode: var(--colorHighlight);
-  --textColorMarkup: var(--colorFullInk);
+  --textColorMarkup: var(--colorSubdued);
+  --textColorHoverLink: var(--colorSubdued);
   --textColorCode: var(--colorKnockout);
-  --textColorCodeBar: #a8a8a1;
+  --textColorModeline: var(--colorMark);
   --textColorFocusEditor: var(--colorKnockout);
   --textColorVisibleWS: var(--colorMark);
 
@@ -66,7 +69,8 @@
   --textSizeMarkup: 0.8rem;
   --textSizeVisibleWS: 80%;
   --textSizeCode: 1rem;
-  --textSizeCodeBar: 0.75rem;
+  --textSizeModeline: 0.75rem;
+  --textSizeFooter: 1rem;
 
   --cursorColorEditor: var(--colorHighlight);
 
@@ -74,16 +78,16 @@
   --textWeightHeading: 800;
   --textWeightStrong: 600;
   --textWeightMarkup: 400;
-  --textWeightCodeBar: 400;
+  --textWeightModeline: 400;
 
   --textStyleEmphasis: italic;
   --textStyleMarkup: normal;
-  --textStyleCodeBar: italic;
+  --textStyleModeline: italic;
 
-  --lineHeightProse: 1.3em;
+  --lineHeightProse: 1.5;
   --lineHeightMarkup: 0.8em;
   --lineHeightCode: 1.375em;
-  --lineHeightCodeBar: 1rem;
+  --lineHeightModeline: 1rem;
 
   --opacityDisabledControl: 0.5;
   --opacityVisibleWS: 1;

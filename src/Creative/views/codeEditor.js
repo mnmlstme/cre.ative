@@ -23,12 +23,6 @@ export function CodeEditor(props) {
       onSave={doSave}
     >
       <CodeBlock tagName={tag} block={block} onUpdate={doUpdate} />
-      <footer>
-        <dl className={styles.specs}>
-          <dt>Language</dt>
-          <dd>{lang}</dd>
-        </dl>
-      </footer>
     </Editor>
   )
 }
@@ -37,6 +31,9 @@ export function CodeBlock({ block, index, onUpdate }) {
   const [_, { lang }, code] = block
   return (
     <pre lang={lang} className={`${styles.codeblock} language-${lang}`}>
+      <header className={editorStyles.modeline}>
+        <span>{lang}</span>
+      </header>
       <Block
         className={styles.code}
         block={block}

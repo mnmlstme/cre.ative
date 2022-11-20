@@ -12,14 +12,17 @@
 }
 
 .prose > * {
-  margin-left: 1.5rem;
+  margin: 1.5rem;
   position: relative;
 }
 
-.prose > pre,
 .prose > ul,
 .prose > ol {
   margin-left: 2rem;
+}
+
+.prose > pre {
+  margin: 2rem;
 }
 
 .prose > [contenteditable]:focus-within {
@@ -53,13 +56,11 @@
 }
 
 .prose > pre[class*='language-'] {
-  margin: 0 0 0 2em;
   padding: 0;
-  overflow: visible;
+  overflow: auto;
 }
 
-.prose > * + *,
-.prose > * + pre[class*='language-'] {
+.prose > * + * {
   margin-top: 0.5em;
 }
 
@@ -88,7 +89,11 @@
   color: inherit;
   text-decoration: none;
 
-  background: var(--backgroundLink);
+  background: linear-gradient(
+    transparent,
+    transparent 50%,
+    var(--backgroundLink)
+  );
   padding: 0 0.25em;
   border: var(--borderLink);
   border-radius: var(--borderRadiusLink);
@@ -96,8 +101,7 @@
 }
 
 .prose > :not(pre) a:hover {
-  background: none;
-  border-color: var(--borderColorHoverLink);
+  color: var(--textColorHoverLink);
 }
 
 .prose > :not(pre) strong {

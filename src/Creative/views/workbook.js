@@ -64,11 +64,11 @@ function Workbook({
           doLoadResource={doLoadResource}
         />
       </section>
-      <footer>
+      <footer className={styles.footer}>
         <h6>{title || workbookId}</h6>
-        <span>
+        <nav>
           <button disabled={scene - 1 < 1} onClick={doPrevScene}>
-            &lt;
+            ←
           </button>
           <select value={scene} onChange={doChangeScene}>
             {scenes.map((scn, i) => (
@@ -79,10 +79,9 @@ function Workbook({
             ))}
           </select>
           <button disabled={scene + 1 > scenes.length} onClick={doNextScene}>
-            &gt;
+            →
           </button>
-        </span>
-        <h6></h6>
+        </nav>
       </footer>
     </article>
   )

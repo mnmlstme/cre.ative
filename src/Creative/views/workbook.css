@@ -17,49 +17,46 @@
   background: var(--backgroundPage);
 }
 
-.workbook > footer {
+.footer {
   position: absolute;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  font-family: var(--fontDisplay);
+  left: 0;
   bottom: 0;
-  height: 1.5rem;
-  width: 100%;
-  padding: 0 0.5rem;
-  line-height: 1.5rem;
-  font-size: 0.75rem;
-  border-top: var(--borderFooter);
-  background: var(--backgroundFooter);
-  color: var(--textColorFooter);
-}
-
-.workbook > footer > * {
-  display: inline-block;
-  font-size: inherit;
-  flex-grow: 0;
-}
-
-.workbook > footer > h6 {
-  font-weight: normal;
-  font-family: var(--fontCode);
-  flex-basis: 0;
-  flex-grow: 1;
-}
-
-.workbook > footer select,
-.workbook > footer button {
-  border: var(--borderControl);
-  background: var(--borderBackground);
-  font-size: var(--textSizeControl);
-  font-family: var(--fontControl);
-  color: var(--textColorControl);
-  padding: 0 0.5em;
+  width: 40vw;
+  padding: 0 2rem;
+  font-size: var(--textSizeFooter);
   text-align: center;
 }
 
-.workbook > footer select {
-  width: 25em;
+.footer > * {
+  padding: 0.5em 0.5em 0;
+  background: var(--backgroundFooter);
+  color: var(--textColorFooter);
+  border: var(--borderFooter);
+  border-bottom: none;
+  border-radius: 0.5rem 0.5rem 0 0;
+}
+
+.footer h6 {
+  display: inline-block;
+}
+
+.footer nav {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 0.5em;
+}
+
+.footer button,
+.footer select {
+  background: var(--backgroundControl);
+  color: var(--textColorControl);
+  border: none;
+  padding: 0 0.5em;
+  line-height: 1.5em;
+  font-family: var(--fontControl);
+  font-size: var(--textSizeControl);
+  text-align: center;
 }
 
 .workbook > footer button:disabled {
@@ -91,12 +88,10 @@
 .layout > ol > li {
   /* document view */
   grid-row-start: doc;
-  margin-bottom: 1.5rem;
   display: flex;
   flex-direction: row;
   width: 100vw;
   align-items: flex-end;
-  gap: 2rem;
 }
 
 .container > ol > li {
@@ -106,26 +101,9 @@
   grid-row-start: view;
   overflow: auto;
   transform: translate(40vw, -100vh);
-  padding: 4rem 4rem 0 2rem;
+  padding: 0;
   width: 60vw;
   height: 75vh;
   position: relative;
   z-index: 1;
-}
-
-.container > ol > li::before {
-  content: '';
-  background: var(--backgroundRender);
-  box-shadow: var(--shadowRender);
-  border-radius: var(--borderRadiusRender) var(--borderRadiusRender) 0 0;
-  margin: ;
-  display: block;
-  position: absolute;
-  box-sizing: content-box;
-  padding: ;
-  z-index: -1;
-  top: 2rem;
-  left: 0;
-  bottom: 0;
-  right: 2rem;
 }
