@@ -1,7 +1,7 @@
 import React from 'react'
 import { Block } from './block'
 import { Editor } from './editor'
-import { CodeBlock, getMinorMode } from './codeEditor'
+import { CodeBlock, Modeline, getMinorMode } from './codeEditor'
 import { Highlight } from './highlight'
 
 import styles from './prose.css'
@@ -39,12 +39,17 @@ export function ProseEditor(props) {
 
 function Node(props) {
   const { block, path, onUpdate } = props
-  const [type, { tag, uniqueId }, ...rest] = block
+  const [type, { tag, uniqueId, lang }, ...rest] = block
   const childPath = (path || []).concat([uniqueId])
 
   switch (type) {
     case 'fence':
-      return <CodeBlock block={block} onUpdate={onUpdate} />
+      return (
+        <figure>
+          <Modeline tagName="figcaption" lang={lang} />
+          <CodeBlock block={block} onUpdate={onUpdate} />
+        </figure>
+      )
     case 'bullet_list':
     case 'ordered_list':
     case 'list_item':

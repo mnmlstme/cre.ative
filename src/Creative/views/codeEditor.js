@@ -22,18 +22,25 @@ export function CodeEditor(props) {
       modes={[minorMode]}
       onSave={doSave}
     >
+      <Modeline lang={lang} />
       <CodeBlock tagName={tag} block={block} onUpdate={doUpdate} />
     </Editor>
   )
 }
 
+export function Modeline({ tagName, lang }) {
+  const TagName = tagName || 'header'
+
+  return (
+    <TagName className={editorStyles.modeline}>
+      <span>{lang}</span>
+    </TagName>
+  )
+}
 export function CodeBlock({ block, index, onUpdate }) {
   const [_, { lang }, code] = block
   return (
     <pre lang={lang} className={`${styles.codeblock} language-${lang}`}>
-      <header className={editorStyles.modeline}>
-        <span>{lang}</span>
-      </header>
       <Block
         className={styles.code}
         block={block}

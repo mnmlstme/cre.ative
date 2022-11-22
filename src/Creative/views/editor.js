@@ -46,13 +46,14 @@ export class Editor extends React.Component {
   }
 
   render() {
-    const { className, children } = this.props
+    const { className, tagName, children } = this.props
     const { popup } = this.state
     const options = popup && popup.options
     const classes = [styles.editor].concat(className ? [className] : [])
+    const TagName = tagName || 'section'
 
     return (
-      <section
+      <TagName
         className={classes.join(' ')}
         onKeyDown={this.handleKeyEvent}
         onKeyUp={this.handleKeyEvent}
@@ -65,7 +66,7 @@ export class Editor extends React.Component {
           onSelect={this.handlePopupSelection}
           onClose={() => this.setState({ popup: null })}
         />
-      </section>
+      </TagName>
     )
   }
 

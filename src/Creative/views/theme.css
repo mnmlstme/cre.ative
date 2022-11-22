@@ -2,7 +2,9 @@
   --fontDisplay: 'Hepta Slab', serif;
   --fontBody: 'Inter', sans-serif;
   --fontCode: 'Anonymous Pro', monospace;
-  --fontControl: inherit;
+  --fontDisplay: 'Hepta Slab', serif;
+  --fontControl: var(--fontBody);
+  --fontSymbol: var(--fontDisplay);
 
   --colorCanvas: #faf8fa;
   --colorInk: #282426;
@@ -20,31 +22,36 @@
     var(--backgroundColorGlare),
     var(--backgroundColorBase) 15vw 5vh
   );
-  --backgroundFooter: var(--colorMark);
+  --backgroundFooter: none;
   --backgroundRender: var(--colorKnockout);
   --backgroundCode: rgba(0, 0, 0, 0.5);
   --backgroundCodeLine: var(--colorInk);
   --backgroundModeline: var(--colorSubdued);
   --backgroundFocusProse: var(--colorMark);
   --backgroundInlineCode: var(--colorFullInk);
-  --backgroundControl: transparent;
+  --backgroundControl: var(--colorKnockout);
   --backgroundLink: var(--colorMark);
   --backgroundMarkup: var(--colorMark);
   --backgroundFocusEditor: var(--colorFullInk);
 
-  --borderFooter: 1px solid #ccc;
-  --borderControl: 1px solid currentColor;
-  --borderLink: 1px solid transparent;
+  --borderPage: 1px solid var(--colorSubdued);
+  --borderFooter: none;
+  --borderControl: 1px solid transparent;
+  --borderLink: 1px solid var(--colorSubdued);
   --borderMarkup: 0.5px solid currentColor;
   --borderColorHoverLink: rgba(255, 255, 255, 0.4);
   --borderModeline: 1px solid currentColor;
 
   --borderRadiusLink: 0.25em;
   --borderRadiusMarkup: 0.125em;
-  --borderRadiusRender: 0;
+  --borderRadiusRender: 1rem;
+  --borderRadiusControl: 0.25rem;
+  --borderRadiusPopover: 0.5rem;
 
+  --sizeControl: 2.5rem;
   --shadowCodeLine: 0.1em 0 0.1em 0.1em var(--backgroundCodeLine);
-  --shadowRender: none;
+  --shadowControl: 0 0 0.25rem var(--colorSubdued);
+  --shadowRender: 0 0 0.5rem var(--colorSubdued);
 
   --spaceHorizontalCode: 0.25em;
   --spaceVerticalCode: 0.5em;
@@ -61,7 +68,7 @@
   --textColorFocusEditor: var(--colorKnockout);
   --textColorVisibleWS: var(--colorMark);
 
-  --textSizeControl: inherit;
+  --textSizeControl: 1rem;
   --textSizeProse: 1rem;
   --textSizeH1: 175%;
   --textSizeH2: 150%;
@@ -71,6 +78,7 @@
   --textSizeCode: 1rem;
   --textSizeModeline: 0.75rem;
   --textSizeFooter: 1rem;
+  --textSizeHint: 0.5rem;
 
   --cursorColorEditor: var(--colorHighlight);
 

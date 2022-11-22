@@ -15,7 +15,8 @@
 .editor.discuss {
   width: 40vw;
   height: 100%;
-  padding-bottom: 10rem 0 4rem 0;
+  padding: 10rem 0 4rem 0;
+  border-right: var(--borderPage);
 }
 
 .editor.eval {
@@ -28,9 +29,6 @@
 }
 
 .modeline {
-  position: absolute;
-  bottom: 100%;
-  right: 0;
   color: var(--textColorModeline);
   background: var(--backgroundModeline);
   font-family: var(--fontCode);

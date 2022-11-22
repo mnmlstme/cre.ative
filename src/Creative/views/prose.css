@@ -21,7 +21,7 @@
   margin-left: 2rem;
 }
 
-.prose > pre {
+.prose > figure {
   margin: 2rem;
 }
 
@@ -30,7 +30,7 @@
   outline: none;
 }
 
-.prose > pre > *:focus {
+.prose pre > *:focus {
   outline: none;
 }
 
@@ -55,7 +55,7 @@
   font-size: var(--textSizeH3);
 }
 
-.prose > pre[class*='language-'] {
+.prose pre[class*='language-'] {
   padding: 0;
   overflow: auto;
 }
@@ -78,14 +78,14 @@
   position: relative;
 }
 
-.prose > :not(pre) code {
+.prose > :not(figure) > code {
   color: var(--textColorInlineCode);
   font-family: var(--fontCode);
   background: var(--backgroundInlineCode);
   padding: 0 0.25em;
 }
 
-.prose > :not(pre) a {
+.prose > :not(figure) a {
   color: inherit;
   text-decoration: none;
 
@@ -100,15 +100,15 @@
   cursor: pointer;
 }
 
-.prose > :not(pre) a:hover {
+.prose > :not(figure) a:hover {
   color: var(--textColorHoverLink);
 }
 
-.prose > :not(pre) strong {
+.prose > :not(figure) strong {
   font-weight: var(--textWeightStrong);
 }
 
-.prose > :not(pre) em {
+.prose > :not(figure) em {
   font-style: --var(textStyleEmphasis);
 }
 
@@ -118,9 +118,8 @@
 }
 
 .prose > *::before,
-.prose > * > li::before,
-.prose > :not(pre) *::before,
-.prose > :not(pre) *::after {
+.prose > :not(figure) > *::before,
+.prose > :not(figure) > *::after {
   display: inline;
   color: var(--textColorMarkup);
   background: var(--backgroundMarkup);
@@ -146,7 +145,6 @@
   width: 1rem;
 }
 
-.prose > pre::before,
 .prose > ul::before,
 .prose > ol::before {
   display: block;
@@ -166,23 +164,19 @@
   content: attr(data-mark-before);
 }
 
-.prose > pre:focus-within::before {
-  content: attr(lang);
-}
-
-.prose > :not(pre):focus [data-mark-around]::before,
-.prose > :not(pre):focus [data-mark-around]::after {
+.prose > :not(figure):focus [data-mark-around]::before,
+.prose > :not(figure):focus [data-mark-around]::after {
   content: attr(data-mark-around);
 }
 
-.prose > :not(pre):focus a::before {
+.prose > :not(figure):focus a::before {
   content: '[';
 }
 
-.prose > :not(pre):focus a::after {
+.prose > :not(figure):focus a::after {
   content: ']';
 }
 
-.prose > :not(pre):focus a[href]::after {
+.prose > :not(figure):focus a[href]::after {
   content: '](' attr(href) ')';
 }

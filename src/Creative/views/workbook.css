@@ -13,54 +13,89 @@
   position: fixed;
   width: 100vw;
   height: 100vh;
-  padding-bottom: 2rem;
   background: var(--backgroundPage);
 }
 
-.footer {
+.menubar {
   position: absolute;
+  top: 0;
   left: 0;
-  bottom: 0;
   width: 40vw;
-  padding: 0 2rem;
-  font-size: var(--textSizeFooter);
   text-align: center;
-}
-
-.footer > * {
-  padding: 0.5em 0.5em 0;
-  background: var(--backgroundFooter);
+  padding: 0.5rem;
   color: var(--textColorFooter);
+  background: var(--backgroundFooter);
   border: var(--borderFooter);
-  border-bottom: none;
-  border-radius: 0.5rem 0.5rem 0 0;
+  font-size: var(--textSizeFooter);
 }
 
-.footer h6 {
-  display: inline-block;
-}
-
-.footer nav {
+.menubar nav {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   gap: 0.5em;
 }
 
-.footer button,
-.footer select {
+.menubar h6 {
+  line-height: var(--sizeControl);
+}
+
+.menubar .spacer {
+  flex-grow: 1;
+}
+
+.menubar button {
+  position: relative;
   background: var(--backgroundControl);
   color: var(--textColorControl);
-  border: none;
-  padding: 0 0.5em;
-  line-height: 1.5em;
+  border: var(--borderControl);
+  border-radius: var(--sizeControl);
+  height: var(--sizeControl);
+  width: var(--sizeControl);
+  box-shadow: var(--shadowControl);
   font-family: var(--fontControl);
   font-size: var(--textSizeControl);
+  line-height: 1.5em;
+  flex-grow: 0;
   text-align: center;
 }
 
-.workbook > footer button:disabled {
+.menubar button:disabled {
   opacity: var(--opacityDisabledControl);
+}
+
+.menubar button:empty::before {
+  font-family: var(--fontSymbol);
+  font-weight: normal;
+}
+
+.menubar button.previous:empty::before {
+  content: '◀';
+}
+
+.menubar button.next:empty::before {
+  content: '◀';
+}
+
+.menubar button.menu:empty::before {
+  content: '▼';
+}
+
+.toc {
+  position: absolute;
+  top: 100%;
+  left: 0.5rem;
+  right: 0.5rem;
+  padding: 0.5em 0.5em 0.5em 2.5em;
+  background: var(--backgroundControl);
+  color: var(--textColorControl);
+  border: var(--borderControl);
+  border-radius: var(--borderRadiusPopover);
+  box-shadow: var(--shadowControl);
+  text-align: left;
+  font-family: var(--fontBody);
+  font-size: var(--textSizeBody);
+  font-weight: var(--textWeightProse);
 }
 
 .layout {
@@ -101,7 +136,7 @@
   grid-row-start: view;
   overflow: auto;
   transform: translate(40vw, -100vh);
-  padding: 0;
+  padding: 2rem;
   width: 60vw;
   height: 75vh;
   position: relative;

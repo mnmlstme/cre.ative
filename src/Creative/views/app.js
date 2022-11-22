@@ -1,11 +1,10 @@
 import React from 'react'
 import {
   BrowserRouter,
-  Switch,
+  Navigate,
+  Routes,
   Route,
-  Redirect,
   useLocation,
-  useParams,
 } from 'react-router-dom'
 
 import Workbook from './workbook'
@@ -14,28 +13,17 @@ import Finder from './finder'
 export default function App() {
   return (
     <BrowserRouter>
-      <Switch>
-        <Route path="/app/workbook/:path*">
-          <WorkbookWithParams />
+      <Routes>
+        <Route path="/app">
+          <Route path="finder" element={<Finder />} />
+          <Route path="workbook/:projectId/:workbookId" element={<Workbook />}>
+            <Route path=":slug/:sceneId" element={<Workbook />} />
+          </Route>
         </Route>
-        <Route path="/app/finder">
-          <Finder />
-        </Route>
-        <Route exact path="/app/">
-          <Redirect to="/app/finder" />
-        </Route>
-        <Route path="*">
-          <NoMatch />
-        </Route>
-      </Switch>
+        <Route path="*" element={<NoMatch />} />
+      </Routes>
     </BrowserRouter>
   )
-}
-
-function WorkbookWithParams() {
-  let { path } = useParams()
-
-  return <Workbook urlpath={path} />
 }
 
 function NoMatch() {

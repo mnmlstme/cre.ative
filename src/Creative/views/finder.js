@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import {
   changeFile,
@@ -24,8 +24,8 @@ function Finder({ projects, project, workbooks, selected, dispatch }) {
       <section>
         <ul>
           {projects.map((p) => (
-            <li>
-              <button key={p.name} onClick={doChangeProject} value={p.name}>
+            <li key={p.name}>
+              <button onClick={doChangeProject} value={p.name}>
                 {p.name}
               </button>
             </li>
@@ -40,10 +40,10 @@ function Finder({ projects, project, workbooks, selected, dispatch }) {
     return <h1>Loading Project {project} ...</h1>
   }
 
-  let history = useHistory()
+  let navigate = useNavigate()
 
   const doLoadWorkbook = (event) => {
-    history.push(`./workbook/${project}/${selected.replace(/\.\w+$/, '')}`)
+    navigate(`../workbook/${project}/${selected.replace(/\.\w+$/, '')}`)
   }
 
   const doChangeFile = (event) => dispatch(changeFile(event.target.value))
