@@ -1,7 +1,8 @@
 import React from 'react'
-import styles from './document.css'
 import { ProseEditor } from './proseEditor'
 import { CodeEditor } from './codeEditor'
+import frameStyles from './frame.css'
+import styles from './document.css'
 
 export function Document({ workbook, doUpdate, doSave }) {
   //console.log('Document:', workbook.toObject())
@@ -25,7 +26,18 @@ export function Document({ workbook, doUpdate, doSave }) {
         })
 
         return (
-          <li key={i} className={styles.doc}>
+          <li
+            key={i}
+            className={[
+              styles.doc,
+              frameStyles.frame,
+              frameStyles.fixedHeight,
+              frameStyles.yScrollable,
+            ].join(' ')}
+            style={{
+              '--fixedHeight': '100%',
+            }}
+          >
             <ProseEditor
               blocks={discussion}
               doUpdate={doUpdate}

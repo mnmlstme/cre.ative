@@ -58,6 +58,7 @@
   line-height: 1.5em;
   flex-grow: 0;
   text-align: center;
+  cursor: pointer;
 }
 
 .menubar button:disabled {
@@ -123,10 +124,7 @@
 .layout > ol > li {
   /* document view */
   grid-row-start: doc;
-  display: flex;
-  flex-direction: row;
-  width: 100vw;
-  align-items: flex-end;
+  width: 40vw;
 }
 
 .container > ol > li {

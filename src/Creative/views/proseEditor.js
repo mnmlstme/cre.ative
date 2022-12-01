@@ -6,6 +6,7 @@ import { Highlight } from './highlight'
 
 import styles from './prose.css'
 import codeStyles from './code.css'
+import frameStyles from './frame.css'
 import editorStyles from './editor.css'
 
 export function ProseEditor(props) {
@@ -24,7 +25,9 @@ export function ProseEditor(props) {
 
   return (
     <Editor
-      className={[styles.prose, editorStyles.discuss].join(' ')}
+      className={[styles.prose, editorStyles.discuss, frameStyles.pane].join(
+        ' '
+      )}
       modes={modes}
       onSave={doSave}
     >
@@ -45,7 +48,14 @@ function Node(props) {
   switch (type) {
     case 'fence':
       return (
-        <figure>
+        <figure
+          className={[
+            frameStyles.frame,
+            frameStyles.fixedHeight,
+            frameStyles.yScrollable,
+            frameStyles.withHeader,
+          ].join(' ')}
+        >
           <Modeline tagName="figcaption" lang={lang} />
           <CodeBlock block={block} onUpdate={onUpdate} />
         </figure>

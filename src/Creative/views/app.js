@@ -14,7 +14,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/app">
+        <Route path="/app" render={() => <Navigate to="about-us" />}>
           <Route path="finder" element={<Finder />} />
           <Route path="workbook/:projectId/:workbookId" element={<Workbook />}>
             <Route path=":slug/:sceneId" element={<Workbook />} />

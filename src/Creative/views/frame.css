@@ -1,0 +1,70 @@
+.frame {
+  position: relative;
+  height: auto;
+  overflow: visible;
+}
+
+.frame.fixedHeight {
+  --fixedHeight: 16rem;
+  /*--*/
+  height: var(--fixedHeight, auto);
+}
+
+.frame.withHeader {
+  --headerHeight: 1.5rem;
+}
+
+.frame.withHeader > :first-child {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: var(--headerHeight);
+  width: 100%;
+}
+
+.frame.yScrollable {
+  --scrollbarSize: 10px;
+  --scrollbarOffset: 3px;
+  /*--*/
+  padding-right: var(--scrollbarOffset);
+}
+
+.frame > * {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.frame > .pane {
+  background: transparent;
+}
+
+.frame.withHeader > .pane {
+  top: var(--headerHeight);
+}
+
+.frame.yScrollable > .pane {
+  right: calc(0px - var(--scrollbarOffset) - var(--scrollbarSize));
+  padding-right: var(--scrollbarOffset);
+  /* Firefox supports these: */
+  scrollbar-width: thin;
+  scrollbar-color: var(--colorSubdued) transparent;
+  scrollbar-gutter: stable;
+}
+
+.frame.yScrollable > .pane::-webkit-scrollbar {
+  /**
+        Style the scrollbar in webkit browsers
+    **/
+  width: 10px;
+  height: 10px;
+  background: transparent;
+}
+
+.frame.yScrollable > .pane::-webkit-scrollbar-thumb {
+  background: var(--colorSubdued);
+  border-radius: 5px;
+  border: 2px solid white;
+}

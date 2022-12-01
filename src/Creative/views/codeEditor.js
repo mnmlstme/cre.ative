@@ -4,6 +4,7 @@ import { Editor } from './editor.js'
 import { Highlight } from './highlight.js'
 
 import styles from './code.css'
+import frameStyles from './frame.css'
 import editorStyles from './editor.css'
 
 export function CodeEditor(props) {
@@ -18,7 +19,14 @@ export function CodeEditor(props) {
 
   return (
     <Editor
-      className={[styles[mode], editorStyles[mode]].join(' ')}
+      className={[
+        styles[mode],
+        editorStyles[mode],
+        frameStyles.frame,
+        frameStyles.fixedHeight,
+        frameStyles.withHeader,
+        frameStyles.yScrollable,
+      ].join(' ')}
       modes={[minorMode]}
       onSave={doSave}
     >
@@ -40,7 +48,12 @@ export function Modeline({ tagName, lang }) {
 export function CodeBlock({ block, index, onUpdate }) {
   const [_, { lang }, code] = block
   return (
-    <pre lang={lang} className={`${styles.codeblock} language-${lang}`}>
+    <pre
+      lang={lang}
+      className={[styles.codeblock, frameStyles.pane, `language-${lang}`].join(
+        ' '
+      )}
+    >
       <Block
         className={styles.code}
         block={block}

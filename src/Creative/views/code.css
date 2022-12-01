@@ -1,13 +1,11 @@
 @import './theme.css';
 
 pre.codeblock {
-  position: relative;
-  overflow: auto;
-  z-index: 0;
   padding: 0;
-  flex-grow: 1;
-  font-size: var(--textSizeCode);
   margin: 0;
+  overflow: auto;
+  font-size: var(--textSizeCode);
+  z-index: 0;
 }
 
 .define {
