@@ -6,6 +6,10 @@
   box-sizing: border-box;
 }
 
+body {
+  background: black;
+}
+
 @import './theme.css';
 
 .workbook {
@@ -14,6 +18,7 @@
   width: 100vw;
   height: 100vh;
   background: var(--backgroundPage);
+  border-radius: 2em;
 }
 
 .menubar {
@@ -44,8 +49,8 @@
   flex-grow: 1;
 }
 
-.menubar button {
-  position: relative;
+.menubar .button {
+  display: inline-block;
   background: var(--backgroundControl);
   color: var(--textColorControl);
   border: var(--borderControl);
@@ -58,36 +63,42 @@
   line-height: 1.5em;
   flex-grow: 0;
   text-align: center;
+  text-decoration: none;
   cursor: pointer;
 }
 
-.menubar button:disabled {
+.menubar .button:disabled {
   opacity: var(--opacityDisabledControl);
 }
 
-.menubar button:empty::before {
+.menubar .button:empty::before {
   font-family: var(--fontSymbol);
   font-weight: normal;
+  font-size: inherit;
+  display: inline-block;
 }
 
-.menubar button.previous:empty::before {
-  content: '◀';
-}
-
-.menubar button.next:empty::before {
-  content: '◀';
-}
-
-.menubar button.menu:empty::before {
-  content: '▼';
+.menubar .button svg {
+  height: 100%;
+  width: 100%;
+  fill: currentColor;
 }
 
 .toc {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 1rem;
   position: absolute;
+  z-index: 1;
   top: 100%;
   left: 0.5rem;
-  right: 0.5rem;
-  padding: 0.5em 0.5em 0.5em 2.5em;
+  width: 60vw;
+  list-style: inside;
+  counter-reset: toc 0;
+}
+
+.toc > li {
+  position: relative;
   background: var(--backgroundControl);
   color: var(--textColorControl);
   border: var(--borderControl);
@@ -97,6 +108,30 @@
   font-family: var(--fontBody);
   font-size: var(--textSizeBody);
   font-weight: var(--textWeightProse);
+  height: 4rem;
+  counter-increment: toc 1;
+}
+
+.toc > li::marker {
+  font-family: var(--fontDisplay);
+  font-size: 4rem;
+  line-height: 4rem;
+  color: #ccc;
+  content: counter(toc);
+}
+
+.toc li > a {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  padding: 0 0.5em 0 2em;
+  font-weight: var(--textWeightHeading);
+  text-align: right;
+  text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .layout {

@@ -71,7 +71,7 @@ const frontend = {
         test: /\.svg$/,
         include: [path.resolve(__dirname, 'src')],
         use: {
-          loader: 'svg-inline-loader',
+          loader: 'svg-sprite-loader',
           query: {
             idPrefix: true,
             classPrefix: true,

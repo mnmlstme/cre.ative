@@ -45,8 +45,8 @@
   --borderRadiusLink: 0.25em;
   --borderRadiusMarkup: 0.125em;
   --borderRadiusRender: 1rem;
-  --borderRadiusControl: 0.25rem;
-  --borderRadiusPopover: 0.5rem;
+  --borderRadiusControl: 0;
+  --borderRadiusPopover: 2px;
 
   --sizeControl: 2.5rem;
   --shadowCodeLine: 0.1em 0 0.1em 0.1em var(--backgroundCodeLine);

@@ -12,6 +12,9 @@ import {
   saveScene,
 } from '../actions'
 import styles from './workbook.css'
+import './previous.svg'
+import './next.svg'
+import './scenes.svg'
 
 function Workbook({ workbook, scene, resources, dispatch }) {
   const { projectId, workbookId, sceneId } = useParams()
@@ -28,18 +31,16 @@ function Workbook({ workbook, scene, resources, dispatch }) {
     scene = 1
   }
 
-  if (sceneId && scene !== sceneId) {
-    scene = sceneId
+  if (sceneId && scene != sceneId) {
+    scene = Number.parseInt(sceneId)
     dispatch(changeScene(scene))
   }
 
   const title = workbook.get('title')
+  const slug = title.toLowerCase().replace(/[^a-z0-9-]/g, '-')
   const sceneTitles = workbook
     .get('scenes')
     .map((sn, i) => sn.get('title', `Untitled`))
-  const doChangeScene = (event) => dispatch(changeScene(event.target.value))
-  const doNextScene = () => dispatch(changeScene(scene + 1))
-  const doPrevScene = () => dispatch(changeScene(scene - 1))
   const doUpdateDocument = (blockId, rmNum, ...blocks) =>
     dispatch(updateScene(scene - 1, blockId, rmNum, ...blocks))
   const doSaveDocument = () => dispatch(saveScene(scene - 1))
@@ -67,25 +68,51 @@ function Workbook({ workbook, scene, resources, dispatch }) {
       </section>
       <footer className={styles.menubar}>
         <nav>
-          <button
-            className={styles.previous}
-            disabled={scene - 1 < 1}
-            onClick={doPrevScene}
-          />
-          <button
-            className={styles.next}
-            disabled={scene >= sceneTitles.length}
-            onClick={doNextScene}
-          />
+          {scene > 1 ? (
+            <Link to={`${slug}/${scene - 1}`} className={styles.button}>
+              <svg>
+                <use xlinkHref="#previous" />
+              </svg>
+            </Link>
+          ) : (
+            <button disabled className={styles.button}>
+              <svg>
+                <use xlinkHref="#previous" />
+              </svg>
+            </button>
+          )}
+          {scene < sceneTitles.size ? (
+            <Link
+              to={`${slug}/${scene + 1}`}
+              className={[styles.next, styles.button].join(' ')}
+            >
+              <svg>
+                <use xlinkHref="#next" />
+              </svg>
+            </Link>
+          ) : (
+            <button disabled className={[styles.next, styles.button].join(' ')}>
+              <svg>
+                <use xlinkHref="#previous" />
+              </svg>
+            </button>
+          )}
           <span className={styles.spacer} />
           <h6>{title || workbookId}</h6>
-          <button className={styles.menu} onClick={toggleMenu} Menu />
+          <button
+            className={[styles.menu, styles.button].join(' ')}
+            onClick={toggleMenu}
+          >
+            <svg>
+              <use xlinkHref="#scenes" />
+            </svg>
+          </button>
         </nav>
         {showMenu && (
-          <ol className={styles.toc}>
+          <ol className={styles.toc} onClick={toggleMenu}>
             {sceneTitles.map((title, i) => (
               <li key={i}>
-                <Link to={`${titleToSlug(title)}/${i + 1}`}>{title}</Link>
+                <Link to={`${slug}/${i + 1}`}>{title}</Link>
               </li>
             ))}
           </ol>
@@ -95,17 +122,13 @@ function Workbook({ workbook, scene, resources, dispatch }) {
   )
 }
 
-function titleToSlug(s) {
-  return s.toLowerCase().replace(/[^a-z0-9-]/g, '-')
-}
-
 function mapStateToProps(state) {
   const workbook = state.get('workbook')
 
   return {
     workbook: workbook.get('isLoaded') ? workbook : undefined,
     resources: state.get('resources'),
-    scene: state.get('current'),
+    scene: Number.parseInt(state.get('current')),
   }
 }
 
