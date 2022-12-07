@@ -1,7 +1,11 @@
 ---
 title: React Workbook
 platform: react-redux
-imports: []
+imports:
+  - from: react-tiny-fab
+    expose:
+      - Fab
+      - Action
 model:
   count: 0
   tenth: 0.1

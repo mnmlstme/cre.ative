@@ -6,3 +6,4 @@ kram_modules/
 .parcel-cache/
 .yalc
 yalc.lock
+/.nova

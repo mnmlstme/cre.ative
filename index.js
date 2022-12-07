@@ -154,11 +154,21 @@ export function mount (mountpoint, initial) {
 }
 
 function genImport(spec) {
-  const symbols = [spec.as, spec.expose && `{${spec.expose.join(",")}}`].filter(
-    Boolean
-  );
+  console.log("Generating import statement from spec:", spec);
 
-  return `import ${symbols.join(",")} from '${spec.from}'`;
+  if (spec.expose) {
+    const list =
+      spec.expose === "*" ? spec.expose : "{ " + spec.expose.join(", ") + " }";
+    const maybeDefault = spec.as ? spec.as + ", " : "";
+
+    return `import ${maybeDefault}${list} from '${spec.from}'`;
+  }
+
+  if (spec.as) {
+    return `import ${spec.as} from '${spec.from}'`;
+  }
+
+  return `import '${spec.from}'`;
 }
 
 function genProps(shape) {
