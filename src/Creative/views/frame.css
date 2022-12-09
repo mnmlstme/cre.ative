@@ -1,4 +1,5 @@
 .frame {
+  --frameBorderThickness: 10px;
   position: relative;
   height: auto;
   overflow: visible;
@@ -17,9 +18,9 @@
 .frame.withHeader > :first-child {
   position: absolute;
   top: 0;
-  left: 0;
+  left: var(--frameBorderThickness);
   height: var(--headerHeight);
-  width: 100%;
+  right: var(--frameBorderThickness);
 }
 
 .frame.yScrollable {
@@ -31,10 +32,25 @@
 
 .frame > * {
   position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  top: var(--frameBorderThickness);
+  bottom: var(--frameBorderThickness);
+  left: var(--frameBorderThickness);
+  right: var(--frameBorderThickness);
+}
+
+.frame::before {
+  position: absolute;
+  content: ' ';
+  display: block;
+  top: var(--frameBorderThickness);
+  left: var(--frameBorderThickness);
+  right: var(--frameBorderThickness);
+  bottom: var(--frameBorderThickness);
+  border-radius: var(--borderRadiusPane);
+  background: var(--backgroundPane);
+  opacity: var(--opacityPaneBackground);
+  border: 1px solid var(--colorSubdued);
+  box-shadow: 1px 1px 2px rgba(134, 134, 134, 0.5), 0 0 1px white inset;
 }
 
 .frame > .pane {
@@ -46,11 +62,12 @@
 }
 
 .frame.yScrollable > .pane {
-  right: calc(0px - var(--scrollbarOffset) - var(--scrollbarSize));
-  padding-right: var(--scrollbarOffset);
+  right: calc(
+    var(--frameBorderThickness) - var(--scrollbarOffset) - var(--scrollbarSize)
+  );
   /* Firefox supports these: */
   scrollbar-width: thin;
-  scrollbar-color: var(--colorSubdued) transparent;
+  scrollbar-color: var(--scrollbarColor) transparent;
   scrollbar-gutter: stable;
 }
 

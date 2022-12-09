@@ -8,6 +8,10 @@ pre.codeblock {
   z-index: 0;
 }
 
+pre.codeblock > .highlight {
+  border-radius: 0 0 var(--borderRadiusCode) var(--borderRadiusCode);
+}
+
 .define {
   width: 100%;
 }
@@ -17,6 +21,7 @@ pre.codeblock {
   display: block;
   padding: var(--spaceVerticalCode) 0;
   font-family: var(--fontCode);
+  font-weight: normal;
   line-height: var(--lineHeightCode);
   color: var(--textColorCode);
 }

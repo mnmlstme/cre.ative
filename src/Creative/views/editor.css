@@ -12,18 +12,12 @@
   background: var(--backgroundFocusEditor);
 }
 
-.editor.discuss {
-  width: 40vw;
-  height: 100%;
-}
-
 .editor.eval {
   position: absolute;
   bottom: 0rem;
-  right: -60vw;
+  right: calc(var(--frameBorderThickness) - 60vw);
   left: 40vw;
   top: auto;
-  margin: 0.5rem 2rem;
 }
 
 .modeline {
@@ -34,6 +28,7 @@
   font-style: var(--textStyleModeline);
   line-height: 1.5;
   border-bottom: var(--borderModeline);
+  border-radius: var(--borderRadiusCode) var(--borderRadiusCode) 0 0;
 }
 
 .modeline span {

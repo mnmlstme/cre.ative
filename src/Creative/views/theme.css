@@ -6,37 +6,38 @@
   --fontControl: var(--fontBody);
   --fontSymbol: var(--fontDisplay);
 
-  --colorCanvas: #faf8fa;
+  --colorBase: #f8f8f8;
+  --colorCanvas: #ffecd3;
   --colorInk: #282426;
   --colorKnockout: white;
   --colorFullInk: black;
-  --colorHighlight: #99bb41;
-  --colorSubdued: #736991;
+  --colorHighlight: #f7a0a0;
+  --colorSubdued: #698d91;
   --colorMark: #fff1d6;
 
-  --backgroundColorBase: var(--colorCanvas);
+  --backgroundColorBase: var(--colorBase);
   --backgroundColorGlare: var(--colorMark);
   --backgroundPage: radial-gradient(
     ellipse at 20vw 25vh,
     var(--backgroundColorGlare),
     var(--backgroundColorBase) 25vw 10vh
   );
-  --backgroundProse: transparent;
+  --backgroundPane: var(--colorCanvas);
   --backgroundFooter: none;
-  --backgroundRender: var(--colorKnockout);
+  --backgroundRender: var(--colorBase);
   --backgroundCode: rgba(0, 0, 0, 0.5);
   --backgroundCodeLine: var(--colorInk);
   --backgroundModeline: var(--colorSubdued);
   --backgroundFocusProse: var(--colorMark);
   --backgroundInlineCode: var(--colorFullInk);
-  --backgroundControl: var(--colorKnockout);
+  --backgroundControl: transparent;
   --backgroundLink: var(--colorMark);
   --backgroundMarkup: var(--colorMark);
   --backgroundFocusEditor: var(--colorFullInk);
 
   --borderPage: none;
   --borderFooter: none;
-  --borderControl: 1px solid transparent;
+  --borderControl: none;
   --borderLink: 1px solid var(--colorSubdued);
   --borderMarkup: 0.5px solid currentColor;
   --borderColorHoverLink: rgba(255, 255, 255, 0.4);
@@ -46,17 +47,23 @@
   --borderRadiusMarkup: 0.125em;
   --borderRadiusRender: 1rem;
   --borderRadiusControl: 0;
+  --borderRadiusPane: 0.5rem;
+  --borderRadiusCode: 0.25rem;
   --borderRadiusPopover: 2px;
 
-  --sizeControl: 2.5rem;
+  --scrollbarColor: #9191914f;
+  --sizeControl: 1.75rem;
+  --sizeFixedHeightCode: 16rem;
+  --sizePanelMargin: 10px;
+
   --shadowCodeLine: 0.1em 0 0.1em 0.1em var(--backgroundCodeLine);
-  --shadowControl: 0 0 0.25rem var(--colorSubdued);
+  --shadowControl: none;
   --shadowRender: 0 0 0.5rem var(--colorSubdued);
 
   --spaceHorizontalCode: 0.25em;
   --spaceVerticalCode: 0.5em;
 
-  --textColorFooter: var(--colorSubdued);
+  --textColorFooter: var(--colorInk);
   --textColorControl: var(--colorSubdued);
   --textColorProse: var(--colorInk);
   --textColorHeading: var(--colorSubdued);
@@ -100,4 +107,5 @@
   --opacityDisabledControl: 0.5;
   --opacityVisibleWS: 1;
   --opacityLabel: 0.5;
+  --opacityPaneBackground: 0.75;
 }

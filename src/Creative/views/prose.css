@@ -6,13 +6,12 @@
   font-weight: var(--textWeightProse);
   line-height: var(--lineHeightProse);
   color: var(--textColorProse);
-  background: var(--backgroundProse);
   outline: none;
   padding: 10em 0 1em 0;
 }
 
 .prose > * {
-  margin: 1.5rem;
+  margin: 1rem;
   position: relative;
 }
 
@@ -22,7 +21,7 @@
 }
 
 .prose > figure {
-  margin: 2rem;
+  margin: 0.5rem;
 }
 
 .prose > [contenteditable]:focus-within {

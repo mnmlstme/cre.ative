@@ -18,52 +18,91 @@ body {
   width: 100vw;
   height: 100vh;
   background: var(--backgroundPage);
-  border-radius: 2em;
 }
 
 .menubar {
+  --frameBorderThickness: 10px;
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 40vw;
+  top: var(--frameBorderThickness);
+  left: calc(var(--frameBorderThickness) + 40vw);
+  right: var(--frameBorderThickness);
   text-align: center;
-  padding: 0.5rem;
+  padding: 0 2rem;
   color: var(--textColorFooter);
   background: var(--backgroundFooter);
   border: var(--borderFooter);
+  border-radius: var(--borderRadiusPane);
+  overflow: hidden;
   font-size: var(--textSizeFooter);
+  z-index: 10;
+}
+
+.menubar > svg:first-child {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  color: var(--colorSubdued);
 }
 
 .menubar nav {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  align-items: center;
   gap: 0.5em;
 }
 
-.menubar h6 {
-  line-height: var(--sizeControl);
+.menubar nav > * {
+  height: var(--sizeControl);
+}
+
+.segment {
+  position: relative;
+  z-index: 0;
+}
+
+.segment > svg:first-child {
+  /* the background mask */
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  mix-blend-mode: screen;
+  z-index: -1;
 }
 
 .menubar .spacer {
   flex-grow: 1;
 }
 
+.menubar nav > h6 {
+  line-height: 1;
+  box-shadow: 0 0 2px 2px white;
+  height: auto;
+  background: var(--colorKnockout);
+  text-align: right;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  z-index: 0;
+}
+
 .menubar .button {
   display: inline-block;
   background: var(--backgroundControl);
-  color: var(--textColorControl);
   border: var(--borderControl);
-  border-radius: var(--sizeControl);
   height: var(--sizeControl);
   width: var(--sizeControl);
-  box-shadow: var(--shadowControl);
   font-family: var(--fontControl);
   font-size: var(--textSizeControl);
   line-height: 1.5em;
   flex-grow: 0;
   text-align: center;
   text-decoration: none;
+  color: inherit;
   cursor: pointer;
 }
 
@@ -160,6 +199,7 @@ body {
   /* document view */
   grid-row-start: doc;
   width: 40vw;
+  padding: 10px;
 }
 
 .container > ol > li {
@@ -169,9 +209,10 @@ body {
   grid-row-start: view;
   overflow: auto;
   transform: translate(40vw, -100vh);
-  padding: 2rem;
-  width: 60vw;
-  height: 75vh;
+  margin-top: calc(2 * var(--sizePanelMargin) + var(--sizeControl));
+  margin-right: 2rem;
+  margin-bottom: calc(2 * var(--sizePanelMargin) + var(--sizeFixedHeightCode));
+  margin-left: 2rem;
   position: relative;
   z-index: 1;
 }

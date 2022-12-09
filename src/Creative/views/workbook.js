@@ -12,9 +12,13 @@ import {
   saveScene,
 } from '../actions'
 import styles from './workbook.css'
-import './previous.svg'
 import './next.svg'
+import './next-mask.svg'
+import './previous.svg'
+import './previous-mask.svg'
 import './scenes.svg'
+import './scenes-mask.svg'
+import './stripes.svg'
 
 function Workbook({ workbook, scene, resources, dispatch }) {
   const { projectId, workbookId, sceneId } = useParams()
@@ -67,46 +71,25 @@ function Workbook({ workbook, scene, resources, dispatch }) {
         />
       </section>
       <footer className={styles.menubar}>
+        <svg viewBox="0 0 32 28" preserveAspectRatio="none">
+          <use xlinkHref="#stripes" />
+        </svg>
         <nav>
-          {scene > 1 ? (
-            <Link to={`${slug}/${scene - 1}`} className={styles.button}>
-              <svg>
-                <use xlinkHref="#previous" />
-              </svg>
-            </Link>
-          ) : (
-            <button disabled className={styles.button}>
-              <svg>
-                <use xlinkHref="#previous" />
-              </svg>
-            </button>
-          )}
-          {scene < sceneTitles.size ? (
-            <Link
-              to={`${slug}/${scene + 1}`}
-              className={[styles.next, styles.button].join(' ')}
-            >
-              <svg>
-                <use xlinkHref="#next" />
-              </svg>
-            </Link>
-          ) : (
-            <button disabled className={[styles.next, styles.button].join(' ')}>
-              <svg>
-                <use xlinkHref="#previous" />
-              </svg>
-            </button>
-          )}
+          <NavButton
+            to={`${slug}/${scene - 1}`}
+            icon="#previous"
+            mask="#previous-mask"
+            disabled={scene <= 1}
+          />
+          <NavButton
+            to={`${slug}/${scene + 1}`}
+            icon="#next"
+            mask="#next-mask"
+            disabled={scene >= sceneTitles.size}
+          />
           <span className={styles.spacer} />
           <h6>{title || workbookId}</h6>
-          <button
-            className={[styles.menu, styles.button].join(' ')}
-            onClick={toggleMenu}
-          >
-            <svg>
-              <use xlinkHref="#scenes" />
-            </svg>
-          </button>
+          <NavButton to={toggleMenu} icon="#scenes" mask="#scenes-mask" />
         </nav>
         {showMenu && (
           <ol className={styles.toc} onClick={toggleMenu}>
@@ -119,6 +102,37 @@ function Workbook({ workbook, scene, resources, dispatch }) {
         )}
       </footer>
     </article>
+  )
+}
+
+function SvgUse({ href }) {
+  return (
+    <svg>
+      <use xlinkHref={href} />
+    </svg>
+  )
+}
+
+function NavButton({ to, icon, mask, disabled = false }) {
+  const onClick = typeof to === 'function' && to
+
+  return (
+    <div className={styles.segment}>
+      <SvgUse href={mask} />
+      {!onClick && !disabled ? (
+        <Link to={to} className={styles.button}>
+          <SvgUse href={icon} />
+        </Link>
+      ) : (
+        <button
+          disabled={disabled}
+          className={styles.button}
+          onClick={onClick || undefined}
+        >
+          <SvgUse href={icon} />
+        </button>
+      )}
+    </div>
   )
 }
 
