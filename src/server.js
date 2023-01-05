@@ -13,24 +13,36 @@ export async function create(options) {
     res.status(500).send("Something broke!");
   });
 
-  app.use(express.json());
+  if (options.dev) {
+    app.use(
+      // Webpack devserver
+      devServer(compiler, {
+        // middleware options
+      })
+    );
+  }
 
-  app.use(
-    // Webpack devserver
-    devServer(compiler, {
-      // middleware options
-    })
-  );
+  if (options.dev === "hmr") {
+    app.use(
+      // Webpack HMR devserver
+      hmrServer(compiler, {
+        // middleware options
+        log: console.log,
+        path: "/__webpack_hmr",
+        heartbeat: 10 * 1000,
+      })
+    );
+  }
 
-  app.use(
-    // Webpack HMR devserver
-    hmrServer(compiler, {
-      // middleware options
-      log: console.log,
-      path: "/__webpack_hmr",
-      heartbeat: 10 * 1000,
-    })
-  );
+  if (!options.quiet) {
+    app.use(requestLogger);
+  }
+
+  if (options.api) {
+    app.use(express.json());
+  }
+
+  app.use("/workbook", express.static(options.public));
 
   const store = {
     projectDir: "./projects",
@@ -41,6 +53,11 @@ export async function create(options) {
   mount(app, store);
 
   return app;
+}
+
+function requestLogger(req, res, next) {
+  console.log("kram-express-webpack:", [req.method, req.path].join(" "));
+  next();
 }
 
 export function start(app, port = 3000) {

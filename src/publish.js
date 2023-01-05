@@ -10,8 +10,13 @@ export async function publish(options) {
       if (err || stats.hasErrors()) {
         console.log("Publish FAILURE:", err || stats);
       } else {
-        console.log("Publish SUCCESS:", stats);
+        console.log("Publish SUCCESS");
       }
+      wp.close((closeErr) => {
+        if (closeErr) {
+          console.log("Webpack FAILED to shutdown cleanly.");
+        }
+      });
     })
   );
 }

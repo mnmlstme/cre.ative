@@ -28,22 +28,28 @@ function loader(content) {
   )
     .then((wb) => Kr.classify(wb, plugin.modules))
     .then((wb) => Kr.dekram(wb, emitter(dir, output), plugin))
-    .then((wb) => Kr.collect(wb))
+    .then((wb) => Kr.collect(wb, resourceLoader))
     .then((mod) => callback(null, mod))
     .catch(callback);
+}
 
-  function emitter(reldir, output = "") {
-    const absdir = path.join(output, reldir);
+function emitter(reldir, output = "") {
+  const absdir = path.join(output, reldir);
 
-    return (name, code) => {
-      const relname = path.join(reldir, name);
-      const absname = path.join(absdir, name);
+  return (name, code) => {
+    const relname = path.join(reldir, name);
+    const absname = path.join(absdir, name);
 
-      fs.mkdirSync(absdir, { recursive: true });
-      fs.writeFileSync(absname, code);
+    fs.mkdirSync(absdir, { recursive: true });
+    fs.writeFileSync(absname, code);
 
-      console.log(`Kram emit: ${relname} -> `, absname);
-      return relname;
-    };
-  }
+    console.log(`Kram emit: ${relname} -> `, absname);
+    return relname;
+  };
+}
+
+function resourceLoader(module) {
+  const { filepath } = module;
+
+  return `() => import('DEKRAM/${filepath}')`;
 }
