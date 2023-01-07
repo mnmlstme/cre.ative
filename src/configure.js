@@ -37,13 +37,7 @@ export function configure(options) {
         const dir = path.dirname(file);
         const base = path.basename(file, ".md");
 
-        return [
-          path.join(dir, base, "index"),
-          {
-            import: [app, path.join("PROJECTS", file)],
-            dependOn: "app",
-          },
-        ];
+        return [path.join(dir, base, "index"), path.join("PROJECTS", file)];
       })
     )
   );

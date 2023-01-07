@@ -42,6 +42,11 @@ export async function create(options) {
     app.use(express.json());
   }
 
+  if (options.serve) {
+    console.log("Serving compiled assets from ", options.public);
+    app.use("/dist", express.static(options.public));
+  }
+
   app.use("/workbook", express.static(options.public));
 
   const store = {
