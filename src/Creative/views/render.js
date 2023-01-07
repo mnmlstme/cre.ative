@@ -1,5 +1,4 @@
 import React from 'react'
-const path = require('path')
 import styles from './workbook.css'
 
 export class Render extends React.Component {

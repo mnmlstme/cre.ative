@@ -1,99 +1,13 @@
 import Im from 'immutable'
-import { initial } from './model'
 import Actions from './actions'
 
 const API = '/api'
 
-export function update(state = initial, action = {}) {
+export function update(state, action = {}) {
   switch (action.type) {
-    case Actions.ChangeFile: {
-      console.log(
-        'update ChangeFile',
-        action.filepath,
-        state.get('finder').toObject()
-      )
-      const finder = state.get('finder') || Im.Map()
-
-      return state.set('finder', finder.set('selected', action.filepath))
-    }
-
     case Actions.ChangeScene:
       console.log('update ChangeScene', action.number)
       return state.set('current', Number.parseInt(action.number))
-
-    case Actions.ChangeProject:
-      console.log('update ChangeProject', action.data)
-      const finder = state.get('finder') || Im.Map()
-
-      return state.set('finder', finder.set('project', action.data))
-
-    case Actions.LoadIndex: {
-      console.log('update LoadIndex', action.data)
-      const finder = state.get('finder') || Im.Map()
-
-      return state.set(
-        'finder',
-        finder.set(
-          'projects',
-          Object.entries(action.data.projects).map(([name, path]) => ({
-            name,
-            path,
-          }))
-        )
-      )
-    }
-
-    case Actions.IndexError: {
-      console.log('update IndexError', action.error)
-      const finder = state.get('finder') || Im.Map()
-
-      return state.set('finder', finder.set('projects', []))
-    }
-
-    case Actions.LoadProject: {
-      console.log('update LoadProject', action.data)
-      const finder = state.get('finder') || Im.Map()
-
-      return state.set('finder', finder.set('workbooks', action.data.workbooks))
-    }
-
-    case Actions.ProjectError: {
-      console.log('update ProjectError', action.error)
-      const finder = state.get('finder') || Im.Map()
-
-      return state.set('finder', finder.set('workbooks', []))
-    }
-
-    case Actions.LoadWorkbook: {
-      console.log('update LoadWorkbook', action.data)
-      const { basename, title, scenes, modules, init } = action.data
-
-      return state.set(
-        'workbook',
-        Im.Map({
-          basename,
-          projectId: action.projectId,
-          workbookId: action.workbookId,
-          isLoaded: true,
-          title,
-          scenes: Im.List(scenes).map(immutableScene),
-          modules: Im.List(modules || []),
-          init,
-        })
-      )
-    }
-
-    case Actions.WorkbookError:
-      console.log('update WorkbookError', action.error)
-      return state.set(
-        'workbook',
-        Im.Map({
-          ProjectErrorId: action.projectId,
-          workbookId: action.workbookId,
-          isLoaded: false,
-          error: action.error,
-        })
-      )
 
     case Actions.UpdateScene: {
       //console.log('update UpdateScene', action)
@@ -183,7 +97,7 @@ export function update(state = initial, action = {}) {
   }
 }
 
-function immutableScene(scene) {
+export function immutableScene(scene) {
   const { title, blocks } = scene
   const parser = new DOMParser()
   console.log('immutableScene', scene)

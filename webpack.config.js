@@ -1,20 +1,23 @@
 var path = require('path')
 const webpack = require('webpack')
+const CopyPlugin = require('copy-webpack-plugin')
 const nodeExternals = require('webpack-node-externals')
 const docroot = path.resolve(__dirname, 'workbooks')
 
 const frontend = {
   name: 'frontend',
+  target: 'web',
 
   entry: {
     client: './src/Creative/index.js',
   },
 
   output: {
-    filename: '[name].bundle.js',
-    chunkFilename: 'chunk.[id].js',
     path: path.resolve(__dirname, 'dist'),
-    libraryTarget: 'umd',
+    library: {
+      name: 'Cre_ative',
+      type: 'window',
+    },
   },
 
   module: {
@@ -24,7 +27,7 @@ const frontend = {
         include: [path.resolve(__dirname, 'src')],
         use: {
           loader: 'babel-loader',
-          query: {
+          options: {
             presets: ['@babel/preset-react'],
             plugins: [
               [
@@ -72,7 +75,7 @@ const frontend = {
         include: [path.resolve(__dirname, 'src')],
         use: {
           loader: 'svg-sprite-loader',
-          query: {
+          options: {
             idPrefix: true,
             classPrefix: true,
             removingTagAttrs: ['xmlns', 'xmlns:xlink', 'version'],
@@ -102,6 +105,14 @@ const backend = {
     new webpack.BannerPlugin({
       raw: true,
       banner: '#!/usr/bin/env node\n',
+    }),
+    new CopyPlugin({
+      patterns: [
+        {
+          from: 'src/templates',
+          to: 'templates',
+        },
+      ],
     }),
   ],
 }

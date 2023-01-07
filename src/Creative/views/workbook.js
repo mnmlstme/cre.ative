@@ -4,13 +4,7 @@ import { useParams, Link } from 'react-router-dom'
 
 import { Document } from './document'
 import { Render } from './render'
-import {
-  changeScene,
-  loadWorkbook,
-  loadResource,
-  updateScene,
-  saveScene,
-} from '../actions'
+import { changeScene, loadResource, updateScene, saveScene } from '../actions'
 import styles from './workbook.css'
 import './next.svg'
 import './next-mask.svg'
@@ -27,7 +21,7 @@ function Workbook({ workbook, scene, resources, dispatch }) {
   const toggleMenu = () => setShowMenu(!showMenu)
 
   if (!workbook) {
-    dispatch(loadWorkbook(projectId, workbookId))
+    // dispatch(loadWorkbook(projectId, workbookId))
     return <h1>Loading {workbookId} ...</h1>
   }
 
