@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkKram_module=self.webpackChunkKram_module||[]).push([[854],{854:(l,e,n)=>{n.r(e),n.d(e,{default:()=>a});const a='<html>\n<ol>\n<li id="kramScene-1"><p class="hi">Hello, creative world.</p>\n</li>\n</ol>\n</html>'}}]);

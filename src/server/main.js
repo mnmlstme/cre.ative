@@ -23,20 +23,17 @@ if (options.serve) {
 }
 
 function getAppRoot() {
-  const pkg = '@cre.ative/cre-a-tive'
-  let modulepath = path.join('./node_modules', pkg)
+  let module = '@cre.ative/self'
+  let modulepath = path.join('./node_modules', module)
 
-  try {
-    console.log(`Looking for ${pkg}`)
-    modulepath = require.resolve(pkg)
-    console.log(`Found ${pkg}:`, modulepath)
-  } catch (e) {
-    if (!fs.existsSync(modulepath)) {
-      modulepath = '.'
-    }
+  if (!fs.existsSync(modulepath)) {
+    module = '@cre.ative/cre-a-tive'
+    console.log(`Looking for ${module}`)
+    modulepath = require.resolve(module)
   }
 
-  return path.join(modulepath, 'dist')
+  console.log(`Found Creative app ${module}:`, modulepath)
+  return [module, path.join(modulepath, 'dist')]
 }
 
 function setup(args) {
@@ -71,7 +68,8 @@ function setup(args) {
   const [projectsDir] = argv._
   const basedir = cwd
   const pubdir = path.join(basedir, 'public')
-  const approot = path.resolve(basedir, getAppRoot())
+  const [app, appPath] = getAppRoot()
+  const approot = path.resolve(basedir, appPath)
   const docroot = path.resolve(basedir, projectsDir || './projects')
   const indexFile = path.resolve(docroot, './index.yaml')
   const { projects, platforms } = readIndex(indexFile)
@@ -92,7 +90,7 @@ function setup(args) {
     platforms,
     entries,
     template: path.join(approot, 'templates', 'workbook.html'),
-    app: '@cre.ative/cre-a-tive',
+    app,
     dev: hot ? 'hmr' : dev,
     api,
     publish,
