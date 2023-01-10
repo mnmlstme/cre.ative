@@ -23,17 +23,16 @@ if (options.serve) {
 }
 
 function getAppRoot() {
-  let module = '@cre.ative/self'
+  let module = '@cre.ative/cre-a-tive'
   let modulepath = path.join('./node_modules', module)
 
   if (!fs.existsSync(modulepath)) {
-    module = '@cre.ative/cre-a-tive'
-    console.log(`Looking for ${module}`)
-    modulepath = require.resolve(module)
+    module = '@cre.ative/self'
+    modulepath = path.join('./node_modules', module)
   }
 
   console.log(`Found Creative app ${module}:`, modulepath)
-  return [module, path.join(modulepath, 'dist')]
+  return [module, modulepath]
 }
 
 function setup(args) {
@@ -67,7 +66,7 @@ function setup(args) {
   const { dev, hot, api, publish, serve } = argv
   const [projectsDir] = argv._
   const basedir = cwd
-  const pubdir = path.join(basedir, 'public')
+  const pubdir = path.join(basedir, 'docs')
   const [app, appPath] = getAppRoot()
   const approot = path.resolve(basedir, appPath)
   const docroot = path.resolve(basedir, projectsDir || './projects')
@@ -89,7 +88,7 @@ function setup(args) {
     projects,
     platforms,
     entries,
-    template: path.join(approot, 'templates', 'workbook.html'),
+    template: path.join(approot, 'dist', 'templates', 'workbook.html'),
     app,
     dev: hot ? 'hmr' : dev,
     api,

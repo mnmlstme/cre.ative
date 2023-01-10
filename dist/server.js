@@ -9,6 +9,7 @@
  * If you are looking for production-ready output files, see mode: "production" (https://webpack.js.org/configuration/mode/).
  */
 /******/ (() => { // webpackBootstrap
+/******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
 /***/ "./src/server/main.js":
@@ -17,18 +18,7 @@
   \****************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var express__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! express */ \"express\");\n/* harmony import */ var express__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(express__WEBPACK_IMPORTED_MODULE_0__);\nconst path = __webpack_require__(/*! path */ \"path\")\nconst fs = __webpack_require__(/*! fs */ \"fs\")\nconst yargs = __webpack_require__(/*! yargs/yargs */ \"yargs/yargs\")\n;\nconst { create, publish, start } = __webpack_require__(/*! @cre.ative/kram-express-webpack */ \"@cre.ative/kram-express-webpack\")\nconst { parse } = __webpack_require__(/*! yaml */ \"yaml\")\n\nconst PORT = 3000\nconst args = process.argv.slice(2)\nconst cwd = process.cwd()\nconst options = setup(args)\n\nconsole.log('server options:', options)\n\nif (options.publish) {\n  publish(options)\n}\n\nif (options.serve) {\n  create(options).then((app) => {\n    start(app, options.port || PORT)\n  })\n}\n\nfunction getAppRoot() {\n  let module = '@cre.ative/self'\n  let modulepath = path.join('./node_modules', module)\n\n  if (!fs.existsSync(modulepath)) {\n    module = '@cre.ative/cre-a-tive'\n    console.log(`Looking for ${module}`)\n    modulepath = /*require.resolve*/(__webpack_require__(\"./src/server sync recursive\").resolve(module))\n  }\n\n  console.log(`Found Creative app ${module}:`, modulepath)\n  return [module, path.join(modulepath, 'dist')]\n}\n\nfunction setup(args) {\n  const argv = yargs(args)\n    .option('dev', {\n      alias: 'd',\n      type: 'boolean',\n      description: 'Run in dev mode, watching for changed files',\n    })\n    .option('hot', {\n      alias: 'h',\n      type: 'boolean',\n      description: \"Enable HMR; implies '--dev'\",\n    })\n    .option('api', {\n      alias: 'a',\n      type: 'boolean',\n      decription: 'Enable Kram API server for client-side editing',\n    })\n    .option('publish', {\n      alias: 'p',\n      type: 'boolean',\n      description: 'Create static website of all projects.',\n    })\n    .option('serve', {\n      alias: 's',\n      type: 'boolean',\n      description: 'Start an HTTP server to serve the projects',\n    })\n    .parse()\n  const { dev, hot, api, publish, serve } = argv\n  const [projectsDir] = argv._\n  const basedir = cwd\n  const pubdir = path.join(basedir, 'public')\n  const [app, appPath] = getAppRoot()\n  const approot = path.resolve(basedir, appPath)\n  const docroot = path.resolve(basedir, projectsDir || './projects')\n  const indexFile = path.resolve(docroot, './index.yaml')\n  const { projects, platforms } = readIndex(indexFile)\n  const entries = Object.entries(projects)\n    .map(([projId, projPath]) => {\n      const projFile = path.resolve(docroot, projPath, 'project.yaml')\n      const { workbooks } = readProject(projFile)\n\n      return workbooks.map((wb) => path.join(projPath, wb.file))\n    })\n    .flat()\n\n  return {\n    basedir,\n    public: pubdir,\n    docroot,\n    projects,\n    platforms,\n    entries,\n    template: path.join(approot, 'templates', 'workbook.html'),\n    app,\n    dev: hot ? 'hmr' : dev,\n    api,\n    publish,\n    serve: serve || api || dev || hot,\n  }\n}\n\nfunction readIndex(filename) {\n  const file = fs.readFileSync(filename, 'utf8')\n\n  console.log('=== Index file ===\\n', file)\n  return Object.assign({}, { projects: [], platforms: {} }, parse(file))\n}\n\nfunction readProject(filename) {\n  const file = fs.readFileSync(filename, 'utf8')\n\n  console.log('=== Project file ===\\n', file)\n  return Object.assign({}, { workbooks: [] }, parse(file))\n}\n\n\n//# sourceURL=webpack://@cre.ative/cre-a-tive/./src/server/main.js?");
-
-/***/ }),
-
-/***/ "./src/server sync recursive":
-/*!**************************!*\
-  !*** ./src/server/ sync ***!
-  \**************************/
-/***/ ((module) => {
-
-eval("function webpackEmptyContext(req) {\n\tvar e = new Error(\"Cannot find module '\" + req + \"'\");\n\te.code = 'MODULE_NOT_FOUND';\n\tthrow e;\n}\nwebpackEmptyContext.keys = () => ([]);\nwebpackEmptyContext.resolve = webpackEmptyContext;\nwebpackEmptyContext.id = \"./src/server sync recursive\";\nmodule.exports = webpackEmptyContext;\n\n//# sourceURL=webpack://@cre.ative/cre-a-tive/./src/server/_sync?");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var express__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! express */ \"express\");\n/* harmony import */ var express__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(express__WEBPACK_IMPORTED_MODULE_0__);\nconst path = __webpack_require__(/*! path */ \"path\")\nconst fs = __webpack_require__(/*! fs */ \"fs\")\nconst yargs = __webpack_require__(/*! yargs/yargs */ \"yargs/yargs\")\n;\nconst { create, publish, start } = __webpack_require__(/*! @cre.ative/kram-express-webpack */ \"@cre.ative/kram-express-webpack\")\nconst { parse } = __webpack_require__(/*! yaml */ \"yaml\")\n\nconst PORT = 3000\nconst args = process.argv.slice(2)\nconst cwd = process.cwd()\nconst options = setup(args)\n\nconsole.log('server options:', options)\n\nif (options.publish) {\n  publish(options)\n}\n\nif (options.serve) {\n  create(options).then((app) => {\n    start(app, options.port || PORT)\n  })\n}\n\nfunction getAppRoot() {\n  let module = '@cre.ative/cre-a-tive'\n  let modulepath = path.join('./node_modules', module)\n\n  if (!fs.existsSync(modulepath)) {\n    module = '@cre.ative/self'\n    modulepath = path.join('./node_modules', module)\n  }\n\n  console.log(`Found Creative app ${module}:`, modulepath)\n  return [module, modulepath]\n}\n\nfunction setup(args) {\n  const argv = yargs(args)\n    .option('dev', {\n      alias: 'd',\n      type: 'boolean',\n      description: 'Run in dev mode, watching for changed files',\n    })\n    .option('hot', {\n      alias: 'h',\n      type: 'boolean',\n      description: \"Enable HMR; implies '--dev'\",\n    })\n    .option('api', {\n      alias: 'a',\n      type: 'boolean',\n      decription: 'Enable Kram API server for client-side editing',\n    })\n    .option('publish', {\n      alias: 'p',\n      type: 'boolean',\n      description: 'Create static website of all projects.',\n    })\n    .option('serve', {\n      alias: 's',\n      type: 'boolean',\n      description: 'Start an HTTP server to serve the projects',\n    })\n    .parse()\n  const { dev, hot, api, publish, serve } = argv\n  const [projectsDir] = argv._\n  const basedir = cwd\n  const pubdir = path.join(basedir, 'docs')\n  const [app, appPath] = getAppRoot()\n  const approot = path.resolve(basedir, appPath)\n  const docroot = path.resolve(basedir, projectsDir || './projects')\n  const indexFile = path.resolve(docroot, './index.yaml')\n  const { projects, platforms } = readIndex(indexFile)\n  const entries = Object.entries(projects)\n    .map(([projId, projPath]) => {\n      const projFile = path.resolve(docroot, projPath, 'project.yaml')\n      const { workbooks } = readProject(projFile)\n\n      return workbooks.map((wb) => path.join(projPath, wb.file))\n    })\n    .flat()\n\n  return {\n    basedir,\n    public: pubdir,\n    docroot,\n    projects,\n    platforms,\n    entries,\n    template: path.join(approot, 'dist', 'templates', 'workbook.html'),\n    app,\n    dev: hot ? 'hmr' : dev,\n    api,\n    publish,\n    serve: serve || api || dev || hot,\n  }\n}\n\nfunction readIndex(filename) {\n  const file = fs.readFileSync(filename, 'utf8')\n\n  console.log('=== Index file ===\\n', file)\n  return Object.assign({}, { projects: [], platforms: {} }, parse(file))\n}\n\nfunction readProject(filename) {\n  const file = fs.readFileSync(filename, 'utf8')\n\n  console.log('=== Project file ===\\n', file)\n  return Object.assign({}, { workbooks: [] }, parse(file))\n}\n\n\n//# sourceURL=webpack://@cre.ative/cre-a-tive/./src/server/main.js?");
 
 /***/ }),
 
@@ -38,7 +28,6 @@ eval("function webpackEmptyContext(req) {\n\tvar e = new Error(\"Cannot find mod
   \**************************************************/
 /***/ ((module) => {
 
-"use strict";
 module.exports = require("@cre.ative/kram-express-webpack");
 
 /***/ }),
@@ -49,7 +38,6 @@ module.exports = require("@cre.ative/kram-express-webpack");
   \**************************/
 /***/ ((module) => {
 
-"use strict";
 module.exports = require("express");
 
 /***/ }),
@@ -60,7 +48,6 @@ module.exports = require("express");
   \***********************/
 /***/ ((module) => {
 
-"use strict";
 module.exports = require("yaml");
 
 /***/ }),
@@ -71,7 +58,6 @@ module.exports = require("yaml");
   \******************************/
 /***/ ((module) => {
 
-"use strict";
 module.exports = require("yargs/yargs");
 
 /***/ }),
@@ -82,7 +68,6 @@ module.exports = require("yargs/yargs");
   \*********************/
 /***/ ((module) => {
 
-"use strict";
 module.exports = require("fs");
 
 /***/ }),
@@ -93,7 +78,6 @@ module.exports = require("fs");
   \***********************/
 /***/ ((module) => {
 
-"use strict";
 module.exports = require("path");
 
 /***/ })
