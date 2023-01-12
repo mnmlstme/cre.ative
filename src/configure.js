@@ -3,7 +3,16 @@ const webpack = require("webpack");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 export function configure(options) {
-  const { basedir, docroot, plugins, entries, app, template } = options;
+  const {
+    basedir,
+    docroot,
+    plugins,
+    index,
+    projects,
+    workbooks,
+    app,
+    template,
+  } = options;
   const kramdir = path.resolve(basedir, "./kram_modules");
   const projdir = path.resolve(basedir, "./projects");
 
@@ -16,29 +25,26 @@ export function configure(options) {
       }
     : {};
 
-  const htmlGenerators = entries.map((file) => {
-    const dir = path.dirname(file);
-    const base = path.basename(file, ".md");
-    const entry = path.join(dir, base, "index");
+  const htmlGenerators = workbooks
+    .concat(projects, [index])
+    .map(([slugs, file]) => {
+      const entry = slugs === "/" ? "index" : path.join(slugs, "index");
 
-    return new HtmlWebpackPlugin({
-      inject: false,
-      cache: false,
-      chunks: [entry, "app"],
-      filename: path.join(options.public || "public", dir, base, "index.html"),
-      template,
-      scriptLoading: "blocking",
+      return new HtmlWebpackPlugin({
+        inject: false,
+        cache: false,
+        chunks: [entry, "app"],
+        filename: path.join(options.public || "public", slugs, "index.html"),
+        template,
+        scriptLoading: "blocking",
+      });
     });
-  });
 
   const entry = Object.fromEntries(
     [["app", app]].concat(
-      entries.map((file) => {
-        const dir = path.dirname(file);
-        const base = path.basename(file, ".md");
-
-        return [path.join(dir, base, "index"), path.join("PROJECTS", file)];
-      })
+      workbooks.map(([entry, file]) => [path.join(entry, "index"), file]),
+      projects.map(([entry, file]) => [path.join(entry, "index"), file]),
+      [["index", index[1]]]
     )
   );
 
@@ -53,7 +59,7 @@ export function configure(options) {
     output: {
       chunkFilename: "kram.[id].js",
       path: path.resolve(__dirname, options.public),
-      publicPath: options.dev ? "/" : "/dist/",
+      publicPath: "/",
       library: {
         name: "Kram_module",
         type: "window",
