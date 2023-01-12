@@ -23,6 +23,7 @@ if (options.serve) {
 }
 
 function getAppRoot() {
+  // TODO: use require.resolve to get module path
   let module = '@cre.ative/cre-a-tive'
   let modulepath = path.join('./node_modules', module)
 
@@ -72,12 +73,19 @@ function setup(args) {
   const docroot = path.resolve(basedir, projectsDir || './projects')
   const indexFile = path.resolve(docroot, './index.yaml')
   const { projects, platforms } = readIndex(indexFile)
+  const projectEntries = Object.entries(projects).map(([projId, projPath]) => [
+    path.join('project', projId),
+    path.resolve(docroot, projPath, 'project.yaml'),
+  ])
   const entries = Object.entries(projects)
     .map(([projId, projPath]) => {
       const projFile = path.resolve(docroot, projPath, 'project.yaml')
       const { workbooks } = readProject(projFile)
 
-      return workbooks.map((wb) => path.join(projPath, wb.file))
+      return workbooks.map((wb) => [
+        path.join('workbook', projId, wb.slug || path.basename(file, '.md')),
+        path.resolve(docroot, projPath, wb.file),
+      ])
     })
     .flat()
 
@@ -85,9 +93,10 @@ function setup(args) {
     basedir,
     public: pubdir,
     docroot,
-    projects,
     platforms,
-    entries,
+    index: ['/', indexFile],
+    projects: projectEntries,
+    workbooks: entries,
     template: path.join(approot, 'dist', 'templates', 'workbook.html'),
     app,
     dev: hot ? 'hmr' : dev,
