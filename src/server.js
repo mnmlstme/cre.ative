@@ -3,6 +3,7 @@ import devServer from "webpack-dev-middleware";
 import hmrServer from "webpack-hot-middleware";
 import { mount } from "./api";
 import { packager } from "./webpack";
+const path = require("path");
 
 export async function create(options) {
   const app = express();
@@ -44,10 +45,15 @@ export async function create(options) {
 
   if (options.serve) {
     console.log("Serving compiled assets from ", options.public);
-    app.use("/dist", express.static(options.public));
+    app.use("/", express.static(options.public));
+    // workbook is a SPA so we need to ignore the tail of the URL:
+    app.use("/workbook/:projId/:wbId/*", function (request, response) {
+      const { projId, wbId } = request.params;
+      response.sendFile(
+        path.resolve(options.public, "workbook", projId, wbId, "index.html")
+      );
+    });
   }
-
-  app.use("/workbook", express.static(options.public));
 
   const store = {
     projectDir: "./projects",
