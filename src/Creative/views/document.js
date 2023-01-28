@@ -35,7 +35,7 @@ export function Document({ workbook, doUpdate, doSave }) {
               frameStyles.yScrollable,
             ].join(' ')}
             style={{
-              '--fixedHeight': '100%',
+              '--fixedHeight': '200%',
             }}
           >
             <ProseEditor

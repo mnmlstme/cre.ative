@@ -83,7 +83,7 @@ function setup(args) {
       const { workbooks } = readProject(projFile)
 
       return workbooks.map((wb) => [
-        path.join('workbook', projId, wb.slug || path.basename(file, '.md')),
+        path.join('workbook', projId, wb.slug || path.basename(wb.file, '.md')),
         path.resolve(docroot, projPath, wb.file),
       ])
     })

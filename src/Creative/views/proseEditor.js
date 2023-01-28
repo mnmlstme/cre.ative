@@ -49,12 +49,7 @@ function Node(props) {
     case 'fence':
       return (
         <figure
-          className={[
-            frameStyles.frame,
-            frameStyles.fixedHeight,
-            frameStyles.yScrollable,
-            frameStyles.withHeader,
-          ].join(' ')}
+          className={[frameStyles.frame, frameStyles.withHeader].join(' ')}
         >
           <Modeline tagName="figcaption" lang={lang} />
           <CodeBlock block={block} onUpdate={onUpdate} />

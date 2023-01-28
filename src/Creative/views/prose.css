@@ -55,8 +55,7 @@
 }
 
 .prose pre[class*='language-'] {
-  padding: 0;
-  overflow: auto;
+  overflow: hidden;
 }
 
 .prose > * + * {
@@ -116,7 +115,7 @@
   line-height: 0;
 }
 
-.prose > *::before,
+.prose > :not(figure)::before,
 .prose > :not(figure) > *::before,
 .prose > :not(figure) > *::after {
   display: inline;
@@ -134,7 +133,7 @@
   margin: 0 0.1rem;
 }
 
-.prose > *::before,
+.prose > :not(figure)::before,
 .prose > * > li::before {
   display: block;
   position: absolute;

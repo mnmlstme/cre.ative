@@ -47,8 +47,6 @@ export function Main(workbook) {
   const initial = Im.Map({
     workbook: Im.Map({
       basename,
-      // projectId: action.projectId,
-      // workbookId: action.workbookId,
       isLoaded: true,
       title,
       scenes: Im.List(scenes).map(immutableScene),

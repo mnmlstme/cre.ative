@@ -65,9 +65,16 @@ function Workbook({ workbook, scene, resources, dispatch }) {
         />
       </section>
       <footer className={styles.menubar}>
-        <svg viewBox="0 0 32 28" preserveAspectRatio="none">
-          <use xlinkHref="#stripes" />
-        </svg>
+        <h6>{title || workbookId}</h6>
+        <dl>
+          <dt>Platform</dt>
+          <dd>Web Standards</dd>
+        </dl>
+        <nav>
+          <NavButton to={toggleMenu} icon="#scenes" mask="#scenes-mask">
+            Scene {scene} of {sceneTitles.size}
+          </NavButton>
+        </nav>
         <nav>
           <NavButton
             to={`${slug}/${scene - 1}`}
@@ -81,9 +88,6 @@ function Workbook({ workbook, scene, resources, dispatch }) {
             mask="#next-mask"
             disabled={scene >= sceneTitles.size}
           />
-          <span className={styles.spacer} />
-          <h6>{title || workbookId}</h6>
-          <NavButton to={toggleMenu} icon="#scenes" mask="#scenes-mask" />
         </nav>
         {showMenu && (
           <ol className={styles.toc} onClick={toggleMenu}>
@@ -107,26 +111,21 @@ function SvgUse({ href }) {
   )
 }
 
-function NavButton({ to, icon, mask, disabled = false }) {
+function NavButton({ to, icon, mask, children, disabled = false }) {
   const onClick = typeof to === 'function' && to
 
-  return (
-    <div className={styles.segment}>
-      <SvgUse href={mask} />
-      {!onClick && !disabled ? (
-        <Link to={to} className={styles.button}>
-          <SvgUse href={icon} />
-        </Link>
-      ) : (
-        <button
-          disabled={disabled}
-          className={styles.button}
-          onClick={onClick || undefined}
-        >
-          <SvgUse href={icon} />
-        </button>
-      )}
-    </div>
+  return !onClick && !disabled ? (
+    <Link to={to} className={styles.button}>
+      <SvgUse href={icon} /> {children ? <span>{children}</span> : null}
+    </Link>
+  ) : (
+    <button
+      disabled={disabled}
+      className={styles.button}
+      onClick={onClick || undefined}
+    >
+      <SvgUse href={icon} /> {children ? <span>{children}</span> : null}
+    </button>
   )
 }
 

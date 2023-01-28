@@ -1,7 +1,7 @@
 @import './theme.css';
 
 pre.codeblock {
-  padding: 0;
+  padding-left: 0.25rem;
   margin: 0;
   overflow: auto;
   font-size: var(--textSizeCode);
@@ -9,7 +9,10 @@ pre.codeblock {
 }
 
 pre.codeblock > .highlight {
-  border-radius: 0 0 var(--borderRadiusCode) var(--borderRadiusCode);
+  border-bottom-left-radius: inherit;
+  border-bottom-right-radius: inherit;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
 }
 
 .define {
@@ -40,7 +43,6 @@ pre.codeblock > .highlight {
   /* opacity: 0; /* enable to reveal unhighlighted code below */
   pointer-events: none;
   z-index: 1;
-  background: var(--backgroundCode);
 }
 
 .code {

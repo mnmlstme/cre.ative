@@ -7,13 +7,13 @@
   --fontSymbol: var(--fontDisplay);
 
   --colorBase: #f8f8f8;
-  --colorCanvas: #ffecd3;
+  --colorCanvas: #fbf6ef;
   --colorInk: #282426;
   --colorKnockout: white;
   --colorFullInk: black;
   --colorHighlight: #f7a0a0;
   --colorSubdued: #698d91;
-  --colorMark: #fff1d6;
+  --colorMark: #f6f0e5;
 
   --backgroundColorBase: var(--colorBase);
   --backgroundColorGlare: var(--colorMark);
@@ -23,14 +23,15 @@
     var(--backgroundColorBase) 25vw 10vh
   );
   --backgroundPane: var(--colorCanvas);
+  --backgroundPopover: rgba(255, 255, 255, 0.8);
   --backgroundFooter: none;
   --backgroundRender: var(--colorBase);
-  --backgroundCode: rgba(0, 0, 0, 0.5);
+  --backgroundCode: #999;
   --backgroundCodeLine: var(--colorInk);
   --backgroundModeline: var(--colorSubdued);
   --backgroundFocusProse: var(--colorMark);
   --backgroundInlineCode: var(--colorFullInk);
-  --backgroundControl: transparent;
+  --backgroundControl: var(--colorSubdued);
   --backgroundLink: var(--colorMark);
   --backgroundMarkup: var(--colorMark);
   --backgroundFocusEditor: var(--colorFullInk);
@@ -42,6 +43,7 @@
   --borderMarkup: 0.5px solid currentColor;
   --borderColorHoverLink: rgba(255, 255, 255, 0.4);
   --borderModeline: 1px solid currentColor;
+  --borderPopover: 1px solid white;
 
   --borderRadiusLink: 0.25em;
   --borderRadiusMarkup: 0.125em;
@@ -49,21 +51,26 @@
   --borderRadiusControl: 0;
   --borderRadiusPane: 0.5rem;
   --borderRadiusCode: 0.25rem;
-  --borderRadiusPopover: 2px;
+  --borderRadiusPopover: 0.25rem;
+
+  --heightFooter: 2.5rem;
 
   --scrollbarColor: #9191914f;
-  --sizeControl: 1.75rem;
-  --sizeFixedHeightCode: 16rem;
+
+  --sizeControl: 1.5rem;
+  --heightFixedHeightCode: 25%;
   --sizePanelMargin: 10px;
+  --sizeRenderPadding: 2rem;
 
   --shadowCodeLine: 0.1em 0 0.1em 0.1em var(--backgroundCodeLine);
   --shadowControl: none;
   --shadowRender: 0 0 0.5rem var(--colorSubdued);
+  --shadowPopover: 2px 2px 0 2px rgba(102, 102, 102, 0.23);
 
   --spaceHorizontalCode: 0.25em;
   --spaceVerticalCode: 0.5em;
 
-  --textColorFooter: var(--colorInk);
+  --textColorFooter: var(--colorSubdued);
   --textColorControl: var(--colorSubdued);
   --textColorProse: var(--colorInk);
   --textColorHeading: var(--colorSubdued);
@@ -71,11 +78,11 @@
   --textColorMarkup: var(--colorSubdued);
   --textColorHoverLink: var(--colorSubdued);
   --textColorCode: var(--colorKnockout);
-  --textColorModeline: var(--colorMark);
+  --textColorModeline: var(--colorKnockout);
   --textColorFocusEditor: var(--colorKnockout);
   --textColorVisibleWS: var(--colorMark);
 
-  --textSizeControl: 1rem;
+  --textSizeControl: 1.5rem;
   --textSizeProse: 1rem;
   --textSizeH1: 175%;
   --textSizeH2: 150%;
@@ -83,21 +90,21 @@
   --textSizeMarkup: 0.8rem;
   --textSizeVisibleWS: 80%;
   --textSizeCode: 1rem;
-  --textSizeModeline: 0.75rem;
-  --textSizeFooter: 1rem;
+  --textSizeModeline: 0.875rem;
+  --textSizeFooter: 0.75rem;
   --textSizeHint: 0.5rem;
 
   --cursorColorEditor: var(--colorHighlight);
 
-  --textWeightProse: 300;
+  --textWeightProse: 400;
   --textWeightHeading: 800;
   --textWeightStrong: 600;
   --textWeightMarkup: 400;
-  --textWeightModeline: 400;
+  --textWeightModeline: 600;
 
   --textStyleEmphasis: italic;
-  --textStyleMarkup: normal;
-  --textStyleModeline: italic;
+  --textStyleMarkup: italic;
+  --textStyleModeline: normal;
 
   --lineHeightProse: 1.5;
   --lineHeightMarkup: 0.8em;
@@ -108,4 +115,5 @@
   --opacityVisibleWS: 1;
   --opacityLabel: 0.5;
   --opacityPaneBackground: 0.75;
+  --opacityFooterBackground: 0.5;
 }

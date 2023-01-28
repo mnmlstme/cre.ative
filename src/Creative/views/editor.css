@@ -1,10 +1,12 @@
 @import './theme.css';
 
 .editor {
+  --backgroundPane: var(--colorBase);
   position: relative;
   overflow-x: visible;
   overflow-y: auto;
   caret-color: var(--cursorColorEditor);
+  pointer-events: all;
 }
 
 .focus {
@@ -13,11 +15,17 @@
 }
 
 .editor.eval {
+  --backgroundPane: var(--backgroundCode);
   position: absolute;
-  bottom: 0rem;
-  right: calc(var(--frameBorderThickness) - 60vw);
-  left: 40vw;
+  bottom: var(--frameBorderThickness);
+  right: 40vw;
+  left: -60vw;
   top: auto;
+}
+
+.editor--iT019.eval--2uog2 {
+  left: -60vw;
+  right: 40vw;
 }
 
 .modeline {
@@ -27,7 +35,7 @@
   font-size: var(--textSizeModeline);
   font-style: var(--textStyleModeline);
   line-height: 1.5;
-  border-bottom: var(--borderModeline);
+  box-shadow: 0 1px rgba(0, 0, 0, 0.5);
   border-radius: var(--borderRadiusCode) var(--borderRadiusCode) 0 0;
 }
 
