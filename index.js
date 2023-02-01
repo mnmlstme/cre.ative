@@ -2,6 +2,7 @@ const Kr = require("@cre.ative/kram");
 
 module.exports = {
   name: "react-redux",
+  displayName: "React (JSX) +Redux",
   description: "React (JSX) for Views and Redux for data model",
   languages: {
     jsx: "Javascript (React)",
