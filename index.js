@@ -2,6 +2,7 @@ const Kr = require("@cre.ative/kram");
 
 module.exports = {
   name: "elm",
+  displayName: "Elm",
   description:
     "The Elm Architecture: a pure functional language with ADTs and an MVU architecture",
   languages: {
@@ -21,7 +22,14 @@ function register({ providesLanguage }) {
           plugins: ["module:elm-css-modules-plugin"],
         },
       },
-      { loader: "elm-webpack-loader" },
+      {
+        loader: "elm-webpack-loader",
+        options: {
+          // add Elm's debug overlay to output
+          debug: true,
+          optimize: false,
+        },
+      },
     ],
     bind: (moduleName, lang) =>
       `function(resource, mountpoint, initial){
@@ -33,6 +41,14 @@ function register({ providesLanguage }) {
         return (n, container) => {
           console.log('Elm rendering scene ', n)
           app.ports.kram_render.send(n-1) /* render the scene */
+          let toolbox = safety.lastElementChild
+          if ( toolbox && 
+            toolbox.style && 
+            toolbox.style.position === 'fixed') {
+            /* make it absolute instead of fixed */
+            console.log('Adjusting position of Elm debug tools')
+            toolbox.style.position = 'absolute'
+          }
           container.appendChild(safety) /* move it into the scene */
         }
       }`,
