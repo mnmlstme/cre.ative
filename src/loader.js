@@ -21,11 +21,12 @@ function loader(content) {
   const plugin = platforms[platform] || Kr.defaultPlugin;
   const dir = path.join(platform, projname, basename);
 
-  console.log("Kram loader, using plugin:", platform, projname, basename);
+  return new Promise((resolve, reject) => {
+    console.log("Kram: loading workbook:", dir);
+    console.log(`Kram: using ${platform} plugin:`, JSON.stringify(plugin));
 
-  return new Promise((resolve, reject) =>
-    resolve({ project: projname, ...workbook })
-  )
+    resolve({ project: projname, plugin, ...workbook });
+  })
     .then((wb) => Kr.classify(wb, plugin.modules))
     .then((wb) => Kr.dekram(wb, emitter(dir, output), plugin))
     .then((wb) => Kr.collect(wb, resourceLoader))

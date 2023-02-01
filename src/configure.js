@@ -102,7 +102,7 @@ function kramRules({ docroot, plugins, kramdir }) {
       loader: "@cre.ative/kram-express-webpack",
       options: {
         platforms: Object.fromEntries(
-          plugins.map(({ name, modules }) => [name, { modules }])
+          plugins.map(({ name, ...rest }) => [name, rest])
         ),
         output: kramdir,
       },
