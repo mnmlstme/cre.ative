@@ -39,6 +39,8 @@ function Workbook({ workbook, scene, resources, dispatch }) {
   const sceneTitles = workbook
     .get('scenes')
     .map((sn, i) => sn.get('title', `Untitled`))
+  const plugin = workbook.get('plugin')
+  const platformName = (plugin && plugin.displayName) || 'Unknown'
   const doUpdateDocument = (blockId, rmNum, ...blocks) =>
     dispatch(updateScene(scene - 1, blockId, rmNum, ...blocks))
   const doSaveDocument = () => dispatch(saveScene(scene - 1))
@@ -68,7 +70,7 @@ function Workbook({ workbook, scene, resources, dispatch }) {
         <h6>{title || workbookId}</h6>
         <dl>
           <dt>Platform</dt>
-          <dd>Web Standards</dd>
+          <dd>{platformName}</dd>
         </dl>
         <nav>
           <NavButton to={toggleMenu} icon="#scenes" mask="#scenes-mask">

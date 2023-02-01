@@ -43,7 +43,7 @@
 .frame > * {
   position: relative;
   top: var(--frameBorderThickness);
-  bottom: 0;
+  bottom: var(--frameBorderThickness);
   left: var(--frameBorderThickness);
   right: 0;
 }
@@ -79,7 +79,9 @@
 }
 
 .frame.yScrollable {
-  padding-right: var(--scrollbarOffset);
+  padding-right: calc(
+    var(--frameBorderThickness) + var(--scrollbarOffset) + var(--scrollbarSize)
+  );
 }
 
 .frame.xScrollable {
@@ -89,9 +91,6 @@
 .frame.yScrollable > .pane {
   border-radius: var(--borderRadiusPane);
   overflow-y: auto;
-  right: calc(
-    var(--frameBorderThickness) - var(--scrollbarOffset) - var(--scrollbarSize)
-  );
 }
 
 .frame.xScrollable > .pane {

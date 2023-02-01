@@ -160,13 +160,14 @@
 
 .toc {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
   gap: 1rem;
   position: absolute;
   z-index: 1;
   bottom: 100%;
-  right: 0.5rem;
-  width: 60vw;
+  right: 0;
+  width: 40vw;
+  padding: 0.5rem 1.5rem;
   list-style: inside;
   counter-reset: toc 0;
 }

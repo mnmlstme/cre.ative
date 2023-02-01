@@ -42,7 +42,7 @@ function NoMatch() {
 }
 
 export function Main(workbook) {
-  const { basename, title, scenes, modules, init } = workbook
+  const { basename, title, scenes, modules, plugin, init } = workbook
 
   const initial = Im.Map({
     workbook: Im.Map({
@@ -51,6 +51,7 @@ export function Main(workbook) {
       title,
       scenes: Im.List(scenes).map(immutableScene),
       modules: Im.List(modules || []),
+      plugin,
       init,
     }),
     finder: Im.Map({
