@@ -112,7 +112,8 @@ const defaultLanguages = {
 
 const defaultPlugin = {
   name: 'web-standard',
-  description: 'Standard technologies supported by all browsers',
+  displayName: 'Web (W3C Standard)',
+  description: 'Standard technologies supported by nearly all browsers',
   languages: defaultLanguages,
   modules: Object.keys(defaultLanguages).map((language) => ({
     language,
@@ -126,7 +127,8 @@ module.exports = {
 }
 
 function register(platform, assignedName) {
-  const { name, description, languages, register, ...rest } = platform
+  const { name, displayName, description, languages, register, ...rest } =
+    platform
   let plugins = {}
 
   if (register) {
@@ -141,6 +143,7 @@ function register(platform, assignedName) {
 
   const plugin = {
     name: assignedName || name,
+    displayName,
     description,
     languages,
     ...rest,

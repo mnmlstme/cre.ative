@@ -41,7 +41,7 @@ function parse(md, basename, updaterFn = (wb) => wb) {
     imports: getImportSpecs(imports),
     scenes: paginate(blocks),
   })
-  console.log('Workbook:', JSON.stringify(result))
+  // console.log('Workbook:', JSON.stringify(result))
 
   const hashkey = hashcode(result)
   const moduleName = `Kram_${hashkey}_${basename}`
