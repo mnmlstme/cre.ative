@@ -1,16 +1,5 @@
 module.exports = {
   classify,
-  defaultClassifier,
-}
-
-function defaultClassifier(code, lang) {
-  switch (lang) {
-    case 'html':
-    case 'svg':
-      return { mode: 'eval' }
-    default:
-      return { mode: 'define' }
-  }
 }
 
 function classify(wb, modules) {

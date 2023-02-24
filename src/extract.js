@@ -2,23 +2,19 @@ module.exports = {
   extract,
 }
 
-function extract({ scenes }, mode, lang) {
-  return scenes
+function extract({ scenes }, lang) {
+  const sceneBlocks = scenes
     .map((scn, i) =>
       scn.blocks
-        .filter((b) => {
-          const [type, attrs] = b
-
-          return (
-            type === 'fence' &&
-            (!lang || attrs.lang === lang) &&
-            (!mode || attrs.mode === mode)
-          )
-        })
-        .map((b) => {
-          const [type, attrs, ...rest] = b
-          return [type, { scene: i, ...attrs }, ...rest]
-        })
+        .filter(
+          ([type, attrs]) => type === 'fence' && (!lang || attrs.lang === lang)
+        )
+        .map(([_, attrs, ...rest]) => [i, attrs, rest.join('\n')])
     )
-    .reduce((a, b) => a.concat(b), [])
+    .flat(1)
+
+  return {
+    scenes: sceneBlocks.filter(([_, attrs]) => attrs.mode === 'eval'),
+    definitions: sceneBlocks.filter(([_, attrs]) => attrs.mode === 'define'),
+  }
 }

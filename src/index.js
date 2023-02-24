@@ -4,7 +4,7 @@ const { extract } = require('./extract')
 const { dekram } = require('./dekram')
 const { collect } = require('./collect')
 const { pack } = require('./pack')
-const { register, defaultPlugin } = require('./platform')
+const { register } = require('./platform')
 const { recordType, scalarType, arrayType } = require('./utils')
 
 module.exports = {
@@ -15,7 +15,6 @@ module.exports = {
   collect,
   pack,
   register,
-  defaultPlugin,
   recordType,
   scalarType,
   arrayType,
