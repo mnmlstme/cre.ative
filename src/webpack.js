@@ -1,12 +1,15 @@
 import webpack from "webpack";
 import Kr from "@cre.ative/kram";
 import { configure } from "./configure";
+import webStandard from "./web-standard-plugin";
 
 export async function packager(options) {
   const { platforms } = options;
+
+  const defaultPlugin = Kr.register(webStandard);
   const plugins = platforms ? await registerPlugins(platforms) : [];
   const webpack_config = configure({
-    plugins: [Kr.defaultPlugin, ...plugins],
+    plugins: [defaultPlugin, ...plugins],
     ...options,
   });
   console.log("Webpack Configuration:", jsonpp(webpack_config));
