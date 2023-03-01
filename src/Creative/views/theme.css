@@ -11,7 +11,7 @@
   --colorInk: #282426;
   --colorKnockout: white;
   --colorFullInk: black;
-  --colorHighlight: #f7a0a0;
+  --colorHighlight: #af0c0c;
   --colorSubdued: #698d91;
   --colorMark: #f6f0e5;
 
@@ -30,7 +30,7 @@
   --backgroundCodeLine: var(--colorInk);
   --backgroundModeline: var(--colorSubdued);
   --backgroundFocusProse: var(--colorMark);
-  --backgroundInlineCode: var(--colorFullInk);
+  --backgroundInlineCode: transparent;
   --backgroundControl: var(--colorSubdued);
   --backgroundLink: var(--colorMark);
   --backgroundMarkup: var(--colorMark);
@@ -97,7 +97,7 @@
   --cursorColorEditor: var(--colorHighlight);
 
   --textWeightProse: 400;
-  --textWeightHeading: 800;
+  --textWeightHeading: 400;
   --textWeightStrong: 600;
   --textWeightMarkup: 400;
   --textWeightModeline: 600;

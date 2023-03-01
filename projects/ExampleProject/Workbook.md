@@ -8,7 +8,7 @@ title: Web Workbook
 <p class="hi">Hello, creative world.</p>
 ```
 
-And here is some CSS to style it:
+Here is some CSS to style it:
 
 ```css
 .hi {
@@ -26,11 +26,33 @@ And here is some CSS to style it:
 
 # Hello artboard
 
-And some CSS to style our drawing:
+Some CSS to style our drawing:
 
 ```css
 .c1 {
   fill: red;
   stroke: black;
+}
+```
+
+---
+
+```html
+<button id="the-button">Hello, click me</button>
+
+<script>
+  document
+    .getElementById('the-button')
+    .addEventListener('click', () => window.alert('Hello, Javascript'))
+</script>
+```
+
+# Hello Javascript
+
+Some Javascript to add an action to the button:
+
+```js
+function sayHello(event) {
+  window.alert('Hello, Javascript!')
 }
 ```

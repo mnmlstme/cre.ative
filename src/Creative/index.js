@@ -2,13 +2,7 @@ import Im from 'immutable'
 import React from 'react'
 import { createRoot } from 'react-dom/client'
 import { Provider } from 'react-redux'
-import {
-  BrowserRouter,
-  Navigate,
-  Routes,
-  Route,
-  useLocation,
-} from 'react-router-dom'
+import { HashRouter, Routes, Route, useLocation } from 'react-router-dom'
 import { createStore, applyMiddleware } from 'redux'
 import thunk from 'redux-thunk'
 import { update, immutableScene } from './update'
@@ -17,14 +11,14 @@ import Workbook from './views/workbook'
 function App({ store }) {
   return (
     <Provider store={store}>
-      <BrowserRouter>
+      <HashRouter>
         <Routes>
-          <Route path="workbook/:projectId/:workbookId" element={<Workbook />}>
-            <Route path=":slug/:sceneId" element={<Workbook />} />
+          <Route path="/" element={<Workbook />}>
+            <Route path="/s/:sceneId/:slug" element={<Workbook />} />
           </Route>
           <Route path="*" element={<NoMatch />} />
         </Routes>
-      </BrowserRouter>
+      </HashRouter>
     </Provider>
   )
 }

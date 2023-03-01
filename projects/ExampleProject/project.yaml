@@ -1,4 +1,4 @@
 workbooks:
   - file: Workbook.md
     title: Example Workbook
-    slug: workbook-00
+    slug: web-workbook

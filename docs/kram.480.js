@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkKram_module=self.webpackChunkKram_module||[]).push([[480],{480:(n,e,r)=>{r.r(e),r.d(e,{default:()=>a});const a=".hi {\n  font-family: Georgia;\n  color: darkorange;\n  font-size: 6rem;\n}\n\n.c1 {\n  fill: red;\n  stroke: black;\n}\n"}}]);

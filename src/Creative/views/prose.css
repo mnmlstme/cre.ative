@@ -80,7 +80,6 @@
   color: var(--textColorInlineCode);
   font-family: var(--fontCode);
   background: var(--backgroundInlineCode);
-  padding: 0 0.25em;
 }
 
 .prose > :not(figure) a {

@@ -1,6 +1,6 @@
 {
   "name": "@cre.ative/cre-a-tive",
-  "version": "1.3.17",
+  "version": "1.4.0",
   "description": "A framework-agnostic creative programming environment",
   "browser": "dist/client.js",
   "bin": {
@@ -8,9 +8,9 @@
   },
   "scripts": {
     "build": "webpack build && chmod +x dist/server.js && npm install @cre.ative/self",
-    "dev": "nodemon dist/server.js --dev ./projects",
-    "start": "nodemon dist/server.js --serve ./projects",
+    "start": "node dist/server.js --serve ./projects",
     "publish": "node dist/server.js --publish ./projects",
+    "dev": "node dist/server.js --dev ./projects",
     "test": "echo \"Error: no test specified\" && exit 1",
     "clean": "rm -rf package-lock.json node_modules kram_modules dist docs"
   },
@@ -21,7 +21,7 @@
   "author": "ken@mnmlst.me",
   "license": "BSD-3-Clause",
   "dependencies": {
-    "@cre.ative/kram-express-webpack": "^1.3.8",
+    "@cre.ative/kram-express-webpack": "^1.4.0",
     "file-system": "^2.2.2",
     "he": "^1.2.0",
     "immutable": "^4.0.0-rc.12",

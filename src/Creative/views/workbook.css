@@ -245,7 +245,7 @@
 .container > ol > li {
   /* rendered view */
   display: flex;
-  align-items: center;
+  flex-direction: column;
   justify-content: center;
   grid-row-start: view;
   overflow: auto;

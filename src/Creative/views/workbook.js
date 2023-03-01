@@ -1,52 +1,48 @@
 import React, { useState } from 'react'
 import { connect } from 'react-redux'
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link, Navigate } from 'react-router-dom'
 
 import { Document } from './document'
 import { Render } from './render'
 import { changeScene, loadResource, updateScene, saveScene } from '../actions'
 import styles from './workbook.css'
 import './next.svg'
-import './next-mask.svg'
 import './previous.svg'
-import './previous-mask.svg'
 import './scenes.svg'
-import './scenes-mask.svg'
-import './stripes.svg'
 
-function Workbook({ workbook, scene, resources, dispatch }) {
-  const { projectId, workbookId, sceneId } = useParams()
-
+function Workbook({ workbook, resources, dispatch }) {
+  const { sceneId, slug } = useParams()
   const [showMenu, setShowMenu] = useState(false)
-  const toggleMenu = () => setShowMenu(!showMenu)
 
   if (!workbook) {
-    // dispatch(loadWorkbook(projectId, workbookId))
-    return <h1>Loading {workbookId} ...</h1>
-  }
-
-  if (!scene) {
-    scene = 1
-  }
-
-  if (sceneId && scene != sceneId) {
-    scene = Number.parseInt(sceneId)
-    dispatch(changeScene(scene))
+    return <h1>Loading Workbook ...</h1>
   }
 
   const title = workbook.get('title')
-  const slug = title.toLowerCase().replace(/[^a-z0-9-]/g, '-')
   const sceneTitles = workbook
     .get('scenes')
     .map((sn, i) => sn.get('title', `Untitled`))
+  const scenePath = (i) => {
+    const title = sceneTitles.get(i - 1, 'scene')
+    const slug = title
+      .toLowerCase()
+      .replace(/[^a-z0-9-]/g, '-')
+      .replace(/^[-]+/, '')
+    return `s/${i}/${slug}`
+  }
+
+  if (!sceneId) {
+    return <Navigate to={scenePath(1)} />
+  }
+
+  const scene = Number.parseInt(sceneId) || 1
+  const toggleMenu = () => setShowMenu(!showMenu)
   const plugin = workbook.get('plugin')
   const platformName = (plugin && plugin.displayName) || 'Unknown'
   const doUpdateDocument = (blockId, rmNum, ...blocks) =>
     dispatch(updateScene(scene - 1, blockId, rmNum, ...blocks))
   const doSaveDocument = () => dispatch(saveScene(scene - 1))
   const doLoadResource = (defn) => dispatch(loadResource(defn))
-
-  console.log('Scenes:', sceneTitles)
 
   return (
     <article className={styles.workbook}>
@@ -67,7 +63,7 @@ function Workbook({ workbook, scene, resources, dispatch }) {
         />
       </section>
       <footer className={styles.menubar}>
-        <h6>{title || workbookId}</h6>
+        <h6>{title}</h6>
         <dl>
           <dt>Platform</dt>
           <dd>{platformName}</dd>
@@ -79,13 +75,13 @@ function Workbook({ workbook, scene, resources, dispatch }) {
         </nav>
         <nav>
           <NavButton
-            to={`${slug}/${scene - 1}`}
+            to={scenePath(scene - 1)}
             icon="#previous"
             mask="#previous-mask"
             disabled={scene <= 1}
           />
           <NavButton
-            to={`${slug}/${scene + 1}`}
+            to={scenePath(scene + 1)}
             icon="#next"
             mask="#next-mask"
             disabled={scene >= sceneTitles.size}
@@ -95,7 +91,7 @@ function Workbook({ workbook, scene, resources, dispatch }) {
           <ol className={styles.toc} onClick={toggleMenu}>
             {sceneTitles.map((title, i) => (
               <li key={i}>
-                <Link to={`${slug}/${i + 1}`}>{title}</Link>
+                <Link to={scenePath(i + 1)}>{title}</Link>
               </li>
             ))}
           </ol>
@@ -134,10 +130,11 @@ function NavButton({ to, icon, mask, children, disabled = false }) {
 function mapStateToProps(state) {
   const workbook = state.get('workbook')
 
+  console.log('Connecting workbook state:', workbook)
+
   return {
     workbook: workbook.get('isLoaded') ? workbook : undefined,
     resources: state.get('resources'),
-    scene: Number.parseInt(state.get('current')),
   }
 }
 

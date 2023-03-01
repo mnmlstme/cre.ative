@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkKram_module=self.webpackChunkKram_module||[]).push([[405],{405:(s,e,c)=>{c.r(e),c.d(e,{default:()=>n});const n='<svg xmlns="http://www.w3.org/2000/svg">\n<defs>\n</defs>\n<svg id="kramScene-2" viewBox="0 0 100 100"><circle class="c1" r="10" cx="50" cy="50"/>\n</svg>\n</svg>'}}]);

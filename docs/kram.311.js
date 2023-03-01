@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkKram_module=self.webpackChunkKram_module||[]).push([[311],{311:(n,e,r)=>{function t({connectStore:n}){return{}}function u(n,e){Object.assign({},e);const r={};return(n,e)=>{r[n-1].call(e)}}r.r(e),r.d(e,{Program:()=>t,mount:()=>u})}}]);
