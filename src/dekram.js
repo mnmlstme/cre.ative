@@ -5,21 +5,29 @@ export function dekram(workbook, emitter, plugin) {
   // console.log('Dekram: ', workbook)
 
   const emit = (module) => {
-    const collated = module.collate(workbook, module.language)
-    const { moduleName, language, name, code } = collated
-    const filepath = emitter(name, code)
     const use = module.use(module.language)
-    return {
-      language,
-      filepath,
-      use,
-      bind: module.bind(moduleName || hashedName, module.language) || 'null',
-    }
+    const collated = module.collate(workbook, module.language)
+    const files = Array.isArray(collated) ? collated : [collated]
+
+    return files.map((f) => {
+      const { moduleName, language, name, mode = 'define', code, ...rest } = f
+      const filepath = emitter(name, code)
+      return {
+        moduleName,
+        mode,
+        language,
+        filepath,
+        use,
+        bind: module.bind(moduleName || name, module.language) || 'null',
+        ...rest,
+      }
+    })
   }
 
   const modules = plugin.modules
     .filter((m) => languages.find((s) => s === m.language))
     .map(emit)
+    .flat()
 
   // console.log('Dekram modules', modules)
 

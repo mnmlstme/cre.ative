@@ -94,7 +94,6 @@ function getLanguages(tokens) {
 }
 
 function getImportSpecs(imports) {
-  console.log('imports:', JSON.stringify(imports))
   switch (getTypeOf(imports)) {
     case 'array':
       return imports.map(importSpec)

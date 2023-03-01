@@ -61,7 +61,7 @@ function register(platform, assignedName) {
     ...rest,
   }
 
-  console.log('Plugin registered:', assignedName || name, plugin)
+  // console.log('Plugin registered:', assignedName || name, plugin)
 
   return plugin
 }
