@@ -1,0 +1,16 @@
+{
+  "name": "@cre.ative/kram-11ty",
+  "version": "1.0.0",
+  "description": "Kram plugin for Eleventy",
+  "main": "index.js",
+  "type": "commonjs",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "ken@mnmlst.me",
+  "license": "BSD-3-Clause",
+  "dependencies": {
+    "@cre.ative/kram": "^1.5.0",
+    "he": "^1.2.0"
+  }
+}
