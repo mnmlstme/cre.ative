@@ -1,6 +1,8 @@
 const Kr = require("@cre.ative/kram");
 const he = require("he");
 const path = require("node:path");
+const Prism = require("prismjs");
+const loadLanguages = require("prismjs/components/");
 const webStandard = require("./web-standard-plugin");
 
 module.exports = {
@@ -58,6 +60,7 @@ function genHtml(wb, data, files) {
 <html>
 <head>
 <title>${title}</title>
+<link rel="stylesheet" href="/_styles/prism.css" webc:keep>
 <link rel="stylesheet" href="/_styles/theme.css" webc:keep>
 <link rel="stylesheet" href="./styles.css" webc:keep>
 ${genCSSDefs(modules, files)}
@@ -137,18 +140,19 @@ function genScenes(scenes, modules, files) {
       .filter((blk) => !isEvalBlock(blk))
       .map(genProse)
       .join("\n");
-    const code = blocks
+    const evalcode = blocks
       .filter(isEvalBlock)
-      .map(
-        ([_, { lang }, ...rest]) =>
-          `<code lang="${lang}">${encodeAsHtml(rest.join("\n"))}</code>`
-      )
+      .map(([_, { lang }, ...rest]) => {
+        const code = rest.join("\n");
+        const formatted = Prism.highlight(code, Prism.languages[lang], lang);
+        return `<code lang="${lang}" class="language-${lang}">${formatted})}</code>`;
+      })
       .join("\n");
 
     return [
       `<oper-ative>${file}</oper-ative>`,
       `<narr-ative>${prose}</narr-ative>`,
-      `<ide-ative>${code}</ide-ative>`,
+      `<ide-ative data-language="markup">${evalcode}</ide-ative>`,
     ];
   });
 
@@ -166,9 +170,10 @@ function genProse(blk) {
 
   switch (type) {
     case "fence":
-      return `<figure><figcaption>${lang}</figcaption><pre lang="${lang}"><code>${encodeAsHtml(
-        rest.join("\n")
-      )}</code></pre></figure>\n`;
+      const code = rest.join("\n");
+      const formatted = Prism.highlight(code, Prism.languages[lang], lang);
+      return `<ide-ative data-language="${lang}>
+        <code class="language-${lang}>${formatted}</code></ide-ative>`;
     case "bullet_list":
     case "ordered_list":
     case "list_item":
