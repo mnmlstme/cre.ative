@@ -79,12 +79,10 @@ moduleNames.forEach((name) => mount(name, mountpoint, initial));
 <title>${title}</title>
 <link rel="stylesheet" href="/_styles/prism.css" webc:keep>
 <link rel="stylesheet" href="/_styles/theme.css" webc:keep>
-<link rel="stylesheet" href="./styles.css" webc:keep>
 ${genCSSDefs(modules, files)}
-<script type="module" src="./script.js" webc:keep></script>
 ${genJSDefs(modules, files)}
 </head>
-<body>
+<body webc:bucket="defer">
 ${genHTMLDefs(modules, files)}
 ${genSVGDefs(modules, files)}
 <st-ative>
