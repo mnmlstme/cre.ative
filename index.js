@@ -23,7 +23,11 @@ function configure() {
       const workbook = parse(inputContent, inputPath);
 
       return async (data) => {
-        return render(workbook, data, options);
+        if (data.platform === "none") {
+          return this.defaultRenderer(data);
+        } else {
+          return render(workbook, data, options);
+        }
       };
     },
   };
@@ -53,8 +57,21 @@ function render(wb, data, options) {
 }
 
 function genHtml(wb, data, files) {
-  const { moduleName, basename, scenes, modules, plugin } = wb;
+  const { basename, scenes, modules = [], plugin } = wb;
   const { title, model } = data;
+  const namedModules = modules.filter((mdl) => Boolean(mdl.moduleName));
+  const mountScript = namedModules.length
+    ? `
+import { mount } from "/_scripts/oper.ative.js";
+console.log("Mounting Operative");
+const mountpoint = document.getElementById("lets-be-oper-ative");
+const initial = ${JSON.stringify(model)};
+const moduleNames = ${JSON.stringify(
+        namedModules.map((mdl) => mdl.moduleName)
+      )};
+moduleNames.forEach((name) => mount(name, mountpoint, initial));
+`
+    : "";
 
   return `<!DOCTYPE html>
 <html>
@@ -78,13 +95,8 @@ ${genSVGDefs(modules, files)}
 ${genScenes(scenes, modules, files)}
 </consolid-ative>
 </st-ative>
-
 <script type="module" webc:keep>
-import { mount } from "/_scripts/oper.ative.js";
-console.log("Mounting Operative");
-const mountpoint = document.getElementById("lets-be-oper-ative");
-const initial = ${JSON.stringify(model)};
-mount("${moduleName}", mountpoint, initial);
+${mountScript}
 </script>
 </body>
 </html>
@@ -145,14 +157,14 @@ function genScenes(scenes, modules, files) {
       .map(([_, { lang }, ...rest]) => {
         const code = rest.join("\n");
         const formatted = Prism.highlight(code, Prism.languages[lang], lang);
-        return `<code lang="${lang}" class="language-${lang}">${formatted})}</code>`;
+        return `<code lang="${lang}" class="language-${lang}">${formatted}</code>`;
       })
       .join("\n");
 
     return [
       `<oper-ative>${file}</oper-ative>`,
+      `<ide-ative data-language="auto">${evalcode}</ide-ative>`,
       `<narr-ative>${prose}</narr-ative>`,
-      `<ide-ative data-language="markup">${evalcode}</ide-ative>`,
     ];
   });
 
@@ -172,8 +184,7 @@ function genProse(blk) {
     case "fence":
       const code = rest.join("\n");
       const formatted = Prism.highlight(code, Prism.languages[lang], lang);
-      return `<ide-ative data-language="${lang}>
-        <code class="language-${lang}>${formatted}</code></ide-ative>`;
+      return `<ide-ative data-language="${lang}"><code class="language-${lang}">${formatted}</code></ide-ative>`;
     case "bullet_list":
     case "ordered_list":
     case "list_item":

@@ -98,9 +98,8 @@ function register({ providesLanguage, defaultModule }) {
           name: "defs.svg",
           mode: "define",
           language: "svg",
-          code: `<svg xmlns="http://www.w3.org/2000/svg">
-            <defs>${definitions.map(buildDefn).join("\n")}</defs>
-          </svg>`,
+          code: `<svg xmlns="http://www.w3.org/2000/svg" style="display:none;">
+            <defs>${definitions.map(buildDefn).join("\n")}</defs></svg>`,
         },
         ...sceneFiles,
       ];
@@ -118,6 +117,7 @@ function register({ providesLanguage, defaultModule }) {
         `// JS scene ${n + 1}\n"${n}": function () { ${code} }`;
 
       return {
+        moduleName,
         name: "module.js",
         language: "js",
         code: `// module ${moduleName} (ES6)
