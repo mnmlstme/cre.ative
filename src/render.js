@@ -4,6 +4,8 @@ module.exports = {
     heading_close: close_element,
     paragraph_open: open_element,
     paragraph_close: close_element,
+    blockquote_open: open_element,
+    blockquote_close: close_element,
     bullet_list_open: open_element,
     bullet_list_close: close_element,
     ordered_list_open: open_element,
@@ -22,22 +24,24 @@ module.exports = {
     link_open: open_element,
     link_close: close_element,
     html_block: insert_code_block, // escaping html for now
-    html_inline: insert_code // escaping html for now
+    html_inline: insert_code, // escaping html for now
   },
-  not_implemented
+  not_implemented,
 }
 
-const nl = (b) => b ? '\n' : ''
+const nl = (b) => (b ? '\n' : '')
 
 function open_element(tokens, i) {
-  const {type, block, attrs, tag, markup} = tokens[i]
+  const { type, block, attrs, tag, markup } = tokens[i]
   const ts = JSON.stringify(type.replace(/_(open|close)$/, ''))
   const attrjson = attrs && attrs.length ? Object.fromEntries(attrs) : {}
-  const json = JSON.stringify(Object.assign(attrjson, {
-    tag: tag.toLowerCase(),
-    block,
-    markup
-  }))
+  const json = JSON.stringify(
+    Object.assign(attrjson, {
+      tag: tag.toLowerCase(),
+      block,
+      markup,
+    })
+  )
 
   return `,${nl(block)}[${ts},${json}`
 }
@@ -51,7 +55,7 @@ function insert_empty_element(tokens, i) {
 }
 
 function insert_text(tokens, i) {
-  const {content} = tokens[i]
+  const { content } = tokens[i]
   const json = JSON.stringify(content)
 
   return content ? `,${json}` : ''
@@ -62,22 +66,22 @@ function insert_newline() {
 }
 
 function insert_code(tokens, i) {
-  const {type, tag, block, markup, info, content} = tokens[i]
+  const { type, tag, block, markup, info, content } = tokens[i]
   const json = JSON.stringify([
     type,
     {
       tag: tag.toLowerCase(),
       block,
-      markup
+      markup,
     },
-    content
+    content,
   ])
 
   return `,${nl(block)}${json}`
 }
 
 function insert_code_block(tokens, i) {
-  const {type, tag, block, markup, info, content} = tokens[i]
+  const { type, tag, block, markup, info, content } = tokens[i]
   const json = JSON.stringify([
     type,
     {
@@ -86,17 +90,16 @@ function insert_code_block(tokens, i) {
       lang: info.toLowerCase(),
       markup,
       block,
-      id: `krumb-${i}`
+      id: `krumb-${i}`,
     },
-    content
+    content,
   ])
 
   return `,${nl(block)}${json}`
 }
 
-
 function not_implemented(tokens, i) {
-  const {type} = tokens[i]
+  const { type } = tokens[i]
 
   console.log(`renderer.rule.${type} not implemented`)
 }
