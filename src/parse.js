@@ -7,7 +7,11 @@ module.exports = {
   parse,
 }
 
-const mdit = MarkdownIt('commonmark')
+const mdit = MarkdownIt({
+  html: true,
+  linkify: true,
+  typographer: true,
+})
 
 Object.assign(mdit.renderer.rules, rules)
 

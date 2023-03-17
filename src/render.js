@@ -12,6 +12,18 @@ module.exports = {
     ordered_list_close: close_element,
     list_item_open: open_element,
     list_item_close: close_element,
+    table_open: open_element,
+    table_close: close_element,
+    thead_open: open_element,
+    thead_close: close_element,
+    tbody_open: open_element,
+    tbody_close: close_element,
+    tr_open: open_element,
+    tr_close: close_element,
+    th_open: open_element,
+    th_close: close_element,
+    td_open: open_element,
+    td_close: close_element,
     text: insert_text,
     softbreak: insert_newline,
     hr: insert_empty_element,
@@ -42,11 +54,18 @@ function open_element(tokens, i) {
       markup,
     })
   )
+  const out = `,${nl(block)}[${ts},${json}`
 
-  return `,${nl(block)}[${ts},${json}`
+  // console.log(`open_element(${type}) -> `, out)
+
+  return out
 }
 
 function close_element(tokens, i) {
+  const { type } = tokens[i]
+
+  // console.log(`close_element(${type}) -> ]`)
+
   return ']'
 }
 
@@ -57,11 +76,16 @@ function insert_empty_element(tokens, i) {
 function insert_text(tokens, i) {
   const { content } = tokens[i]
   const json = JSON.stringify(content)
+  const out = content ? `,${json}` : ''
 
-  return content ? `,${json}` : ''
+  // console.log(`insert_text(${content}) -> `, out)
+
+  return out
 }
 
 function insert_newline() {
+  // console.log(`insert_newline() -> `, ', \\n')
+
   return ',"\\n"'
 }
 
@@ -76,8 +100,11 @@ function insert_code(tokens, i) {
     },
     content,
   ])
+  const out = `,${nl(block)}${json}`
 
-  return `,${nl(block)}${json}`
+  // console.log(`insert_code(${type}) -> `, out)
+
+  return out
 }
 
 function insert_code_block(tokens, i) {
@@ -94,8 +121,11 @@ function insert_code_block(tokens, i) {
     },
     content,
   ])
+  const out = `,${nl(block)}${json}`
 
-  return `,${nl(block)}${json}`
+  // console.log(`insert_code_block(${type} -> `, out)
+
+  return out
 }
 
 function not_implemented(tokens, i) {
