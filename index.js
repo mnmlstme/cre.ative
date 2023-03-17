@@ -178,7 +178,11 @@ function isEvalBlock(blk) {
 function genProse(blk) {
   const [type, { tag, lang }, ...rest] = blk;
 
+  // console.log(`genProse(${type}, {tag:${tag}}, ... ${rest.length} inside)`);
+
   switch (type) {
+    case "html_block":
+      return rest.join("\n");
     case "fence":
       const code = rest.join("\n");
       const formatted = Prism.highlight(code, Prism.languages[lang], lang);
@@ -186,16 +190,23 @@ function genProse(blk) {
     case "bullet_list":
     case "ordered_list":
     case "list_item":
-      return `<${tag}>${genProse(rest)}</${tag}>\n`;
+      return `<${tag}>${rest.map(genProse).join("\n")}</${tag}>\n`;
     default:
       return `<${tag}>${jsonToHtml(rest)}</${tag}>\n`;
   }
 }
 
 function jsonToHtml(tokens) {
-  return tokens
+  // console.log("jsonToHtml", JSON.stringify(tokens, null, ""));
+
+  const out = tokens
     .map((t) => (typeof t === "string" ? encodeAsHtml(t) : tokenToHtml(t)))
     .join("");
+
+  // console.log("jsonToHtml", JSON.stringify(tokens, null, ""));
+  // console.log(" --->", out);
+
+  return out;
 }
 
 function encodeAsHtml(text) {
@@ -207,6 +218,10 @@ function encodeAsHtml(text) {
 
 function tokenToHtml([type, attrs, ...children]) {
   const { tag, block, markup, href } = attrs;
+  if (type === "html_inline") {
+    // console.log("HTML out:", JSON.stringify(children));
+    return children.join("\n");
+  }
   const hrefPair = href && ["href", href];
   const markPair = markup &&
     !type.match(/\w+_list/) &&
