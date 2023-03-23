@@ -124,7 +124,7 @@ function register({ providesLanguage, defaultModule }) {
           import { register } from "/_scripts/oper.ative.js"
           ${imports.map(buildImport).join("\n")}
           console.log('Loading module "${moduleName}"')
-          export function Program ({connectStore}) {
+          export function Program ({connectStore, initializeStore}) {
             ${definitions.map(buildDefn).join("\n")}
             return ({
               ${scenes.map(buildScene).join(",\n")}
@@ -134,9 +134,15 @@ function register({ providesLanguage, defaultModule }) {
             let Store = {
               root: Object.assign({}, initial),
             };
-            const connectStore = (root = "root") => ({
-                get: (key) => Store[root][key],
-            })
+            const connectStore = (path = ["root"]) => {
+              let root = Store;
+              path.forEach((key) => root = root[key]);
+              return ({
+                root,
+                get: (key) => root[key],
+                set: (key, value) => root[key] = value,
+                keys: () => Object.keys(root),
+              })};
             const program = Program({connectStore})
             return (n, container) => {
               program[n-1].call(container)
