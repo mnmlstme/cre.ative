@@ -62,7 +62,7 @@ function genHtml(wb, data, files) {
   const namedModules = modules.filter((mdl) => Boolean(mdl.moduleName));
   const mountScript = namedModules.length
     ? `
-import { mount } from "/_scripts/oper.ative.js";
+import { mount } from "/scripts/oper.ative.js";
 console.log("Mounting Operative");
 const mountpoint = document.getElementById("lets-be-oper-ative");
 const initial = ${JSON.stringify(model)};
@@ -77,8 +77,8 @@ moduleNames.forEach((name) => mount(name, mountpoint, initial));
 <html>
 <head>
 <title>${title}</title>
-<link rel="stylesheet" href="/_styles/prism.css" webc:keep>
-<link rel="stylesheet" href="/_styles/theme.css" webc:keep>
+<link rel="stylesheet" href="/styles/prism.css" webc:keep>
+<link rel="stylesheet" href="/styles/theme.css" webc:keep>
 ${genCSSDefs(modules, files)}
 ${genJSDefs(modules, files)}
 </head>

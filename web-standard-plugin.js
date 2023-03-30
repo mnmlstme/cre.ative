@@ -121,7 +121,7 @@ function register({ providesLanguage, defaultModule }) {
         name: "module.js",
         language: "js",
         code: `// module ${moduleName} (ES6)
-          import { register } from "/_scripts/oper.ative.js"
+          import { register } from "/scripts/oper.ative.js"
           ${imports.map(buildImport).join("\n")}
           console.log('Loading module "${moduleName}"')
           export function Program ({connectStore, initializeStore}) {
