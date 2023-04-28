@@ -13,6 +13,6 @@
     "@cre.ative/kram": "^1.5.2",
     "@cre.ative/kram-express-webpack": "file:.yalc/@cre.ative/kram-express-webpack",
     "he": "^1.2.0",
-    "prismjs": "^1.29.0"
+    "webpack": "^5.75.0"
   }
 }

@@ -3,7 +3,7 @@ const Kr = require("@cre.ative/kram");
 
 module.exports = { render };
 
-function render(wb, data, plugin) {
+function render(wb, data, plugin, emitDependency) {
   let files = {};
 
   wb = Kr.classify(wb, plugin.modules);
@@ -11,9 +11,10 @@ function render(wb, data, plugin) {
 
   return genHtml(wb, data, files);
 
-  function emitter(name, code) {
+  function emitter(name, code, language) {
     console.log("[kram-11ty] emit:", name);
     files[name] = code;
+    emitDependency(name, code, language);
     return name;
   }
 }
