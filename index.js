@@ -16,13 +16,12 @@ function register({ providesLanguage }) {
       'babel-loader?{presets:["@babel/preset-react"],"plugins":[["react-native-web",{"commonjs":true}]]}',
     classify: classifyJavascript,
     collate: (workbook, lang) => {
-      const evals = Kr.extract(workbook, "eval", lang);
-      const defns = Kr.extract(workbook, "define", lang);
+      const { scenes, definitions } = Kr.extract(workbook, lang);
 
       return {
         name: "index.jsx",
         language: lang,
-        code: generateJsx(workbook, defns, evals),
+        code: generateJsx(workbook, definitions, scenes),
       };
     },
   });
@@ -32,12 +31,12 @@ function register({ providesLanguage }) {
       'babel-loader?{presets:["@babel/preset-env"],"plugins":[["react-native-web",{"commonjs":true}]]}',
     classify: classifyJavascript,
     collate: (workbook, lang) => {
-      const defns = Kr.extract(workbook, "define", lang);
+      const { definitions } = Kr.extract(workbook, lang);
 
       return {
         name: "index.js",
         language: lang,
-        code: generateJavascript(workbook, defns),
+        code: generateJavascript(workbook, definitions),
       };
     },
   });
@@ -153,10 +152,9 @@ function genExposeModel(shape) {
 }
 
 function genView(block) {
-  const [_, attrs, code] = block;
-  const { scene } = attrs;
+  const [scene, _, code] = block;
 
-  return `${scene}: () => (<>${code}</>)`;
+  return `"${scene}": () => (<>${code}</>)`;
 }
 
 function genDefn(block) {
