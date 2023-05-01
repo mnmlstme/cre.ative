@@ -22,8 +22,7 @@ function loader(content) {
   const dir = path.join(platform, projname, basename);
 
   return new Promise((resolve, reject) => {
-    console.log("Kram: loading workbook:", dir);
-    console.log(`Kram: using ${platform} plugin:`, JSON.stringify(plugin));
+    console.log(`[kram] loading (${platform})`, relpath);
 
     resolve({ project: projname, plugin, ...workbook });
   })
@@ -44,7 +43,7 @@ function emitter(reldir, output = "") {
     fs.mkdirSync(absdir, { recursive: true });
     fs.writeFileSync(absname, code);
 
-    console.log(`Kram emit: ${relname} -> `, absname);
+    // console.log(`[kram] ${relname} -> `, absname);
     return relname;
   };
 }

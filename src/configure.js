@@ -7,11 +7,11 @@ export function configure(options) {
     basedir,
     docroot,
     plugins,
-    index,
-    projects,
-    workbooks,
-    app,
+    entry,
+    library,
+    generated,
     template,
+    inPlace,
   } = options;
   const kramdir = path.resolve(basedir, "./kram_modules");
   const projdir = path.resolve(basedir, "./projects");
@@ -25,28 +25,25 @@ export function configure(options) {
       }
     : {};
 
-  const htmlGenerators = workbooks
-    .concat(projects, [index])
-    .map(([slugs, file]) => {
-      const entry = slugs === "/" ? "index" : path.join(slugs, "index");
+  const htmlGenerators = generated
+    ? generated.map(([entry, template, ...dependencies]) => {
+        const relPath = path.relative(projdir, path.dirname(entry));
 
-      return new HtmlWebpackPlugin({
-        inject: false,
-        cache: false,
-        chunks: [entry, "app"],
-        filename: path.join(options.public || "public", slugs, "index.html"),
-        template,
-        scriptLoading: "blocking",
-      });
-    });
-
-  const entry = Object.fromEntries(
-    [["app", app]].concat(
-      workbooks.map(([entry, file]) => [path.join(entry, "index"), file]),
-      projects.map(([entry, file]) => [path.join(entry, "index"), file]),
-      [["index", index[1]]]
-    )
-  );
+        return new HtmlWebpackPlugin({
+          inject: false,
+          cache: false,
+          chunks: [entry].concat(dependencies),
+          filename: path.join(
+            options.public || "public",
+            relPath,
+            path.basename(entry, ".md"),
+            "index.html"
+          ),
+          template,
+          scriptLoading: "blocking",
+        });
+      })
+    : [];
 
   return {
     name: "kram-webpack",
@@ -58,12 +55,9 @@ export function configure(options) {
     },
     output: {
       chunkFilename: "kram.[id].js",
+      chunkFormat: "module",
       path: path.resolve(__dirname, options.public),
-      publicPath: "/",
-      library: {
-        name: "Kram_module",
-        type: "window",
-      },
+      library,
     },
     resolve: {
       alias: {
@@ -85,6 +79,7 @@ export function configure(options) {
       ? [new webpack.HotModuleReplacementPlugin()]
       : []
     ).concat(htmlGenerators),
+    experiments: { outputModule: true },
   };
 }
 

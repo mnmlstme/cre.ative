@@ -21,7 +21,9 @@ async function registerPlugins(platforms) {
   const allPlatforms = Object.entries(platforms).map(([name, moduleName]) =>
     import(/* webpackIgnore: true */ moduleName)
       .then((mod) => Kr.register(mod.default, name))
-      .catch((err) => console.log("Failed to load Kram plugin:", name, err))
+      .catch((err) =>
+        console.log("Failed to load Kram plugin:", name, moduleName, err)
+      )
   );
 
   return Promise.allSettled(allPlatforms).then((results) =>
