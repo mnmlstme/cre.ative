@@ -1,6 +1,6 @@
 {
   "name": "@cre.ative/kram-11ty",
-  "version": "1.1.5",
+  "version": "1.5.0",
   "description": "Kram plugin for Eleventy",
   "main": "index.js",
   "type": "commonjs",
@@ -10,8 +10,8 @@
   "author": "ken@mnmlst.me",
   "license": "BSD-3-Clause",
   "dependencies": {
-    "@cre.ative/kram": "^1.5.2",
-    "@cre.ative/kram-express-webpack": "file:.yalc/@cre.ative/kram-express-webpack",
+    "@cre.ative/kram": "^1.5.3",
+    "@cre.ative/kram-express-webpack": "^1.4.0",
     "he": "^1.2.0",
     "webpack": "^5.75.0"
   }

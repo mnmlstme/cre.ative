@@ -26,37 +26,43 @@ function configure(options = {}) {
       const baseconfig = {
         name: `kram-11ty-${projName}-${basename}`,
         context,
+        experiments: { outputModule: true },
         output: {
-          chunkFilename: "chunk.[id].js",
+          module: true,
+          chunkFilename: "chunk.[id].mjs",
           chunkFormat: "module",
-          library: {
-            type: "module",
-          },
           path: context,
         },
-        experiments: { outputModule: true },
+        mode: "production",
       };
 
       return async (data) => {
-        const platform = data.platform || "web-standard";
+        const platform = data.platform;
 
-        if (data.platform === "none") {
+        if (!platform || platform === "none") {
           return this.defaultRenderer(data);
         }
 
         const plugin = Kr.register(require(platforms[platform]));
-        const workbook = Kr.parse(
+        let workbook = Kr.parse(
           { body: inputContent, attributes: data },
           basename
         );
         workbook.project = projName;
-        let entries = {};
+        let entries = {}; // webpack entry point descriptors
         const emitFile = emitter(".", context);
         const emitDependency = (name, code, language) => {
-          entries[language] = emitFile(name, code);
+          const srcfile = emitFile(name, code);
+          entries[language] = {
+            import: srcfile,
+            filename: path.join("modules", `${srcfile}.module.js`),
+          };
+          return srcfile;
         };
-        const html = render(workbook, data, plugin, emitDependency);
-        console.log("Modules emitted:", JSON.stringify(entries));
+        workbook = Kr.classify(workbook, plugin.modules);
+        workbook = Kr.dekram(workbook, emitDependency, plugin);
+
+        const html = render(workbook.scenes, data, entries);
 
         const webpack_config = {
           entry: entries,
@@ -65,6 +71,10 @@ function configure(options = {}) {
           },
           ...baseconfig,
         };
+        console.log(
+          "Webpack configuration:",
+          JSON.stringify(webpack_config, 2)
+        );
         const compiler = webpack(webpack_config);
 
         return await new Promise((resolve, reject) => {

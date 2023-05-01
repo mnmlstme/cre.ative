@@ -1,33 +1,11 @@
 const he = require("he");
 const Kr = require("@cre.ative/kram");
+const path = require("node:path");
 
 module.exports = { render };
 
-function render(wb, data, plugin, emitDependency) {
-  let files = {};
-
-  wb = Kr.classify(wb, plugin.modules);
-  wb = Kr.dekram(wb, emitter, plugin);
-
-  return genHtml(wb, data, files);
-
-  function emitter(name, code, language) {
-    console.log("[kram-11ty] emit:", name);
-    files[name] = code;
-    emitDependency(name, code, language);
-    return name;
-  }
-}
-
-function genHtml(wb, data, files) {
-  const { basename, scenes, modules = [] } = wb;
+function render(scenes, data, entries) {
   const { title, model } = data;
-  const namedModules = modules.filter((mdl) => Boolean(mdl.moduleName));
-  console.log(
-    "Generating Html",
-    modules.map((m) => m.moduleName).join(","),
-    Object.keys(files).join(",")
-  );
 
   return `<!DOCTYPE html>
 <html>
@@ -41,26 +19,50 @@ function genHtml(wb, data, files) {
 <span slot="title">${title}</title>
 </kram-nav>
 <kram-flow>
-${genScenes(scenes, modules, files)}
+${genScenes(scenes)}
 </kram-flow>
 </kram-main>
 <script type="module" webc:keep>
-import Wb from "./workbook.js";
-console.log("Workbook loaded; ready to mount!", wb);
+${genModuleImports(entries, model)}
 </script>
 </body>
 </html>
 `;
 }
 
-function genScenes(scenes, modules, files) {
-  const filesByScene = Object.fromEntries(
-    modules
-      .filter((mdl) => mdl.scene)
-      .map(({ scene, filepath }) => [scene, files[filepath]])
-  );
+function genModuleImports(entries, model) {
+  console.log("Modules:", JSON.stringify(entries));
+  const mpt = "kram-mountpoint";
+  const mfn = "mount";
+  const dynamicImports = Object.values(entries)
+    .map(
+      (m) =>
+        `import("./${m.filename}").then((mod) => ${mfn}(mod, "${m.import}", "${mpt}"));`
+    )
+    .join("\n");
+
+  return `
+    const initialState = ${JSON.stringify(model)};
+    ${dynamicImports}
+    function ${mfn} (mod, name, mountpoint) {
+      let render = (n, container) => {
+        console.log("Cannot render scene; module not mounted:", name);
+      };
+
+      try {
+        const mountElement = document.getElementById(mountpoint);
+        render = mod.mount(mountElement, initialState);
+        console.log("Module mounted:", name);
+      } catch (err) {
+        console.log("Warning: module not mounted", name, err);
+      }
+
+      return render;
+    }`;
+}
+
+function genScenes(scenes) {
   const sceneBlocks = scenes.map(({ blocks }, i) => {
-    const file = filesByScene[i + 1] || [];
     const prose = blocks
       .filter((blk) => !isEvalBlock(blk))
       .map(genProse)
@@ -74,7 +76,7 @@ function genScenes(scenes, modules, files) {
       .join("\n");
 
     return [
-      `<kram-scene>${file}</kram-scene>`,
+      `<kram-scene scene="${i}"></kram-scene>`,
       `<kram-code data-language="auto">${evalcode}</kram-code>`,
       `<kram-narrative>${prose}</kram-narrative>`,
     ];
