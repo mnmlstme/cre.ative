@@ -15,8 +15,8 @@ const mdit = MarkdownIt({
 
 Object.assign(mdit.renderer.rules, rules)
 
-function parse(md, basename, updaterFn = (wb) => wb) {
-  const { body, attributes } = frontMatter(md)
+function parse(md, basename) {
+  const { body, attributes } = typeof md === 'string' ? frontMatter(md) : md
   const defaultLang = attributes.lang || 'text'
   const tokens = mdit.parse(body)
   const flat = tokens.reduce(
@@ -28,14 +28,10 @@ function parse(md, basename, updaterFn = (wb) => wb) {
   )
   const json = `[{}${mdit.render(body)}]`
 
-  if (unhandled.length > 0) {
-    console.log('Unhandled Tokens:', unhandled)
-  }
-
   const blocks = JSON.parse(json).slice(1)
   const { title, platform, model, imports } = attributes
 
-  const result = updaterFn({
+  const result = {
     title,
     basename,
     platform,
@@ -44,8 +40,7 @@ function parse(md, basename, updaterFn = (wb) => wb) {
     shape: getShapeOf(model),
     imports: getImportSpecs(imports),
     scenes: paginate(blocks),
-  })
-  // console.log('Workbook:', JSON.stringify(result))
+  }
 
   const hashkey = hashcode(result)
   const moduleName = `Kram_${hashkey}_${basename}`

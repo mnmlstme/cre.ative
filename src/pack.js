@@ -32,7 +32,7 @@ function sceneToMarkdown(scn) {
 
 function blockToMarkdown(blk) {
   const [type, { markup, block, lang }, ...rest] = blk
-  console.log('blockToMarkdown:', type, { markup, block, lang }, rest)
+
   switch (type) {
     case 'fence':
       return `${markup}${lang}\n${rest[0]}${markup}\n`

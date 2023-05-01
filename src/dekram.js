@@ -11,7 +11,7 @@ export function dekram(workbook, emitter, plugin) {
 
     return files.map((f) => {
       const { moduleName, language, name, mode = 'define', code, ...rest } = f
-      const filepath = emitter(name, code)
+      const filepath = emitter(name, code, language)
       return {
         moduleName,
         mode,

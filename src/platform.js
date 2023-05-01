@@ -28,7 +28,7 @@ const defaultModule = {
 
   // default module requires no binding, and, if need be,
   // defines its own mount function which returns a render function
-  bind: () => `function(resource, container, initial) { 
+  bind: () => `function(resource, container, initial) {
       if ( typeof (resource && resource.mount) === 'function' ) {
         return resource.mount(container, initial)
       }}`,
