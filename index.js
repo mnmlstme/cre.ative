@@ -15,30 +15,29 @@ module.exports = {
 
 function register({ providesLanguage }) {
   providesLanguage("jsx", {
-    use: () => 'babel-loader?{presets:["@babel/preset-react"]}',
+    use: () => 'babel-loader?{presets:["@babel/preset-react",{modules:false}]}',
     classify: classifyJavascript,
     collate: (workbook, lang) => {
-      const evals = Kr.extract(workbook, "eval", lang);
-      const defns = Kr.extract(workbook, "define", lang);
+      const { scenes, definitions } = Kr.extract(workbook, "eval");
 
       return {
         name: "index.jsx",
         language: lang,
-        code: generateJsx(workbook, defns, evals),
+        code: generateJsx(workbook, definitions, scenes),
       };
     },
   });
 
   providesLanguage("js", {
-    use: () => 'babel-loader?{presets:["@babel/preset-es6"]}',
+    use: () => 'babel-loader?{presets:["@babel/preset-env",{modules:false}]}',
     classify: classifyJavascript,
     collate: (workbook, lang) => {
-      const defns = Kr.extract(workbook, "define", lang);
+      const { definitions } = Kr.extract(workbook, lang);
 
       return {
         name: "index.js",
         language: lang,
-        code: generateJavascript(workbook, defns),
+        code: generateJavascript(workbook, definitions),
       };
     },
   });
@@ -57,12 +56,12 @@ function register({ providesLanguage }) {
       },
     }),
     collate: (workbook, lang) => {
-      const defns = Kr.extract(workbook, "define", lang);
+      const { definitions } = Kr.extract(workbook, lang);
 
       return {
         name: "styles.css",
         language: lang,
-        code: defns.map((b) => b[2]).join("\n\n/****/\n\n"),
+        code: definitions.map((b) => b[2]).join("\n\n/****/\n\n"),
       };
     },
   });
@@ -98,7 +97,7 @@ function generateJavascript({ moduleName, imports }, defns) {
 
 function generateJsx(workbook, defns, evals) {
   const { moduleName, imports, shape } = workbook;
-  const cssDefns = Kr.extract(workbook, "define", "css");
+  const css = Kr.extract(workbook, "css");
 
   return `// module ${moduleName} (JSX)
 import React from 'react'
@@ -106,7 +105,11 @@ import { createRoot } from 'react-dom/client'
 const Redux = require('redux')
 import Im from 'immutable'
 import { Provider, connect } from 'react-redux'
-${cssDefns && cssDefns.length ? "import CssModule from './styles.css'" : ""}
+${
+  css.definitions && css.definitions.length
+    ? "import CssModule from './styles.css'"
+    : ""
+}
 ${imports.map(genImport).join("\n")}
 
 export function Program (css) {
@@ -193,10 +196,9 @@ function genExposeModel(shape) {
 }
 
 function genView(block) {
-  const [_, attrs, code] = block;
-  const { scene } = attrs;
+  const [scene, _, code] = block;
 
-  return `${scene}: () => (<>${code}</>)`;
+  return `"${scene}": () => (<>${code}</>)`;
 }
 
 function genDefn(block) {
