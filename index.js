@@ -36,14 +36,14 @@ function register({ providesLanguage }) {
         let { Elm } = resource
         let safety = mountpoint.appendChild(document.createElement('div'))
         let elmNode = safety.appendChild(document.createElement('div'))
-        let app = 
+        let app =
           Elm.${moduleName}.init({ node: elmNode, flags: initial })
         return (n, container) => {
           console.log('Elm rendering scene ', n)
           app.ports.kram_render.send(n-1) /* render the scene */
           let toolbox = safety.lastElementChild
-          if ( toolbox && 
-            toolbox.style && 
+          if ( toolbox &&
+            toolbox.style &&
             toolbox.style.position === 'fixed') {
             /* make it absolute instead of fixed */
             console.log('Adjusting position of Elm debug tools')
@@ -53,17 +53,16 @@ function register({ providesLanguage }) {
         }
       }`,
     classify: classifyElm,
-    collate: (workbook) => {
+    collate: (workbook, lang) => {
       const { basename, project } = workbook;
       const moduleName = `${project}.${basename}.Main`;
-      const evals = Kr.extract(workbook, "eval", "elm");
-      const defns = Kr.extract(workbook, "define", "elm");
+      const { scenes, definitions } = Kr.extract(workbook, lang);
 
       return {
         moduleName,
         name: "Main.elm",
         language: "elm",
-        code: generateElm(moduleName, workbook, defns, evals),
+        code: generateElm(moduleName, workbook, definitions, scenes),
       };
     },
   });
@@ -73,13 +72,13 @@ function register({ providesLanguage }) {
       loader: "css-loader",
     }),
     collate: (workbook, lang) => {
-      const defns = Kr.extract(workbook, "define", lang);
+      const { definitions } = Kr.extract(workbook, lang);
 
       return {
         name: "styles.css",
         moduleName: "Styles",
-        language: "lang",
-        code: defns.map((b) => b[2]).join("\n/****/\n\n"),
+        language: "css",
+        code: definitions.map((b) => b[2]).join("\n/****/\n\n"),
       };
     },
   });
@@ -105,7 +104,8 @@ function classifyElm(code) {
 
 function generateElm(moduleName, { init, imports, shape }, defns, evals) {
   // generates Elm module
-  console.log("generateElm with imports:", JSON.stringify(imports));
+  console.log("generateElm, init=", JSON.stringify(init));
+
   return `port module ${moduleName} exposing (main)
 import Browser
 import Debug exposing (log)
@@ -125,9 +125,9 @@ main =
 
 port kram_render : (Int -> msg) -> Sub msg
 
-type alias Scope = 
+type alias Scope =
   ${genModel(shape)}
-  
+
 type alias Model =
   { scope: Scope
   , scene__: Maybe Int
@@ -165,7 +165,7 @@ view model =
   ${genExposeModel(shape)}
   case model.scene__ of
     ${evals.map(genView).join("\n    ")}
-    _ -> 
+    _ ->
       Html.text ""
 
 ${defns.map(genDefn).join("\n")}
@@ -247,8 +247,7 @@ function genExposeModel(shape) {
 }
 
 function genView(block) {
-  const [_, attrs, code] = block;
-  const { scene } = attrs;
+  const [scene, attrs, code] = block;
 
   return `Just ${scene} ->
       ${code.split("\n").join("\n        ")}

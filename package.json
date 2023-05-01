@@ -1,6 +1,6 @@
 {
   "name": "@cre.ative/kram-elm",
-  "version": "1.3.2",
+  "version": "1.5.0",
   "description": "kram platform for the Elm language and architecture",
   "main": "index.js",
   "scripts": {
@@ -18,7 +18,7 @@
     "webpack-cli": "^4.10.0"
   },
   "dependencies": {
-    "@cre.ative/kram": "^1.3.4",
+    "@cre.ative/kram": "1.5.3",
     "babel-loader": "^8.2.2",
     "css-loader": "^5.2.6",
     "elm": "^0.19.1-5",
