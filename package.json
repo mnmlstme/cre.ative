@@ -1,8 +1,11 @@
 {
   "name": "@cre.ative/kram-11ty",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "description": "Kram plugin for Eleventy",
-  "main": "index.js",
+  "exports": {
+    ".": "./index.js",
+    "./runtime": "./runtime.mjs"
+  },
   "type": "commonjs",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

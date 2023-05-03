@@ -1,19 +1,30 @@
 const he = require("he");
 const Kr = require("@cre.ative/kram");
+const MarkdownIt = require("markdown-it");
 const path = require("node:path");
 
 module.exports = { render };
 
-function render(scenes, data, entries) {
-  const { title, model } = data;
+const mdit = MarkdownIt({
+  html: true,
+  linkify: true,
+  typographer: true,
+});
+
+function render(scenes, data, files, importMap) {
+  const { title, model = {}, runtime } = data;
 
   return `<!DOCTYPE html>
 <html>
 <head>
 <title>${title}</title>
-<link rel="stylesheet" href="/styles/theme.css" webc:keep>
+<script type="importmap">
+{ "imports": ${JSON.stringify(importMap)} }
+</script>
+<link rel="stylesheet" href="/styles/theme.css">
+${genCssDefs(files)}
 </head>
-<body webc:bucket="defer">
+<body>
 <kram-main>
 <kram-nav>
 <span slot="title">${title}</title>
@@ -22,43 +33,58 @@ function render(scenes, data, entries) {
 ${genScenes(scenes)}
 </kram-flow>
 </kram-main>
-<script type="module" webc:keep>
-${genModuleImports(entries, model)}
+${genHtmlDefs(files)}
+${genSvgDefs(files)}
+<script type="module">
+${genRuntimeInit(model, runtime)}
+${genModuleImports(files, model)}
 </script>
 </body>
 </html>
 `;
 }
 
-function genModuleImports(entries, model) {
-  console.log("Modules:", JSON.stringify(entries));
-  const mpt = "kram-mountpoint";
-  const mfn = "mount";
-  const dynamicImports = Object.values(entries)
-    .map(
-      (m) =>
-        `import("./${m.filename}").then((mod) => ${mfn}(mod, "${m.import}", "${mpt}"));`
-    )
+function genCssDefs(files) {
+  return files
+    .filter((f) => f.language === "css")
+    .map((f) => `<link rel="stylesheet" href="${f.filename}"/>`)
     .join("\n");
+}
 
+function genHtmlDefs(files) {
+  return files
+    .filter((f) => f.language === "html")
+    .map((f) => f.code)
+    .join("\n");
+}
+
+function genSvgDefs(files) {
+  return files
+    .filter((f) => f.language === "svg")
+    .map((f) => f.code)
+    .join("\n");
+}
+
+function genRuntimeInit(model, runtime) {
   return `
-    const initialState = ${JSON.stringify(model)};
-    ${dynamicImports}
-    function ${mfn} (mod, name, mountpoint) {
-      let render = (n, container) => {
-        console.log("Cannot render scene; module not mounted:", name);
-      };
+    import {register, init} from "${runtime}";
+    init(${JSON.stringify(model)});
+  `;
+}
 
-      try {
-        const mountElement = document.getElementById(mountpoint);
-        render = mod.mount(mountElement, initialState);
-        console.log("Module mounted:", name);
-      } catch (err) {
-        console.log("Warning: module not mounted", name, err);
-      }
-
-      return render;
-    }`;
+function genModuleImports(files) {
+  console.log("Modules:", JSON.stringify(files.map((f) => f.name)));
+  const mustImport = (type) => !["html", "svg", "css"].includes(type);
+  return (
+    files
+      // .filter((f) => mustImport(f.language))
+      .map(
+        (f) =>
+          `import("${f.filename}")
+          .then((mod) => register(mod, "${f.name}"))`
+      )
+      .join("\n")
+  );
 }
 
 function genScenes(scenes) {
@@ -75,11 +101,7 @@ function genScenes(scenes) {
       })
       .join("\n");
 
-    return [
-      `<kram-scene scene="${i}"></kram-scene>`,
-      `<kram-code data-language="auto">${evalcode}</kram-code>`,
-      `<kram-narrative>${prose}</kram-narrative>`,
-    ];
+    return [`<kram-scene scene="${i}">${prose}</kram-scene>`];
   });
 
   return sceneBlocks.flat().join("\n");

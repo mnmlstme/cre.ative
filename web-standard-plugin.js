@@ -31,25 +31,33 @@ function register({ providesLanguage, defaultModule }) {
     collate: (workbook) => {
       const { scenes, definitions } = Kr.extract(workbook, "html");
       const buildDefn = ([n, attrs, code]) => code;
-      const buildScene = ([n, attrs, code]) => ({
-        name: `scene-${n + 1}.html`,
-        language: "html",
-        mode: "eval",
-        scene: n + 1,
-        code,
-      });
+      const buildScene = ([n, attrs, code]) =>
+        `<kram-scene scene="${n + 1}">${code}</kram-scene>`;
 
-      const sceneFiles = scenes.map(buildScene);
-
-      return [
-        {
-          name: "templates.html",
-          mode: "define",
-          language: "html",
-          code: definitions.map(buildDefn).join("\n"),
-        },
-        ...sceneFiles,
-      ];
+      return [].concat(
+        definitions.length
+          ? [
+              {
+                name: "templates.html",
+                mode: "define",
+                language: "html",
+                code: definitions.map(buildDefn).join("\n"),
+              },
+            ]
+          : [],
+        scenes.length
+          ? [
+              {
+                name: "scenes.html",
+                mode: "eval",
+                language: "html",
+                code: `
+                ${scenes.map(buildScene).join("\n")}
+                `,
+              },
+            ]
+          : []
+      );
     },
   });
 
@@ -121,7 +129,6 @@ function register({ providesLanguage, defaultModule }) {
         name: "module.js",
         language: "js",
         code: `// module ${moduleName} (ES6)
-          import { register } from "/scripts/oper.ative.js"
           ${imports.map(buildImport).join("\n")}
           console.log('Loading module "${moduleName}"')
           export function Program ({connectStore, initializeStore}) {
@@ -148,7 +155,7 @@ function register({ providesLanguage, defaultModule }) {
               program[n-1].call(container)
             }
           }
-          register("${moduleName}", {Program, mount})
+
         `,
       };
     },
@@ -163,19 +170,18 @@ function classifyJavascript(code) {
     let: "variable",
   };
   const defnMatch = code.match(jsDefnRegex);
-  if (defnMatch) {
-    return {
-      mode: "define",
-      definitions: [
-        {
-          name: defnMatch[2],
-          type: keywordToType[defnMatch[1]],
-        },
-      ],
-    };
-  } else {
-    return { mode: "eval" };
-  }
+
+  return {
+    mode: "define",
+    definitions: defnMatch
+      ? [
+          {
+            name: defnMatch[2],
+            type: keywordToType[defnMatch[1]],
+          },
+        ]
+      : undefined,
+  };
 }
 
 function buildImport(spec) {
