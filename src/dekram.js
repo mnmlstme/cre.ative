@@ -13,12 +13,11 @@ export function dekram(workbook, emitter, plugin) {
       const { moduleName, language, name, mode = 'define', code, ...rest } = f
       const filepath = emitter(name, code, language)
       return {
-        moduleName,
+        moduleName: moduleName || name,
         mode,
         language,
         filepath,
         use,
-        bind: module.bind(moduleName || name, module.language) || 'null',
         ...rest,
       }
     })

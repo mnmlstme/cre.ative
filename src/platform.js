@@ -23,15 +23,9 @@ const defaultModule = {
         .concat(scenes)
         .map(([n, attrs, code]) => code)
         .join('\n'),
+      bind: '(r, c) => { r.mount(c) }',
     }
   },
-
-  // default module requires no binding, and, if need be,
-  // defines its own mount function which returns a render function
-  bind: () => `function(resource, container, initial) {
-      if ( typeof (resource && resource.mount) === 'function' ) {
-        return resource.mount(container, initial)
-      }}`,
 }
 
 function register(platform, assignedName) {

@@ -6,7 +6,6 @@ export function collect(workbook, loadFn, epilog = '') {
 	  language: '${m.language}',
 	  filepath: '${m.filepath}',
 	  use: '${m.use}',
-	  bind: ${m.bind},
 	  loader: ${loadFn ? loadFn(m) : 'undefined'}
   }`
 
