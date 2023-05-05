@@ -56,12 +56,10 @@ function configure(options = {}) {
         workbook = Kr.classify(workbook, plugin.modules);
         workbook = Kr.dekram(workbook, emitDependency, plugin);
 
-        const html = render(
-          workbook.scenes,
-          { runtime, ...data },
-          files,
-          importMap
-        );
+        const html = render(workbook.scenes, workbook.modules, importMap, {
+          runtime,
+          ...data,
+        });
 
         return html;
       };

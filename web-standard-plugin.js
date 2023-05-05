@@ -32,32 +32,56 @@ function register({ providesLanguage, defaultModule }) {
       const { scenes, definitions } = Kr.extract(workbook, "html");
       const buildDefn = ([n, attrs, code]) => code;
       const buildScene = ([n, attrs, code]) =>
-        `<kram-scene scene="${n + 1}">${code}</kram-scene>`;
+        `<div data-scene="${n + 1}">${code}</div>`;
 
-      return [].concat(
-        definitions.length
-          ? [
-              {
-                name: "templates.html",
-                mode: "define",
-                language: "html",
-                code: definitions.map(buildDefn).join("\n"),
-              },
-            ]
-          : [],
-        scenes.length
-          ? [
-              {
-                name: "scenes.html",
-                mode: "eval",
-                language: "html",
-                code: `
-                ${scenes.map(buildScene).join("\n")}
-                `,
-              },
-            ]
-          : []
-      );
+      return [
+        definitions.length && {
+          name: "templates.html",
+          language: "html",
+          code: `<html>
+          <body>
+            ${definitions.map(buildDefn).join("\n")}
+          </body>
+        </html>`,
+          bind: `(resource, container) => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(resource.default, 'text/html');
+            const body = doc.body;
+            for ( let def = body.firstElementChild; def; def=body.firstElementChild ) {
+              container.appendChild(def); }
+          }`,
+        },
+        scenes.length && {
+          name: "scenes.html",
+          language: "html",
+          code: `<html>
+            <body>${scenes.map(buildScene).join("\n")}</body>
+            </html>`,
+          bind: `(resource, container) => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(resource.default, 'text/html');
+            const body = doc.body;
+            const scenes = Object.fromEntries(
+              Array.prototype.map.call(body.children, (node) => [
+              node && node.dataset.scene, node ])
+              .filter(([num]) => Boolean(num)));
+            return function render (n, container) {
+              const scene = scenes[n]
+              if( scene ) {
+                for( let child = scene.firstElementChild; child; child = scene.firstElementChild ) {
+                  if ( child.tagName === 'SCRIPT' ) {
+                    const text = child.firstChild
+                    scene.removeChild(child)
+                    child = document.createElement('script')
+                    child.appendChild(text)
+                  } 
+                  container.appendChild(child) 
+                }
+              } 
+            }
+          }`,
+        },
+      ];
     },
   });
 
@@ -75,8 +99,14 @@ function register({ providesLanguage, defaultModule }) {
         mode: "define",
         language: "css",
         code: definitions.map(buildDefn).join("\n"),
+        bind: `(resource, container) => {
+          let sheet = document.createElement("style");
+          sheet.innerHTML = resource.default;
+          container.appendChild(sheet);
+        }`,
       };
     },
+    bind: (moduleName, language) => ``,
   });
 
   providesLanguage("svg", {
@@ -92,24 +122,47 @@ function register({ providesLanguage, defaultModule }) {
     collate: (workbook) => {
       const { scenes, definitions } = Kr.extract(workbook, "svg");
       const buildDefn = ([n, attrs, code]) => code;
-      const buildScene = ([n, attrs, code]) => ({
-        name: `scene-${n + 1}.svg`,
-        language: "svg",
-        mode: "eval",
-        scene: n + 1,
-        code: `<svg xmlns="http://www.w3.org/2000/svg">${code}</svg>`,
-      });
-      const sceneFiles = scenes.map(buildScene);
+      const buildScene = ([n, attrs, code]) =>
+        `<g data-scene="${n + 1}" ${code}</g>`;
 
       return [
-        {
-          name: "defs.svg",
-          mode: "define",
+        definitions.length && {
+          name: "symbols.svg",
           language: "svg",
           code: `<svg xmlns="http://www.w3.org/2000/svg" style="display:none;">
             <defs>${definitions.map(buildDefn).join("\n")}</defs></svg>`,
+          bind: `(resource, container) => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(resource.default, 'image/svg+xml');
+            const body = doc.firstChild;
+            const defns = body.firstElementChild;
+            if ( defns ) { container.appendChild(defns) }
+          }`,
         },
-        ...sceneFiles,
+        scenes.length && {
+          name: "scenes.svg",
+          language: "svg",
+          code: `<svg xmlns="http://www.w3.org/2000/svg" style="display:none;">
+            <defs>${definitions.map(buildDefn).join("\n")}</defs>
+            ${scenes.map(buildScene).join("\n")}</svg>`,
+          bind: `(resource, container) => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(resource.default, 'image/svg+xml');
+            const body = doc.firstChild;
+            const scenes = Object.fromEntries(
+              Array.prototype.map.call(body.children, (node) => [
+                node && node.dataset.scene, node ])
+              .filter(([num] => Boolean(num)));
+            return function render (n, container) {
+              const scene = scenes[n];
+              if( scenes[n] ) {
+                const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+                container.appendChild(svg);
+                svg.appendChild(scenes[n]);
+              }
+            };
+          }`,
+        },
       ];
     },
   });
@@ -154,9 +207,7 @@ function register({ providesLanguage, defaultModule }) {
             return (n, container) => {
               program[n-1].call(container)
             }
-          }
-
-        `,
+          }`,
       };
     },
   });

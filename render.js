@@ -11,7 +11,7 @@ const mdit = MarkdownIt({
   typographer: true,
 });
 
-function render(scenes, data, files, importMap) {
+function render(scenes, modules, importMap, data = {}) {
   const { title, model = {}, runtime } = data;
 
   return `<!DOCTYPE html>
@@ -22,7 +22,6 @@ function render(scenes, data, files, importMap) {
 { "imports": ${JSON.stringify(importMap)} }
 </script>
 <link rel="stylesheet" href="/styles/theme.css">
-${genCssDefs(files)}
 </head>
 <body>
 <kram-main>
@@ -33,36 +32,13 @@ ${genCssDefs(files)}
 ${genScenes(scenes)}
 </kram-flow>
 </kram-main>
-${genHtmlDefs(files)}
-${genSvgDefs(files)}
 <script type="module">
 ${genRuntimeInit(model, runtime)}
-${genModuleImports(files, model)}
+${genModuleImports(modules)}
 </script>
 </body>
 </html>
 `;
-}
-
-function genCssDefs(files) {
-  return files
-    .filter((f) => f.language === "css")
-    .map((f) => `<link rel="stylesheet" href="${f.filename}"/>`)
-    .join("\n");
-}
-
-function genHtmlDefs(files) {
-  return files
-    .filter((f) => f.language === "html")
-    .map((f) => f.code)
-    .join("\n");
-}
-
-function genSvgDefs(files) {
-  return files
-    .filter((f) => f.language === "svg")
-    .map((f) => f.code)
-    .join("\n");
 }
 
 function genRuntimeInit(model, runtime) {
@@ -72,19 +48,20 @@ function genRuntimeInit(model, runtime) {
   `;
 }
 
-function genModuleImports(files) {
-  console.log("Modules:", JSON.stringify(files.map((f) => f.name)));
-  const mustImport = (type) => !["html", "svg", "css"].includes(type);
-  return (
-    files
-      // .filter((f) => mustImport(f.language))
-      .map(
-        (f) =>
-          `import("${f.filename}")
-          .then((mod) => register(mod, "${f.name}"))`
-      )
-      .join("\n")
+function genModuleImports(modules) {
+  console.log(
+    "Modules:",
+    JSON.stringify(modules.map((f) => [f.moduleName, f.filepath, f.bind]))
   );
+  return modules
+    .map(
+      (f) =>
+        `import("${f.filepath}")
+          .then((mod) => register(mod, "${f.moduleName}", "${f.language}", ${
+          f.bind || "null"
+        }))`
+    )
+    .join("\n");
 }
 
 function genScenes(scenes) {
@@ -93,15 +70,23 @@ function genScenes(scenes) {
       .filter((blk) => !isEvalBlock(blk))
       .map(genProse)
       .join("\n");
+    let language = null;
     const evalcode = blocks
       .filter(isEvalBlock)
       .map(([_, { lang }, ...rest]) => {
         const code = rest.join("\n");
-        return `<code lang="${lang}" class="language-${lang}">${code}</code>`;
+        if (lang && !language) {
+          language = lang;
+        }
+        return `<code lang="${lang}" class="language-${
+          lang || "text"
+        }">${code}</code>`;
       })
       .join("\n");
 
-    return [`<kram-scene scene="${i}">${prose}</kram-scene>`];
+    return [
+      `<kram-scene scene="${i}" language="${language}">${prose}</kram-scene>`,
+    ];
   });
 
   return sceneBlocks.flat().join("\n");
@@ -123,7 +108,10 @@ function genProse(blk) {
       return rest.join("\n");
     case "fence":
       const code = rest.join("\n");
-      return `<kram-code data-language="${lang}"><code class="language-${lang}">${code}</code></kram-code>`;
+      return `<kram-code data-language="${lang}">
+        <code class="language-${lang}">${encodeAsHtml(
+        code
+      )}</code></kram-code>`;
     case "bullet_list":
     case "ordered_list":
     case "list_item":
