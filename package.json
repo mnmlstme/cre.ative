@@ -4,7 +4,8 @@
   "description": "Kram plugin for Eleventy",
   "exports": {
     ".": "./index.js",
-    "./runtime": "./runtime.mjs"
+    "./runtime": "./runtime.mjs",
+    "./styles": "./styles.css"
   },
   "type": "commonjs",
   "scripts": {

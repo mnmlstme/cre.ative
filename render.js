@@ -12,7 +12,7 @@ const mdit = MarkdownIt({
 });
 
 function render(scenes, modules, importMap, data = {}) {
-  const { title, model = {}, runtime } = data;
+  const { title, model = {}, runtime, styles } = data;
 
   return `<!DOCTYPE html>
 <html>
@@ -21,7 +21,7 @@ function render(scenes, modules, importMap, data = {}) {
 <script type="importmap">
 { "imports": ${JSON.stringify(importMap)} }
 </script>
-<link rel="stylesheet" href="/styles/theme.css">
+<link rel="stylesheet" href="${importMap[styles]}">
 </head>
 <body>
 <kram-main>
@@ -49,10 +49,10 @@ function genRuntimeInit(model, runtime) {
 }
 
 function genModuleImports(modules) {
-  console.log(
-    "Modules:",
-    JSON.stringify(modules.map((f) => [f.moduleName, f.filepath, f.bind]))
-  );
+  // console.log(
+  //   "Modules:",
+  //   JSON.stringify(modules.map((f) => [f.moduleName, f.filepath, f.bind]))
+  // );
   return modules
     .map(
       (f) =>

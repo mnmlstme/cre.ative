@@ -24,6 +24,7 @@ function configure(options = {}) {
 
       return async (data) => {
         const { platform, runtime = "@cre.ative/kram-11ty/runtime" } = data;
+        const styles = "@cre.ative/kram-11ty/styles";
 
         if (!platform) {
           return this.defaultRenderer(data);
@@ -36,7 +37,7 @@ function configure(options = {}) {
         );
 
         const importMap = importPackages(
-          [runtime].concat(data.imports || []),
+          [runtime, styles].concat(data.imports || []),
           path.resolve(root, "node_modules"),
           outputRoot
         );
@@ -58,6 +59,7 @@ function configure(options = {}) {
 
         const html = render(workbook.scenes, workbook.modules, importMap, {
           runtime,
+          styles,
           ...data,
         });
 
@@ -96,8 +98,17 @@ function relocate(pkg, src, nodeModules, outputRoot) {
   const dest = path.join(outputRoot, modulePrefix, relpath);
   const result = path.join("/", modulePrefix, relpath);
 
+  if (fs.existsSync(dest)) {
+    // short-circuit the copy if it exists and is not older
+    const mtime = (path) => new Date(fs.statSync(path).mtime).getTime();
+
+    if (mtime(src) <= mtime(dest)) {
+      return result;
+    }
+  }
+
   fs.mkdirSync(path.dirname(dest), { recursive: true });
-  // might want to check first if the file exists and is not old
+
   fs.copyFile(src, dest, fs.constants.COPYFILE_FICLONE, (err) => {
     if (err) {
       console.log(

@@ -1,0 +1,18 @@
+kram-scene {
+  display: grid;
+}
+
+kram-scene > :not([slot="rendering"]) {
+  border: 5px solid cyan;
+}
+
+kram-scene > [slot="rendering"] {
+  border: 5px solid yellow;
+}
+
+kram-nav {
+  border: 5px solid magenta;
+}
+kram-main {
+  display: grid;
+}
