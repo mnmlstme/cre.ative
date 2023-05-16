@@ -15,8 +15,6 @@
   "license": "BSD-3-Clause",
   "dependencies": {
     "@cre.ative/kram": "^1.5.3",
-    "@cre.ative/kram-express-webpack": "^1.4.0",
-    "he": "^1.2.0",
-    "webpack": "^5.75.0"
+    "he": "^1.2.0"
   }
 }

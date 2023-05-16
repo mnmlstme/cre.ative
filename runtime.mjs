@@ -55,22 +55,45 @@ function mount(mod, name, bindfn) {
   return render;
 }
 
-class MainElement extends HTMLElement {}
+class MainElement extends HTMLElement {
+  constructor() {
+    super();
+
+    this.attachShadow({ mode: "open" }).appendChild(
+      MainElement.html_template.cloneNode(true)
+    );
+  }
+
+  static html_template = template`<article>
+    <header>
+      <h1><slot name="title">Untitled Workbook</slot></h1>
+      <nav><slot name="nav"><a href="#">Top</a></slot></nav>
+    </header>
+    <main><slot></slot></main>
+  </article>
+  <style>
+    article {
+      display: grid;
+      grid-template-columns: var(--grid-size-sidebar) var(--grid-size-main) var(--grid-size-extra);
+      grid-template-areas:
+        "hd hd nav"
+        "mn mn mn";
+    }
+    header { display: contents; }
+    h1 { grid-area: hd; }
+    nav { grid-area: nav; }
+    main { grid-area: mn; }
+  </style>
+  `;
+}
 
 class SceneElement extends HTMLElement {
   constructor() {
     super();
 
-    let shadowRoot = this.attachShadow({ mode: "open" });
-    shadowRoot.innerHTML = `
-      <section>
-        <figure id="rendering">
-          <slot name="rendering">Nothing rendered (yet).</slot>
-        </figure>
-        <main>
-          <slot>Discussion</slot>
-        </main>
-      </section>`;
+    this.attachShadow({ mode: "open" }).appendChild(
+      SceneElement.html_template.cloneNode(true)
+    );
   }
 
   connectedCallback() {
@@ -86,4 +109,42 @@ class SceneElement extends HTMLElement {
       render(parseInt(scnum), slot);
     });
   }
+
+  static html_template = template`<section>
+    <figure id="rendering">
+      <slot name="rendering">Nothing rendered (yet).</slot>
+    </figure>
+    <slot name="scenecode">No code for this scene.</slot>
+    <slot name="title"><h1>Untitled</h1></slot>
+    <main>
+      <slot>Discussion</slot>
+    </main>
+  </section><style>
+    :host { display: contents; }
+    section {
+      display: grid;
+      grid-template-columns: 2fr 5fr 3fr;
+      grid-template-columns: subgrid; /* where supported */
+      grid-template-areas:
+        "title scene scene"
+        ". code  code"
+        ". code  code"
+    }
+    figure {
+      grid-area: scene;
+      width: fit-content;
+      height: auto;
+      margin: 0 auto;
+    }
+    ::slotted([slot="title"]) { grid-area: title; }
+    ::slotted([slot="scenecode"]) { grid-area: code; }
+    main { display: contents; }
+  </style>`;
+}
+
+function template(strings, ...values) {
+  const html = strings.flatMap((s, i) => (i ? [values[i - 1], s] : [s]));
+  let tpl = document.createElement("template");
+  tpl.innerHTML = html;
+  return tpl.content;
 }

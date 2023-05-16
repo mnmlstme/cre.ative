@@ -1,8 +1,26 @@
-kram-scene {
-  display: grid;
+:root {
+  --grid-size-sidebar: 2fr;
+  --grid-size-main: 5fr;
+  --grid-size-extra: 3fr;
 }
 
-kram-scene > :not([slot="rendering"]) {
+kram-main {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+}
+
+kram-flow {
+  display: contents;
+}
+
+kram-scene > * {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+kram-scene > :not([slot]) {
   border: 5px solid cyan;
 }
 
@@ -10,9 +28,24 @@ kram-scene > [slot="rendering"] {
   border: 5px solid yellow;
 }
 
-kram-nav {
-  border: 5px solid magenta;
+kram-scene > [slot="scenecode"] {
+  border: 5px solid yellow;
 }
-kram-main {
-  display: grid;
+
+kram-scene > :not([slot]) {
+  grid-column: span 1 / -2;
+}
+
+kram-scene > kram-code:not([slot]) {
+  grid-column: auto / span 2;
+  grid-row: auto/ span 2;
+}
+
+kram-scene > kram-code + :not(kram-code) {
+  grid-column-end: auto;
+}
+
+kram-code {
+  display: block;
+  white-space: pre;
 }

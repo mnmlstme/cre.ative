@@ -30,6 +30,8 @@ function configure(options = {}) {
           return this.defaultRenderer(data);
         }
 
+        console.log("[kram-11ty] Loading platform", platform);
+
         const plugin = Kr.register(
           platform === "none" || platform === "web-standard"
             ? defaultPlatform

@@ -22,33 +22,29 @@ function render(scenes, modules, importMap, data = {}) {
 { "imports": ${JSON.stringify(importMap)} }
 </script>
 <link rel="stylesheet" href="${importMap[styles]}">
+<script type="module">
+import {init, register} from "${runtime}";
+${genInit(model, "init")}
+${genModuleImports(modules, "register")}
+</script>
 </head>
 <body>
 <kram-main>
-<kram-nav>
-<span slot="title">${title}</title>
-</kram-nav>
+<h1 slot="title">${title}</h1>
 <kram-flow>
 ${genScenes(scenes)}
 </kram-flow>
 </kram-main>
-<script type="module">
-${genRuntimeInit(model, runtime)}
-${genModuleImports(modules)}
-</script>
 </body>
 </html>
 `;
 }
 
-function genRuntimeInit(model, runtime) {
-  return `
-    import {register, init} from "${runtime}";
-    init(${JSON.stringify(model)});
-  `;
+function genInit(model, init = "init") {
+  return `${init}(${JSON.stringify(model)});`;
 }
 
-function genModuleImports(modules) {
+function genModuleImports(modules, reg = "register") {
   // console.log(
   //   "Modules:",
   //   JSON.stringify(modules.map((f) => [f.moduleName, f.filepath, f.bind]))
@@ -57,7 +53,7 @@ function genModuleImports(modules) {
     .map(
       (f) =>
         `import("${f.filepath}")
-          .then((mod) => register(mod, "${f.moduleName}", "${f.language}", ${
+          .then((mod) => ${reg}(mod, "${f.moduleName}", "${f.language}", ${
           f.bind || "null"
         }))`
     )
@@ -78,14 +74,16 @@ function genScenes(scenes) {
         if (lang && !language) {
           language = lang;
         }
-        return `<code lang="${lang}" class="language-${
-          lang || "text"
-        }">${code}</code>`;
+        lang = lang || "text";
+        return `<kram-code slot="scenecode" data-language="${lang}"
+          ><code lang="${lang}" class="language-${lang}"
+            >${encodeAsHtml(code)}</code></kram-code>`;
       })
       .join("\n");
 
     return [
-      `<kram-scene scene="${i}" language="${language}">${prose}</kram-scene>`,
+      `<kram-scene scene="${i + 1}" language="${language}"
+        >${evalcode}${prose}</kram-scene>`,
     ];
   });
 
@@ -108,14 +106,17 @@ function genProse(blk) {
       return rest.join("\n");
     case "fence":
       const code = rest.join("\n");
-      return `<kram-code data-language="${lang}">
-        <code class="language-${lang}">${encodeAsHtml(
-        code
-      )}</code></kram-code>`;
+      return `<kram-code data-language="${lang}"
+        ><code class="language-${lang}"
+          >${encodeAsHtml(code)}</code></kram-code>`;
     case "bullet_list":
     case "ordered_list":
     case "list_item":
       return `<${tag}>${rest.map(genProse).join("\n")}</${tag}>\n`;
+    case "heading":
+      if (tag === "h1") {
+        return `<${tag} slot="title">${jsonToHtml(rest)}</${tag}>\n`;
+      }
     default:
       return `<${tag}>${jsonToHtml(rest)}</${tag}>\n`;
   }
