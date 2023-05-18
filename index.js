@@ -9,7 +9,7 @@ module.exports = {
 };
 
 function configure(options = {}) {
-  const { input = "./src", output = "./docs", template, platforms } = options;
+  const { input = "./src", output = "./docs", platforms } = options;
   const root = process.cwd();
   const inputRoot = path.resolve(root, input);
   const outputRoot = path.resolve(root, output);
@@ -22,6 +22,8 @@ function configure(options = {}) {
       const projName = path.basename(path.dirname(inputPath));
       const context = path.resolve(outputRoot, relPath, basename);
 
+      console.log("Built-in highlighter:", this.highlight);
+
       return async (data) => {
         const { platform, runtime = "@cre.ative/kram-11ty/runtime" } = data;
         const styles = "@cre.ative/kram-11ty/styles";
@@ -29,7 +31,6 @@ function configure(options = {}) {
         if (!platform) {
           return this.defaultRenderer(data);
         }
-
         console.log("[kram-11ty] Loading platform", platform);
 
         const plugin = Kr.register(
@@ -37,6 +38,13 @@ function configure(options = {}) {
             ? defaultPlatform
             : require(platforms[platform])
         );
+
+        console.log("[kram-11ty] Highlighting with", this.highlight);
+
+        const highlight =
+          typeof this.highlight == "function"
+            ? (s) => this.highlight(s)
+            : (s) => s;
 
         const importMap = importPackages(
           [runtime, styles].concat(data.imports || []),

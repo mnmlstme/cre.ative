@@ -1,7 +1,47 @@
+@import "https://fonts.googleapis.com/css2?family=Anonymous+Pro:ital,wght@0,400;0,700;1,400&family=Hepta+Slab:wght@400&family=Inter:wght@400;700&display=swap";
+
 :root {
-  --grid-size-sidebar: 2fr;
-  --grid-size-main: 5fr;
-  --grid-size-extra: 3fr;
+  --border-radius-large: 2rem;
+  --border-thickness-medium: 2px;
+
+  --color-accent: hsl(86, 64%, 65%);
+  --color-accent-darker: hsl(80, 73%, 16%);
+  --color-background-native: white;
+  --color-background-base: rgb(32, 24, 28);
+  --color-text-base: rgb(240, 232, 232);
+  --color-text-native: black;
+
+  --font-display: "Hepta Slab", Georgia, serif;
+  --font-code: "Anonymous Pro", Monaco, "Courier New", monospace;
+  --font-body: Inter, Verdana, sans-serif;
+  --font-native: serif;
+
+  --grid-width-margin: 2rem;
+  --grid-width-main: 5fr;
+  --grid-width-crossover: 3fr;
+  --grid-width-aside: 2fr;
+
+  --spacing-small: 0.5rem;
+  --spacing-medium: 1rem;
+  --spacing-large: 2rem;
+  --spacing-huge: 4rem;
+
+  --page-background: var(--color-background-base);
+  --page-text-color: var(--color-text-base);
+  --page-grid-template: [start] var(--grid-width-aside) [main]
+    var(--grid-width-main) var(--grid-width-crossover) [aside]
+    var(--grid-width-aside) [end];
+
+  --scene-background: var(--color-background-native);
+  --scene-border-thickness: var(--border-thickness-medium);
+  --scene-border-style: solid;
+  --scene-border-color: var(--color-accent-darker);
+  --scene-border: var(--scene-border-thickness) var(--scene-border-style)
+    var(--scene-border-color);
+  --scene-border-radius: var(--border-radius-large);
+  --scene-font: var(--font-native);
+  --scene-padding-inline: var(--spacing-large);
+  --scene-text-color: var(--color-text-native);
 }
 
 kram-main {
@@ -21,31 +61,19 @@ kram-scene > * {
 }
 
 kram-scene > :not([slot]) {
-  border: 5px solid cyan;
-}
-
-kram-scene > [slot="rendering"] {
-  border: 5px solid yellow;
-}
-
-kram-scene > [slot="scenecode"] {
-  border: 5px solid yellow;
-}
-
-kram-scene > :not([slot]) {
-  grid-column: span 1 / -2;
+  grid-column: main / span 2;
 }
 
 kram-scene > kram-code:not([slot]) {
-  grid-column: auto / span 2;
-  grid-row: auto/ span 2;
+  grid-column: start / span 2;
 }
 
-kram-scene > kram-code + :not(kram-code) {
-  grid-column-end: auto;
+kram-scene > kram-code:not([slot]) + :not(kram-code) {
+  grid-column: span 2 / end;
 }
 
 kram-code {
   display: block;
   white-space: pre;
+  font-family: var(--font-code);
 }

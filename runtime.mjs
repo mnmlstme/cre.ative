@@ -74,15 +74,26 @@ class MainElement extends HTMLElement {
   <style>
     article {
       display: grid;
-      grid-template-columns: var(--grid-size-sidebar) var(--grid-size-main) var(--grid-size-extra);
+      grid-template-columns: var(--grid-width-margin) var(--page-grid-template) var(--grid-width-margin);
       grid-template-areas:
-        "hd hd nav"
-        "mn mn mn";
+        "hd hd hd nav nav nav";
+      background: var(--page-background);
+      color: var(--page-text-color);
+      font-family: var(--font-body);
+      padding-inline: var(--spacing-medium);
     }
     header { display: contents; }
-    h1 { grid-area: hd; }
+    h1 {   
+      font-family: var(--font-display);
+      color: var(--color-accent);
+      grid-area: hd; }
     nav { grid-area: nav; }
-    main { grid-area: mn; }
+    main { 
+      display: grid; 
+      grid-template-columns: var(--grid-width-margin) var(--page-grid-template) var(--grid-width-margin);
+      grid-template-columns: subgrid; 
+      grid-column: 1/-1;
+    }
   </style>
   `;
 }
@@ -111,34 +122,65 @@ class SceneElement extends HTMLElement {
   }
 
   static html_template = template`<section>
-    <figure id="rendering">
-      <slot name="rendering">Nothing rendered (yet).</slot>
-    </figure>
-    <slot name="scenecode">No code for this scene.</slot>
-    <slot name="title"><h1>Untitled</h1></slot>
+    <header>
+      <figure id="rendering">
+        <slot name="rendering">Nothing rendered (yet).</slot>
+      </figure>
+      <slot name="scenecode">No code for this scene.</slot>
+      <slot name="title"><h1>Untitled</h1></slot>
+    </header>
     <main>
       <slot>Discussion</slot>
     </main>
   </section><style>
     :host { display: contents; }
     section {
+      display: contents;
+    }
+    header {
       display: grid;
-      grid-template-columns: 2fr 5fr 3fr;
-      grid-template-columns: subgrid; /* where supported */
+      grid-column: 1 / -1;
+      grid-template-columns: var(--page-grid-template);
+      grid-template-columns: subgrid;
       grid-template-areas:
-        "title scene scene"
-        ". code  code"
-        ". code  code"
+        "scene scene scene scene scene scene"
+        ".     title code  code  code  .";
+      align-items: baseline;
+      margin-block: var(--spacing-large);
     }
     figure {
+      display: flex;
+      aspect-ratio: 4;
+      margin: 0;
+      padding-inline: var(--scene-padding-inline);
+      flex-direction: column;
+      align-items: start;
+      justify-content: space-around;
       grid-area: scene;
-      width: fit-content;
-      height: auto;
-      margin: 0 auto;
+      background: var(--scene-background);
+      border: var(--scene-border);
+      border-radius: var(--scene-border-radius);
+      font-family: var(--scene-font);
+      color: var(--scene-text-color);
     }
-    ::slotted([slot="title"]) { grid-area: title; }
+    ::slotted([slot="title"]) { 
+      grid-area: title;
+      margin: 0;
+      margin-left: var(--scene-padding-inline);
+    }
     ::slotted([slot="scenecode"]) { grid-area: code; }
-    main { display: contents; }
+    ::slotted(h1), ::slotted(h2), ::slotted(h3) {
+      font-family: var(--font-display);
+      color: var(--color-accent);
+    }
+    main { 
+      display: grid;
+      grid-column: start / end;
+      grid-template-columns: var(--page-grid-template);
+      grid-template-columns: subgrid;
+      align-items: baseline;
+      gap: var(--spacing-small) var(--spacing-medium);
+    }
   </style>`;
 }
 

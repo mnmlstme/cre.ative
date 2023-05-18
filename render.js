@@ -2,6 +2,15 @@ const he = require("he");
 const Kr = require("@cre.ative/kram");
 const MarkdownIt = require("markdown-it");
 const path = require("node:path");
+const { pairedShortcode } = require("@11ty/eleventy-plugin-syntaxhighlight");
+
+// These are default options from Eleventy Syntax Highlight plugin
+const options = {
+  alwaysWrapLineHighlights: false,
+  lineSeparator: "<br>",
+  preAttributes: {},
+  codeAttributes: {},
+};
 
 module.exports = { render };
 
@@ -21,6 +30,7 @@ function render(scenes, modules, importMap, data = {}) {
 <script type="importmap">
 { "imports": ${JSON.stringify(importMap)} }
 </script>
+<link href="https://unpkg.com/prismjs@1.20.0/themes/prism-okaidia.css" rel="stylesheet">
 <link rel="stylesheet" href="${importMap[styles]}">
 <script type="module">
 import {init, register} from "${runtime}";
@@ -75,15 +85,15 @@ function genScenes(scenes) {
           language = lang;
         }
         lang = lang || "text";
-        return `<kram-code slot="scenecode" data-language="${lang}"
-          ><code lang="${lang}" class="language-${lang}"
-            >${encodeAsHtml(code)}</code></kram-code>`;
+        const highlighted = pairedShortcode(code, lang, "", options);
+        return `<kram-code slot="scenecode" data-language="${lang}">${highlighted}</kram-code>`;
       })
       .join("\n");
 
     return [
-      `<kram-scene scene="${i + 1}" language="${language}"
-        >${evalcode}${prose}</kram-scene>`,
+      `<kram-scene scene="${
+        i + 1
+      }" language="${language}">${evalcode}${prose}</kram-scene>`,
     ];
   });
 
@@ -98,7 +108,6 @@ function isEvalBlock(blk) {
 
 function genProse(blk) {
   const [type, { tag, lang }, ...rest] = blk;
-
   // console.log(`genProse(${type}, {tag:${tag}}, ... ${rest.length} inside)`);
 
   switch (type) {
@@ -106,9 +115,8 @@ function genProse(blk) {
       return rest.join("\n");
     case "fence":
       const code = rest.join("\n");
-      return `<kram-code data-language="${lang}"
-        ><code class="language-${lang}"
-          >${encodeAsHtml(code)}</code></kram-code>`;
+      const highlighted = pairedShortcode(code, lang, "", options);
+      return `<kram-code data-language="${lang}">${highlighted}</kram-code>`;
     case "bullet_list":
     case "ordered_list":
     case "list_item":
