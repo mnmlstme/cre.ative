@@ -36,13 +36,13 @@ function register({ providesLanguage, defaultModule }) {
 
       return [
         definitions.length && {
-          name: "templates.html",
+          name: "templates.html.js",
           language: "html",
-          code: `<html>
+          code: jsLiteralModule(`<html>
           <body>
             ${definitions.map(buildDefn).join("\n")}
           </body>
-        </html>`,
+        </html>`),
           bind: `(resource, container) => {
             const parser = new DOMParser();
             const doc = parser.parseFromString(resource.default, 'text/html');
@@ -52,11 +52,11 @@ function register({ providesLanguage, defaultModule }) {
           }`,
         },
         scenes.length && {
-          name: "scenes.html",
+          name: "scenes.html.js",
           language: "html",
-          code: `<html>
+          code: jsLiteralModule(`<html>
             <body>${scenes.map(buildScene).join("\n")}</body>
-            </html>`,
+            </html>`),
           bind: `(resource, container) => {
             const parser = new DOMParser();
             const doc = parser.parseFromString(resource.default, 'text/html');
@@ -95,10 +95,10 @@ function register({ providesLanguage, defaultModule }) {
         `/* Kram: CSS in Scene ${n + 1} */\n${code}`;
 
       return {
-        name: "styles.css",
+        name: "styles.css.js",
         mode: "define",
         language: "css",
-        code: definitions.map(buildDefn).join("\n"),
+        code: jsLiteralModule(definitions.map(buildDefn).join("\n")),
         bind: `(resource, container) => {
           let sheet = document.createElement("style");
           sheet.innerHTML = resource.default;
@@ -127,10 +127,10 @@ function register({ providesLanguage, defaultModule }) {
 
       return [
         definitions.length && {
-          name: "symbols.svg",
+          name: "symbols.svg.js",
           language: "svg",
-          code: `<svg xmlns="http://www.w3.org/2000/svg" style="display:none;">
-            <defs>${definitions.map(buildDefn).join("\n")}</defs></svg>`,
+          code: jsLiteralModule(`<svg xmlns="http://www.w3.org/2000/svg" style="display:none;">
+            <defs>${definitions.map(buildDefn).join("\n")}</defs></svg>`),
           bind: `(resource, container) => {
             const parser = new DOMParser();
             const doc = parser.parseFromString(resource.default, 'image/svg+xml');
@@ -140,11 +140,11 @@ function register({ providesLanguage, defaultModule }) {
           }`,
         },
         scenes.length && {
-          name: "scenes.svg",
+          name: "scenes.svg.js",
           language: "svg",
-          code: `<svg xmlns="http://www.w3.org/2000/svg" style="display:none;">
+          code: jsLiteralModule(`<svg xmlns="http://www.w3.org/2000/svg" style="display:none;">
             <defs>${definitions.map(buildDefn).join("\n")}</defs>
-            ${scenes.map(buildScene).join("\n")}</svg>`,
+            ${scenes.map(buildScene).join("\n")}</svg>`),
           bind: `(resource, container) => {
             const parser = new DOMParser();
             const doc = parser.parseFromString(resource.default, 'image/svg+xml');
@@ -249,4 +249,8 @@ function buildImport(spec) {
   }
 
   return `import '${spec.from}'`;
+}
+
+function jsLiteralModule(contents) {
+  return ["export default ", contents, ";"].join("`");
 }

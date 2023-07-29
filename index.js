@@ -21,6 +21,7 @@ function configure(options = {}) {
       const relPath = path.relative(inputRoot, path.dirname(inputPath));
       const projName = path.basename(path.dirname(inputPath));
       const context = path.resolve(outputRoot, relPath, basename);
+      const relOutputRoot = path.relative(context, outputRoot);
 
       console.log("Built-in highlighter:", this.highlight);
 
@@ -49,7 +50,8 @@ function configure(options = {}) {
         const importMap = importPackages(
           [runtime, styles].concat(data.imports || []),
           path.resolve(root, "node_modules"),
-          outputRoot
+          outputRoot,
+          relOutputRoot
         );
 
         let workbook = Kr.parse(
@@ -79,11 +81,14 @@ function configure(options = {}) {
   };
 }
 
-function importPackages(imports, nodeModules, moduleRoot) {
+function importPackages(imports, nodeModules, moduleRoot, relModuleRoot) {
   const entries = imports
     .map((spec) => (typeof spec === "object" ? spec.from : spec))
     .map((pkg) => [pkg, resolve(pkg)])
-    .map(([pkg, file]) => [pkg, relocate(pkg, file, nodeModules, moduleRoot)]);
+    .map(([pkg, file]) => [
+      pkg,
+      relocate(pkg, file, nodeModules, moduleRoot, relModuleRoot),
+    ]);
 
   return Object.fromEntries(entries);
 }
@@ -102,11 +107,11 @@ function resolve(pkg) {
   return path;
 }
 
-function relocate(pkg, src, nodeModules, outputRoot) {
+function relocate(pkg, src, nodeModules, outputRoot, relModuleRoot) {
   const modulePrefix = "modules";
   const relpath = path.relative(nodeModules, src);
   const dest = path.join(outputRoot, modulePrefix, relpath);
-  const result = path.join("/", modulePrefix, relpath);
+  const result = path.join(relModuleRoot, modulePrefix, relpath);
 
   if (fs.existsSync(dest)) {
     // short-circuit the copy if it exists and is not older

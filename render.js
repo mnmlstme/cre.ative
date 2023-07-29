@@ -30,7 +30,6 @@ function render(scenes, modules, importMap, data = {}) {
 <script type="importmap">
 { "imports": ${JSON.stringify(importMap)} }
 </script>
-<link href="https://unpkg.com/prismjs@1.20.0/themes/prism-okaidia.css" rel="stylesheet">
 <link rel="stylesheet" href="${importMap[styles]}">
 <script type="module">
 import {init, register} from "${runtime}";
@@ -41,9 +40,8 @@ ${genModuleImports(modules, "register")}
 <body>
 <kram-main>
 <h1 slot="title">${title}</h1>
-<kram-flow>
-${genScenes(scenes)}
-</kram-flow>
+<kram-toc slot="nav">${genToc(scenes)}</kram-toc>
+<kram-flow>${genScenes(scenes)}</kram-flow>
 </kram-main>
 </body>
 </html>
@@ -70,6 +68,14 @@ function genModuleImports(modules, reg = "register") {
     .join("\n");
 }
 
+function genToc(scenes) {
+  const entries = scenes.map(({ title }, i) => {
+    return `<li data-idref="scene-${i + 1}">${title || `Scene ${i + 1}`}</li>`;
+  });
+
+  return ["<ol>", ...entries, "</ol>"].join("\n");
+}
+
 function genScenes(scenes) {
   const sceneBlocks = scenes.map(({ blocks }, i) => {
     const prose = blocks
@@ -89,11 +95,13 @@ function genScenes(scenes) {
         return `<kram-code slot="scenecode" data-language="${lang}">${highlighted}</kram-code>`;
       })
       .join("\n");
+    const norender = language ? "" : "norender";
 
     return [
-      `<kram-scene scene="${
-        i + 1
-      }" language="${language}">${evalcode}${prose}</kram-scene>`,
+      `<kram-scene 
+        scene="${i + 1}" 
+        language="${language}" 
+        ${norender}>${evalcode}${prose}</kram-scene>`,
     ];
   });
 
