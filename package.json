@@ -1,6 +1,6 @@
 {
   "name": "@cre.ative/kram-11ty",
-  "version": "1.6.0",
+  "version": "1.6.1",
   "description": "Kram plugin for Eleventy",
   "exports": {
     ".": "./index.js",

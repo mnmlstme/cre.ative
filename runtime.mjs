@@ -1,6 +1,7 @@
 let mountElement = null;
 let state = {};
 let registry = {};
+let pending = {};
 
 export function init(initialState, mountpoint) {
   Object.assign(state, initialState);
@@ -15,22 +16,35 @@ export function init(initialState, mountpoint) {
 export function register(module, name, language, bindFn) {
   const render = mount(module, name, bindFn);
   if (language && render) {
-    const { pending = [] } = registry[language] || {};
+    const todo = pending[language];
     registry[language] = { name, module, render };
-    console.log(`[kram-11ty] '${language}' scenes rendered from`, name, render);
-    pending.map((resolve) => resolve(render));
+    console.log(
+      `[kram-11ty] '${language}' scenes will be rendered from`,
+      name,
+      render
+    );
+    if (todo && todo.length) {
+      console.log("[kram-11ty] Resolving deferred scene rendering:", todo);
+      todo.map((resolve) => resolve(render));
+      pending[language] = undefined;
+    }
   }
 }
 
 function whenCanRender(language) {
   return new Promise((resolve, reject) => {
     const reg = registry[language];
+    const todo = pending[language];
     if (reg && reg.render) {
       resolve(reg.render);
-    } else if (reg && reg.pending) {
-      reg.pending.push(resolve);
+    } else if (todo) {
+      console.log(
+        `Deferring total ${todo.length + 1} renders of language ${language}`
+      );
+      todo.push(resolve);
     } else {
-      registry[language] = { pending: [resolve] };
+      console.log(`Deferring 1 render of language ${language}`);
+      pending[language] = [resolve];
     }
   });
 }
@@ -81,12 +95,12 @@ class MainElement extends HTMLElement {
       font-family: var(--font-display);
       color: var(--color-accent);
       margin: 0;
-      grid-area: hd;
+      grid-column: header-start / span 3;
       align-self: baseline; }
     ::slotted([slot="title"]) { margin: 0; }
     nav { 
-      grid-column: nav;
-      grid-row: nav/span 2;
+      grid-row: 1/span 2;
+      grid-column: aside;
       align-self: baseline;
     }
     nav a {
@@ -165,12 +179,13 @@ class SceneElement extends HTMLElement {
       const fig = document.createElement("figure");
       const node = document.createElement("div");
       fig.setAttribute("slot", "rendering");
-      this.appendChild(fig);
+      fig.appendChild(node);
 
       whenCanRender(lang).then((render) => {
         render(parseInt(scnum), node);
-        fig.appendChild(node);
       });
+
+      this.appendChild(fig);
     } else {
       this.style.setProperty("--scene-display-mode", "none");
     }
@@ -183,13 +198,13 @@ class SceneElement extends HTMLElement {
 
   static html_template = template`<section>
     <header>
-      <slot name="title"><h1></h1></slot>
       <a id="link" href="#">/</a>
       <slot name="rendering">
         <figure id="rendering">
           Nothing rendered (yet).
         </figure>
       </slot>
+      <slot name="title"><h1></h1></slot>
       <slot name="scenecode">No code for this scene.</slot>
     </header>
     <main>
@@ -198,10 +213,6 @@ class SceneElement extends HTMLElement {
   </section><style>
     :host { 
       --scene-number: "##";
-      --scene-template: 
-        ". title title title number . "
-        ". scene scene scene scene . "
-        ". .     code  code  code  .";
       display: contents;
     }
     section {
@@ -209,27 +220,26 @@ class SceneElement extends HTMLElement {
     }
     header {
       display: grid;
-      grid-column: 1 / -1;
-      grid-template-columns: var(--page-grid-template);
-      grid-template-columns: subgrid;
-      grid-template-areas: var(--scene-template);
+      grid-column: start / end;
+      grid-template-columns: var(--grid-width-margin) 
+          var(--page-grid-template) var(--grid-width-margin);
+      /* grid-template-columns: subgrid; */
       align-items: baseline;
       column-gap: var(--spacing-medium);
-      margin-block: var(--spacing-large);
+      margin-block: var(--spacing-medium);
       background: var(--color-background-accent);
     }
     ::slotted([slot="title"]),
     slot[name="title"] > h1 { 
-      grid-area: title;
+      grid-column: 2;
       margin-top: var(--spacing-medium);
       font-size: var(--font-size-large);
       font-weight: 300;
     }
     #link {
-      grid-area: number;
+      grid-column: 2;
       margin-top: var(--spacing-medium);
       font-size: var(--font-size-large);
-      text-align: right;
       text-decoration: none;
     }
     #link::before {
@@ -243,18 +253,18 @@ class SceneElement extends HTMLElement {
     }
     ::slotted([slot="scenecode"]) { 
       visibility: visible;
-      grid-area: code;
+      grid-column: 3 / span 3;
     }
     ::slotted(figure[slot="rendering"]) {
       visibility: visible;
       display: flex;
       aspect-ratio: 4;
       margin: 0;
+      grid-column: 2 / span 4;
       padding-inline: var(--scene-padding-inline);
       flex-direction: column;
       align-items: start;
       justify-content: space-around;
-      grid-area: scene;
       background: var(--scene-background);
       border-radius: var(--scene-border-radius);
       font-family: var(--scene-font);

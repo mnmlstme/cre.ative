@@ -40,9 +40,6 @@
 
   --page-background: var(--color-background-base);
   --page-text-color: var(--color-text-base);
-  --page-grid-template: [start callout-start] var(--grid-width-aside) [main]
-    var(--grid-width-crossover) [callout-end] var(--grid-width-main) [aside]
-    var(--grid-width-aside) [end];
 
   --box-shadow-dark: 0 2px black;
 
@@ -63,14 +60,14 @@ body {
 }
 
 kram-main {
+  --page-grid-template: [header-start callout-start] var(--grid-width-aside)
+    [main] var(--grid-width-crossover) [callout-end] var(--grid-width-main)
+    [aside] var(--grid-width-aside) [aside-end header-end];
+
   display: grid;
-  grid-template-columns: var(--grid-width-margin) var(--page-grid-template) var(
-      --grid-width-margin
-    );
-  grid-template-areas:
-    ". hd hd hd nav ."
-    "flow flow flow flow flow flow"
-    "flow flow flow flow flow flow";
+  grid-template-columns:
+    [start] var(--grid-width-margin) var(--page-grid-template)
+    var(--grid-width-margin) [end];
   gap: 0 var(--spacing-medium);
   background: var(--page-background);
   color: var(--page-text-color);
@@ -85,9 +82,13 @@ kram-main {
 
 kram-flow {
   display: grid;
-  grid-area: flow;
-  grid-template-columns: var(--page-grid-template);
-  grid-template-columns: subgrid;
+  grid-column: start / end;
+  grid-row-start: 2;
+  grid-template-columns:
+    [start] var(--grid-width-margin) var(--page-grid-template)
+    var(--grid-width-margin) [end];
+  /* grid-template-columns: subgrid; */
+  column-gap: var(--spacing-medium);
   overflow-y: scroll;
   overflow-x: hidden;
 }
@@ -117,7 +118,7 @@ kram-code:not([slot]) > pre[class*="language-"] {
 
 kram-code[slot] > pre[class*="language-"] {
   background: none;
-  padding: var(--spacing-medium);
+  padding: var(--spacing-medium) 0;
   margin-block: 0;
   border-radius: 0;
 }
@@ -128,7 +129,7 @@ kram-scene > * {
 }
 
 kram-scene > :is(p, ul, ol, dl) {
-  grid-column: main / aside;
+  grid-column: main / span 2;
   line-height: 1.5;
 }
 
@@ -171,7 +172,7 @@ kram-scene > :is(blockquote, aside) {
 }
 
 kram-scene > kram-code:not([slot]) {
-  grid-column: main / end;
+  grid-column: main / span 3;
   margin-block: var(--spacing-medium);
 }
 

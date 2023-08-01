@@ -62,6 +62,7 @@ function configure(options = {}) {
         let files = [];
         const emitFile = emitter(".", context);
         const emitDependency = (name, code, language) => {
+          // console.log("[kram] Emitting code:", name, code, language);
           const filename = emitFile(name, code);
           files.push({ name, code, language, filename });
           return filename;

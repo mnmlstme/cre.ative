@@ -34,30 +34,37 @@ function register({ providesLanguage, defaultModule }) {
       const buildScene = ([n, attrs, code]) =>
         `<div data-scene="${n + 1}">${code}</div>`;
 
-      return [
-        definitions.length && {
-          name: "templates.html.js",
-          language: "html",
-          code: jsLiteralModule(`<html>
+      return (
+        definitions.length
+          ? [
+              {
+                name: "templates.html.js",
+                language: "html",
+                code: jsLiteralModule(`<html>
           <body>
             ${definitions.map(buildDefn).join("\n")}
           </body>
         </html>`),
-          bind: `(resource, container) => {
+                bind: `(resource, container) => {
             const parser = new DOMParser();
             const doc = parser.parseFromString(resource.default, 'text/html');
             const body = doc.body;
             for ( let def = body.firstElementChild; def; def=body.firstElementChild ) {
               container.appendChild(def); }
           }`,
-        },
-        scenes.length && {
-          name: "scenes.html.js",
-          language: "html",
-          code: jsLiteralModule(`<html>
+              },
+            ]
+          : []
+      ).concat(
+        scenes.length
+          ? [
+              {
+                name: "scenes.html.js",
+                language: "html",
+                code: jsLiteralModule(`<html>
             <body>${scenes.map(buildScene).join("\n")}</body>
             </html>`),
-          bind: `(resource, container) => {
+                bind: `(resource, container) => {
             const parser = new DOMParser();
             const doc = parser.parseFromString(resource.default, 'text/html');
             const body = doc.body;
@@ -80,8 +87,10 @@ function register({ providesLanguage, defaultModule }) {
               } 
             }
           }`,
-        },
-      ];
+              },
+            ]
+          : []
+      );
     },
   });
 
@@ -125,27 +134,34 @@ function register({ providesLanguage, defaultModule }) {
       const buildScene = ([n, attrs, code]) =>
         `<g data-scene="${n + 1}" ${code}</g>`;
 
-      return [
-        definitions.length && {
-          name: "symbols.svg.js",
-          language: "svg",
-          code: jsLiteralModule(`<svg xmlns="http://www.w3.org/2000/svg" style="display:none;">
+      return (
+        definitions.length
+          ? [
+              {
+                name: "symbols.svg.js",
+                language: "svg",
+                code: jsLiteralModule(`<svg xmlns="http://www.w3.org/2000/svg" style="display:none;">
             <defs>${definitions.map(buildDefn).join("\n")}</defs></svg>`),
-          bind: `(resource, container) => {
+                bind: `(resource, container) => {
             const parser = new DOMParser();
             const doc = parser.parseFromString(resource.default, 'image/svg+xml');
             const body = doc.firstChild;
             const defns = body.firstElementChild;
             if ( defns ) { container.appendChild(defns) }
           }`,
-        },
-        scenes.length && {
-          name: "scenes.svg.js",
-          language: "svg",
-          code: jsLiteralModule(`<svg xmlns="http://www.w3.org/2000/svg" style="display:none;">
+              },
+            ]
+          : []
+      ).concat(
+        scenes.length
+          ? [
+              {
+                name: "scenes.svg.js",
+                language: "svg",
+                code: jsLiteralModule(`<svg xmlns="http://www.w3.org/2000/svg" style="display:none;">
             <defs>${definitions.map(buildDefn).join("\n")}</defs>
             ${scenes.map(buildScene).join("\n")}</svg>`),
-          bind: `(resource, container) => {
+                bind: `(resource, container) => {
             const parser = new DOMParser();
             const doc = parser.parseFromString(resource.default, 'image/svg+xml');
             const body = doc.firstChild;
@@ -162,8 +178,10 @@ function register({ providesLanguage, defaultModule }) {
               }
             };
           }`,
-        },
-      ];
+              },
+            ]
+          : []
+      );
     },
   });
 
