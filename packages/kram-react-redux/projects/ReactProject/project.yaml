@@ -1,0 +1,4 @@
+workbooks:
+    - file: ReactWorkbook.md
+      title: React Workbook
+      platform: react-redux

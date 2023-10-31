@@ -1,0 +1,30 @@
+{
+  "name": "@cre.ative/kram-react-redux",
+  "version": "1.5.0",
+  "description": "kram platform for React with Redux for model store",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack",
+    "start": "cre-a-tive ./projects",
+    "clean": "rm -rf package-lock.json node_modules .yalc kram_modules dist"
+  },
+  "author": "ken@mnmlst.me",
+  "license": "BSD-3-Clause",
+  "devDependencies": {
+    "this-platform": "file:./",
+    "webpack": "^4.16.1",
+    "webpack-cli": "^4.10.0"
+  },
+  "dependencies": {
+    "@babel/preset-react": "^7.14.5",
+    "@cre.ative/kram": "^1.5.3",
+    "babel-loader": "^8.2.2",
+    "css-loader": "^5.2.6",
+    "immutable": "^4.3.0",
+    "react": "^18.1.0",
+    "react-dom": "^18.1.0",
+    "react-redux": "^8.0.5",
+    "redux": "^4.2.1"
+  }
+}
