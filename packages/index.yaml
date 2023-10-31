@@ -1,0 +1,4 @@
+projects:
+  ElmProject: ./ElmProject
+platforms:
+  elm: "this-platform"
