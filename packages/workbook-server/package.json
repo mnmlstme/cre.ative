@@ -1,0 +1,34 @@
+{
+  "name": "@cre.ative/workbook-server",
+  "version": "1.4.0",
+  "description": "A framework-agnostic creative programming environment",
+  "main": "main.js",
+  "bin": {
+    "cre-a-tive": "dist/main.js"
+  },
+  "scripts": {
+    "build": "webpack build && chmod +x dist/server.js && npm install @cre.ative/self",
+    "start": "node dist/server.js --serve ./projects",
+    "publish": "node dist/server.js --publish ./projects",
+    "dev": "node dist/server.js --dev ./projects",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "clean": "rm -rf package-lock.json node_modules kram_modules dist docs"
+  },
+  "keywords": [
+    "creative",
+    "coding"
+  ],
+  "author": "ken@mnmlst.me",
+  "license": "BSD-3-Clause",
+  "dependencies": {
+    "@cre.ative/kram-express-webpack": "^1.4.0",
+    "file-system": "^2.2.2",
+    "webpack": "^5.75.0",
+    "yaml": "^2.1.3",
+    "yargs": "^17.6.2"
+  },
+  "devDependencies": {
+    "@cre.ative/self": "file:",
+    "nodemon": "^2.0.15",
+  }
+}

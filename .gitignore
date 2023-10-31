@@ -1,7 +1,12 @@
+/node_modules
 /package-lock.json
 /elm-stuff
 /kram_modules
-/node_modules
+
+/packages/*/node_modules
+/packages/*/package-lock.json
+/packages/*/elm-stuff
+
 .cache/
 .parcel-cache/
 /.yalc
