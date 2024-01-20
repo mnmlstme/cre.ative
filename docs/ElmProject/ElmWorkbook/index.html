@@ -1,0 +1,27 @@
+<h1>Introduction</h1>
+<pre class="language-elm"><code class="language-elm"><span class="token hvariable">Html.div</span> <span class="token punctuation">[</span> <span class="token hvariable">class</span> <span class="token string">"hi"</span> <span class="token punctuation">]</span>
+  <span class="token punctuation">[</span><span class="token hvariable">Html.text</span> <span class="token operator">&lt;|</span> <span class="token string">"Hello, "</span> <span class="token operator">++</span> <span class="token hvariable">name</span><span class="token punctuation">]</span>
+</code></pre>
+<p>We can write Html expressions in Elm and have them rendered.</p>
+<h3>subtitle</h3>
+<p>We can also pull in CSS classes and reference them using the <code>class</code> attribute.</p>
+<pre class="language-css"><code class="language-css"><span class="token selector">.hi</span> <span class="token punctuation">{</span>
+  <span class="token property">font-family</span><span class="token punctuation">:</span> Georgia<span class="token punctuation">;</span>
+  <span class="token property">color</span><span class="token punctuation">:</span> #835cf0<span class="token punctuation">;</span>
+  <span class="token property">font-size</span><span class="token punctuation">:</span> 4rem<span class="token punctuation">;</span>
+<span class="token punctuation">}</span></code></pre>
+<hr>
+<pre class="language-elm"><code class="language-elm"><span class="token hvariable">Html.input</span>
+  <span class="token punctuation">[</span> <span class="token hvariable">Attr.type_</span> <span class="token string">"number"</span>
+  <span class="token punctuation">,</span> <span class="token hvariable">Attr.value</span> <span class="token operator">&lt;|</span> <span class="token hvariable">asString</span> <span class="token hvariable">count</span>
+  <span class="token punctuation">]</span>
+  <span class="token punctuation">[</span><span class="token punctuation">]</span></code></pre>
+<h1>Functions</h1>
+<p>We can put lots of examples in the same file like this.</p>
+<p>We can also define &quot;helper&quot; functions to make the view more
+concise.</p>
+<pre class="language-elm"><code class="language-elm"><span class="token hvariable">asString</span><span class="token operator">:</span> <span class="token constant">Int</span> <span class="token operator">-></span> <span class="token constant">String</span>
+<span class="token hvariable">asString</span> <span class="token hvariable">n</span> <span class="token operator">=</span>
+  <span class="token hvariable">String.fromInt</span> <span class="token hvariable">n</span></code></pre>
+<p>Alternatively, we can use views to test or demo the functions
+that we define in the same file.</p>

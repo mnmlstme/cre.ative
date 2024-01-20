@@ -3,9 +3,18 @@
   "version": "1.0.0",
   "description": "Monorepo for Cre.ative coding environment",
   "scripts": {
+    "publish": "npx @11ty/eleventy",
+    "start": "npx @11ty/eleventy --serve",
+    "serve": "npx http-server ./docs",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "ken@mnmlst.me",
   "license": "BSD-3-Clause",
-  "workspaces": [ "packages/*" ]
+  "workspaces": [
+    "packages/*"
+  ],
+  "devDependencies": {
+    "@11ty/eleventy-plugin-syntaxhighlight": "^5.0.0",
+    "@11ty/eleventy-plugin-vite": "^4.0.0"
+  }
 }

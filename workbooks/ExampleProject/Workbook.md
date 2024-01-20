@@ -1,5 +1,6 @@
 ---
 title: Web Workbook
+platform: web-standard
 ---
 
 # Hello world
@@ -42,8 +43,10 @@ Some CSS to style our drawing:
 
 <script>
   document
-    .getElementById('the-button')
-    .addEventListener('click', () => window.alert('Hello, Javascript'))
+    .getElementById("the-button")
+    .addEventListener("click", () =>
+      window.alert("Hello, Javascript")
+    );
 </script>
 ```
 
@@ -53,6 +56,6 @@ Some Javascript to add an action to the button:
 
 ```js
 function sayHello(event) {
-  window.alert('Hello, Javascript!')
+  window.alert("Hello, Javascript!");
 }
 ```

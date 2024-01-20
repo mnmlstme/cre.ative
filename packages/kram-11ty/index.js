@@ -9,7 +9,11 @@ module.exports = {
 };
 
 function configure(options = {}) {
-  const { input = "./src", output = "./docs", platforms } = options;
+  const {
+    input = "./src",
+    output = "./docs",
+    platforms,
+  } = options;
   const root = process.cwd();
   const inputRoot = path.resolve(root, input);
   const outputRoot = path.resolve(root, output);
@@ -18,15 +22,33 @@ function configure(options = {}) {
     outputFileExtension: "html",
     compile: async function (inputContent, inputPath) {
       const basename = path.basename(inputPath, ".md");
-      const relPath = path.relative(inputRoot, path.dirname(inputPath));
+      const relPath = path.relative(
+        inputRoot,
+        path.dirname(inputPath)
+      );
       const projName = path.basename(path.dirname(inputPath));
-      const context = path.resolve(outputRoot, relPath, basename);
+      const context = path.resolve(
+        outputRoot,
+        relPath,
+        basename
+      );
+      console.log(
+        `[kram=11ty] Resolved path under ${outputRoot} through ${relPath} to ${basename}:`,
+        context
+      );
       const relOutputRoot = path.relative(context, outputRoot);
+      console.log(
+        `[kram=11ty] Relative path from ${context} to ${outputRoot}:`,
+        relOutputRoot
+      );
 
       console.log("Built-in highlighter:", this.highlight);
 
       return async (data) => {
-        const { platform, runtime = "@cre.ative/kram-11ty/runtime" } = data;
+        const {
+          platform,
+          runtime = "@cre.ative/kram-11ty/runtime",
+        } = data;
         const styles = "@cre.ative/kram-11ty/styles";
 
         if (!platform) {
@@ -40,7 +62,10 @@ function configure(options = {}) {
             : require(platforms[platform])
         );
 
-        console.log("[kram-11ty] Highlighting with", this.highlight);
+        console.log(
+          "[kram-11ty] Highlighting with",
+          this.highlight
+        );
 
         const highlight =
           typeof this.highlight == "function"
@@ -70,11 +95,16 @@ function configure(options = {}) {
         workbook = Kr.classify(workbook, plugin.modules);
         workbook = Kr.dekram(workbook, emitDependency, plugin);
 
-        const html = render(workbook.scenes, workbook.modules, importMap, {
-          runtime,
-          styles,
-          ...data,
-        });
+        const html = render(
+          workbook.scenes,
+          workbook.modules,
+          importMap,
+          {
+            runtime,
+            styles,
+            ...data,
+          }
+        );
 
         return html;
       };
@@ -82,13 +112,26 @@ function configure(options = {}) {
   };
 }
 
-function importPackages(imports, nodeModules, moduleRoot, relModuleRoot) {
+function importPackages(
+  imports,
+  nodeModules,
+  moduleRoot,
+  relModuleRoot
+) {
   const entries = imports
-    .map((spec) => (typeof spec === "object" ? spec.from : spec))
+    .map((spec) =>
+      typeof spec === "object" ? spec.from : spec
+    )
     .map((pkg) => [pkg, resolve(pkg)])
     .map(([pkg, file]) => [
       pkg,
-      relocate(pkg, file, nodeModules, moduleRoot, relModuleRoot),
+      relocate(
+        pkg,
+        file,
+        nodeModules,
+        moduleRoot,
+        relModuleRoot
+      ),
     ]);
 
   return Object.fromEntries(entries);
@@ -108,15 +151,26 @@ function resolve(pkg) {
   return path;
 }
 
-function relocate(pkg, src, nodeModules, outputRoot, relModuleRoot) {
+function relocate(
+  pkg,
+  src,
+  nodeModules,
+  outputRoot,
+  relModuleRoot
+) {
   const modulePrefix = "modules";
   const relpath = path.relative(nodeModules, src);
   const dest = path.join(outputRoot, modulePrefix, relpath);
-  const result = path.join(relModuleRoot, modulePrefix, relpath);
+  const result = path.join(
+    relModuleRoot,
+    modulePrefix,
+    relpath
+  );
 
   if (fs.existsSync(dest)) {
     // short-circuit the copy if it exists and is not older
-    const mtime = (path) => new Date(fs.statSync(path).mtime).getTime();
+    const mtime = (path) =>
+      new Date(fs.statSync(path).mtime).getTime();
 
     if (mtime(src) <= mtime(dest)) {
       return result;
@@ -125,15 +179,22 @@ function relocate(pkg, src, nodeModules, outputRoot, relModuleRoot) {
 
   fs.mkdirSync(path.dirname(dest), { recursive: true });
 
-  fs.copyFile(src, dest, fs.constants.COPYFILE_FICLONE, (err) => {
-    if (err) {
-      console.log(
-        `[ktam-11ty] WARNING: module ${pkg} will not be served (${err.code})`
-      );
-    } else {
-      console.log(`[ktam-11ty] module ${pkg} will be served as "${result}"`);
+  fs.copyFile(
+    src,
+    dest,
+    fs.constants.COPYFILE_FICLONE,
+    (err) => {
+      if (err) {
+        console.log(
+          `[ktam-11ty] WARNING: module ${pkg} will not be served (${err.code})`
+        );
+      } else {
+        console.log(
+          `[ktam-11ty] module ${pkg} will be served as "${result}"`
+        );
+      }
     }
-  });
+  );
 
   return result;
 }

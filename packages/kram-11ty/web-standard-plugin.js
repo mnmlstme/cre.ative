@@ -3,7 +3,8 @@ const Kr = require("@cre.ative/kram");
 module.exports = {
   name: "web-standard",
   displayName: "Web (W3C Standard)",
-  description: "Standard technologies supported by nearly all browsers",
+  description:
+    "Standard technologies supported by nearly all browsers",
   languages: {
     html: "Hypertext Markup Language (HTML5)",
     css: "Cascading Style Sheets (CSS3)",
@@ -15,7 +16,8 @@ module.exports = {
 
 const svgDefnRegex = /^\s*<(defs|symbol)[^>]*>/i;
 const htmlDefnRegex = /^\s*<(template)[^>]*>/i;
-const jsDefnRegex = /^\s*(function|class|let|const|var)\s+(\w+)/;
+const jsDefnRegex =
+  /^\s*(function|class|let|const|var)\s+(\w+)/;
 
 function register({ providesLanguage, defaultModule }) {
   providesLanguage("html", {
@@ -29,7 +31,10 @@ function register({ providesLanguage, defaultModule }) {
         : { mode: "eval" };
     },
     collate: (workbook) => {
-      const { scenes, definitions } = Kr.extract(workbook, "html");
+      const { scenes, definitions } = Kr.extract(
+        workbook,
+        "html"
+      );
       const buildDefn = ([n, attrs, code]) => code;
       const buildScene = ([n, attrs, code]) =>
         `<div data-scene="${n + 1}">${code}</div>`;
@@ -107,7 +112,9 @@ function register({ providesLanguage, defaultModule }) {
         name: "styles.css.js",
         mode: "define",
         language: "css",
-        code: jsLiteralModule(definitions.map(buildDefn).join("\n")),
+        code: jsLiteralModule(
+          definitions.map(buildDefn).join("\n")
+        ),
         bind: `(resource, container) => {
           let sheet = document.createElement("style");
           sheet.innerHTML = resource.default;
@@ -129,7 +136,10 @@ function register({ providesLanguage, defaultModule }) {
         : { mode: "eval" };
     },
     collate: (workbook) => {
-      const { scenes, definitions } = Kr.extract(workbook, "svg");
+      const { scenes, definitions } = Kr.extract(
+        workbook,
+        "svg"
+      );
       const buildDefn = ([n, attrs, code]) => code;
       const buildScene = ([n, attrs, code]) =>
         `<g data-scene="${n + 1}" ${code}</g>`;
@@ -141,7 +151,9 @@ function register({ providesLanguage, defaultModule }) {
                 name: "symbols.svg.js",
                 language: "svg",
                 code: jsLiteralModule(`<svg xmlns="http://www.w3.org/2000/svg" style="display:none;">
-            <defs>${definitions.map(buildDefn).join("\n")}</defs></svg>`),
+            <defs>${definitions
+              .map(buildDefn)
+              .join("\n")}</defs></svg>`),
                 bind: `(resource, container) => {
             const parser = new DOMParser();
             const doc = parser.parseFromString(resource.default, 'image/svg+xml');
@@ -159,7 +171,9 @@ function register({ providesLanguage, defaultModule }) {
                 name: "scenes.svg.js",
                 language: "svg",
                 code: jsLiteralModule(`<svg xmlns="http://www.w3.org/2000/svg" style="display:none;">
-            <defs>${definitions.map(buildDefn).join("\n")}</defs>
+            <defs>${definitions
+              .map(buildDefn)
+              .join("\n")}</defs>
             ${scenes.map(buildScene).join("\n")}</svg>`),
                 bind: `(resource, container) => {
             const parser = new DOMParser();
@@ -168,7 +182,7 @@ function register({ providesLanguage, defaultModule }) {
             const scenes = Object.fromEntries(
               Array.prototype.map.call(body.children, (node) => [
                 node && node.dataset.scene, node ])
-              .filter(([num] => Boolean(num)));
+              .filter(([num]) => Boolean(num)));
             return function render (n, container) {
               const scene = scenes[n];
               if( scenes[n] ) {
@@ -189,7 +203,10 @@ function register({ providesLanguage, defaultModule }) {
     classify: classifyJavascript,
     collate: (workbook) => {
       const { moduleName, imports } = workbook;
-      const { scenes, definitions } = Kr.extract(workbook, "js");
+      const { scenes, definitions } = Kr.extract(
+        workbook,
+        "js"
+      );
       const buildDefn = ([n, attrs, code]) =>
         `// JS Definition from scene ${n + 1}\n${code}`;
       const buildScene = ([n, attrs, code]) =>
@@ -256,7 +273,9 @@ function classifyJavascript(code) {
 function buildImport(spec) {
   if (spec.expose) {
     const list =
-      spec.expose === "*" ? spec.expose : "{ " + spec.expose.join(", ") + " }";
+      spec.expose === "*"
+        ? spec.expose
+        : "{ " + spec.expose.join(", ") + " }";
     const maybeDefault = spec.as ? spec.as + ", " : "";
 
     return `import ${maybeDefault}${list} from '${spec.from}'`;
