@@ -128,7 +128,10 @@ function register(module, name, language, bindFn) {
       render
     );
     if (todo && todo.length) {
-      console.log("[kram-11ty] Resolving deferred scene rendering:", todo);
+      console.log(
+        "[kram-11ty] Resolving deferred scene rendering:",
+        todo
+      );
       todo.map((resolve) => resolve(render));
       pending[language] = undefined;
     }
@@ -143,7 +146,9 @@ function whenCanRender(language) {
       resolve(reg.render);
     } else if (todo) {
       console.log(
-        `Deferring total ${todo.length + 1} renders of language ${language}`
+        `Deferring total ${
+          todo.length + 1
+        } renders of language ${language}`
       );
       todo.push(resolve);
     } else {
@@ -155,7 +160,10 @@ function whenCanRender(language) {
 
 function mount(mod, name, bindfn) {
   let render = (n, container) => {
-    console.log("Cannot render scene; module not mounted:", name);
+    console.log(
+      "Cannot render scene; module not mounted:",
+      name
+    );
   };
 
   try {
@@ -366,8 +374,9 @@ class SceneElement extends HTMLElement {
       margin: 0;
       grid-column: 2 / span 4;
       padding-inline: var(--scene-padding-inline);
+      padding-block: var(--scene-padding-block);
       flex-direction: column;
-      align-items: start;
+      align-items: center;
       justify-content: space-around;
       background: var(--scene-background);
       border-radius: var(--scene-border-radius);
@@ -386,7 +395,9 @@ class SceneElement extends HTMLElement {
 }
 
 function template(strings, ...values) {
-  const html = strings.flatMap((s, i) => (i ? [values[i - 1], s] : [s]));
+  const html = strings.flatMap((s, i) =>
+    i ? [values[i - 1], s] : [s]
+  );
   let tpl = document.createElement("template");
   tpl.innerHTML = html;
   return tpl.content;

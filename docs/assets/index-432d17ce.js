@@ -1,4 +1,4 @@
-import { i as init, _ as __vitePreload, r as register } from './runtime-d35e14fc.js';
+import { i as init, _ as __vitePreload, r as register } from './runtime-72832c7a.js';
 
 init({});
 __vitePreload(() => import('./scenes.html-3d9b9f91.js'),true?[]:void 0)
