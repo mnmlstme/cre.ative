@@ -2,9 +2,6 @@ const kram11ty = require("@cre.ative/kram-11ty");
 const vitePlugin = require("@11ty/eleventy-plugin-vite");
 const syntaxHighlight = require("@11ty/eleventy-plugin-syntaxhighlight");
 
-const fs = require("node:fs/promises");
-const path = require("node:path");
-
 module.exports = function (eleventyConfig) {
   eleventyConfig.addPassthroughCopy({
     "src/scripts": "scripts",
@@ -34,6 +31,7 @@ module.exports = function (eleventyConfig) {
       platforms: {
         "react-redux": "@cre.ative/kram-react-redux",
         elm: "@cre.ative/kram-elm",
+        typescript: "@cre.ative/kram-typescript",
       },
     })
   );

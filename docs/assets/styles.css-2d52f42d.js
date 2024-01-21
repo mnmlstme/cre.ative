@@ -1,4 +1,4 @@
-export default `/* Kram: CSS in Scene 1 */
+const styles_css = `/* Kram: CSS in Scene 1 */
 .hi {
   font-family: Georgia;
   color: darkorange;
@@ -11,3 +11,5 @@ export default `/* Kram: CSS in Scene 1 */
   stroke: black;
 }
 `;
+
+export { styles_css as default };

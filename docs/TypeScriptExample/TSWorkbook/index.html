@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Typescript Workbook</title>
+
+
+
+<script type="importmap">
+{ "imports": {"@cre.ative/kram-11ty/runtime":"../../packages/kram-11ty/runtime.mjs","@cre.ative/kram-11ty/styles":"../../packages/kram-11ty/styles.css"} }
+</script>
+  <script type="module" crossorigin src="/assets/index-bca4d6b0.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/runtime-d35e14fc.js">
+  <link rel="stylesheet" href="/assets/runtime-96d4bbfb.css">
+</head>
+<body>
+<kram-main>
+<h1 slot="title">Typescript Workbook</h1>
+<kram-toc slot="nav"><ol>
+<li data-idref="scene-1">Hello Javascript</li>
+</ol></kram-toc>
+<kram-flow><kram-scene 
+        scene="1" 
+        language="html" 
+        ><kram-code slot="scenecode" data-language="html"><pre class="language-html"><code class="language-html"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>button</span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>the-button<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>Hello, click me<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>button</span><span class="token punctuation">></span></span><br><br><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span><span class="token punctuation">></span></span><span class="token script"><span class="token language-javascript"><br>  document<br>    <span class="token punctuation">.</span><span class="token function">getElementById</span><span class="token punctuation">(</span><span class="token string">"the-button"</span><span class="token punctuation">)</span><br>    <span class="token punctuation">.</span><span class="token function">addEventListener</span><span class="token punctuation">(</span><span class="token string">"click"</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span><br>      window<span class="token punctuation">.</span><span class="token function">alert</span><span class="token punctuation">(</span><span class="token string">"Hello, Javascript"</span><span class="token punctuation">)</span><br>    <span class="token punctuation">)</span><span class="token punctuation">;</span><br></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span></code></pre></kram-code><h1 slot="title">Hello Javascript</h1>
+
+<p>Some Typescript to add an action to the button:</p>
+
+<kram-code data-language="ts"><pre class="language-ts"><code class="language-ts"><span class="token keyword">function</span> <span class="token function">sayHello</span><span class="token punctuation">(</span>event<span class="token operator">:</span> ClickEvent<span class="token punctuation">)</span><span class="token operator">:</span> <span class="token keyword">void</span> <span class="token punctuation">{</span><br>  window<span class="token punctuation">.</span><span class="token function">alert</span><span class="token punctuation">(</span><span class="token string">"Hello, Javascript!"</span><span class="token punctuation">)</span><span class="token punctuation">;</span><br><span class="token punctuation">}</span></code></pre></kram-code></kram-scene></kram-flow>
+</kram-main>
+</body>
+</html>

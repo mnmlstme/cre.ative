@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "description": "Monorepo for Cre.ative coding environment",
   "scripts": {
-    "publish": "npx @11ty/eleventy",
+    "build": "npm run build:kram && npm run build:docs",
+    "build:kram": "npm run -w @cre.ative/kram build",
+    "build:docs": "npx @11ty/eleventy",
     "start": "npx @11ty/eleventy --serve",
     "serve": "npx http-server ./docs",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -16,5 +18,9 @@
   "devDependencies": {
     "@11ty/eleventy-plugin-syntaxhighlight": "^5.0.0",
     "@11ty/eleventy-plugin-vite": "^4.0.0"
+  },
+  "dependencies": {
+    "@cre.ative/kram-typescript": "^1.6.0",
+    "lit": "^3.1.1"
   }
 }

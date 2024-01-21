@@ -1,5 +1,4 @@
-@import "https://fonts.googleapis.com/css2?family=Anonymous+Pro:ital,wght@0,400;0,700;1,400&family=Hepta+Slab:wght@300;600&family=Inter:wght@400;700&display=swap";
-@import "https://unpkg.com/prismjs@1.20.0/themes/prism-okaidia.css";
+@import "https://fonts.googleapis.com/css2?family=Anonymous+Pro:ital,wght@0,400;0,700;1,400&family=Hepta+Slab:wght@300;600&family=Inter:wght@400;700&display=swap";@import "https://unpkg.com/prismjs@1.20.0/themes/prism-okaidia.css";
 
 :root {
   --border-radius-eased: 2px;
@@ -54,11 +53,9 @@
   --scene-padding-inline: var(--spacing-large);
   --scene-text-color: var(--color-text-native);
 }
-
 body {
   margin: 0;
 }
-
 kram-main {
   --page-grid-template: [header-start callout-start] var(--grid-width-aside)
     [main] var(--grid-width-crossover) [callout-end] var(--grid-width-main)
@@ -79,7 +76,6 @@ kram-main {
   bottom: 0;
   overflow: hidden;
 }
-
 kram-flow {
   display: grid;
   grid-column: start / end;
@@ -92,22 +88,18 @@ kram-flow {
   overflow-y: scroll;
   overflow-x: hidden;
 }
-
 kram-code {
   display: block;
   white-space: pre;
   font-family: var(--font-code);
 }
-
 kram-code code[class*="language-"],
 kram-code pre[class*="language-"] {
   font-family: inherit; /* don't use prism theme's font */
 }
-
 kram-code > pre[class*="language-"] {
   border-bottom: var(--border-thickness-medium) solid var(--color-accent);
 }
-
 kram-code:not([slot]) > pre[class*="language-"] {
   background: var(--color-background-accent);
   margin-block: 0;
@@ -115,51 +107,41 @@ kram-code:not([slot]) > pre[class*="language-"] {
   box-shadow: var(--box-shadow-dark);
   padding: var(--spacing-medium);
 }
-
 kram-code[slot] > pre[class*="language-"] {
   background: none;
   padding: var(--spacing-medium) 0;
   margin-block: 0;
   border-radius: 0;
 }
-
 kram-scene > * {
   box-sizing: border-box;
   margin: 0;
 }
-
 kram-scene > :is(p, ul, ol, dl) {
   grid-column: main / span 2;
   line-height: 1.5;
 }
-
 kram-scene > :is(p, ul, ol, dl) + :is(p, blockquote) {
   margin-block-start: var(--spacing-medium);
 }
-
 kram-scene > :is(ul, ol, dl) {
   margin-inline-start: var(--spacing-large);
 }
-
 kram-scene > blockquote {
   grid-column: callout-start / callout-end;
 }
-
 kram-scene > blockquote + :is(p, ul, ol, kram-code) {
   grid-column-start: callout-end;
   margin-block-start: var(--spacing-medium);
 }
-
 kram-scene > aside {
   grid-column: aside / end;
 }
-
 kram-scene > kram-code + aside {
   grid-column: callout-start / main;
   align-self: end;
   margin-block-end: var(--spacing-medium);
 }
-
 kram-scene > :is(blockquote, aside) {
   font-family: var(--font-display);
   padding: var(--spacing-medium);
@@ -170,17 +152,14 @@ kram-scene > :is(blockquote, aside) {
   text-align: center;
   height: fit-content;
 }
-
 kram-scene > kram-code:not([slot]) {
   grid-column: main / span 3;
   margin-block: var(--spacing-medium);
 }
-
 kram-scene > kram-code + kram-code:not([slot]),
 kram-scene > kram-code + :is(aside, blockquote) + kram-code:not([slot]) {
   margin-block-start: 0;
 }
-
 kram-scene > :is(p, ul, ol, dl, blockquote, aside) :is(tt, code, kbd, samp) {
   font-family: var(--font-code);
   color: var(--color-accent);
@@ -188,25 +167,21 @@ kram-scene > :is(p, ul, ol, dl, blockquote, aside) :is(tt, code, kbd, samp) {
   background: var(--color-background-accent);
   border-radius: var(--border-radius-eased);
 }
-
 kram-scene > :is(p, ul, ol, dl, blockquote, aside) a {
   color: var(--color-accent);
   background: var(--color-background-accent);
   border-radius: var(--border-radius-eased);
 }
-
 kram-toc {
   color: var(--color-accent);
   font-family: var(--font-display);
 }
-
 kram-toc > :not([slot]) {
   background: var(--color-background-accent);
   padding: var(--spacing-small);
   border: var(--border-thickness-thin) solid currentColor;
   border-radius: var(--border-radius-small);
 }
-
 kram-toc > :not([slot]) > li {
   margin-left: 3ch;
 }

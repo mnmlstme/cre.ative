@@ -1,17 +1,13 @@
 // module Kram_f626a609_Workbook (ES6)
           
-          console.log('Loading module "Kram_f626a609_Workbook"')
-          export function Program ({connectStore, initializeStore}) {
-            // JS Definition from scene 3
-function sayHello(event) {
-  window.alert("Hello, Javascript!");
-}
+          console.log('Loading module "Kram_f626a609_Workbook"');
+          function Program ({connectStore, initializeStore}) {
 
             return ({
               
             })
           }
-          export function mount (mountpoint, initial) {
+          function mount (mountpoint, initial) {
             let Store = {
               root: Object.assign({}, initial),
             };
@@ -24,8 +20,10 @@ function sayHello(event) {
                 set: (key, value) => root[key] = value,
                 keys: () => Object.keys(root),
               })};
-            const program = Program({connectStore})
+            const program = Program({connectStore});
             return (n, container) => {
-              program[n-1].call(container)
+              program[n-1].call(container);
             }
           }
+
+export { Program, mount };

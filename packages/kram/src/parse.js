@@ -16,15 +16,20 @@ const mdit = MarkdownIt({
 Object.assign(mdit.renderer.rules, rules)
 
 function parse(md, basename) {
-  const { body, attributes } = typeof md === 'string' ? frontMatter(md) : md
+  const { body, attributes } =
+    typeof md === 'string' ? frontMatter(md) : md
   const defaultLang = attributes.lang || 'text'
   const tokens = mdit.parse(body)
   const flat = tokens.reduce(
-    (l, r) => (r.type === 'inline' ? l.concat(r.children) : l.concat([r])),
+    (l, r) =>
+      r.type === 'inline'
+        ? l.concat(r.children)
+        : l.concat([r]),
     []
   )
   const unhandled = flat.filter(
-    (t) => t.type !== 'inline' && typeof rules[t.type] !== 'function'
+    (t) =>
+      t.type !== 'inline' && typeof rules[t.type] !== 'function'
   )
   const json = `[{}${mdit.render(body)}]`
 
@@ -50,7 +55,10 @@ function parse(md, basename) {
 
 function paginate(blocks) {
   const isBreak = (b) =>
-    Array.isArray(b) && b.length === 2 && b[0] === 'hr' && b[1].markup === '---'
+    Array.isArray(b) &&
+    b.length === 2 &&
+    b[0] === 'hr' &&
+    b[1].markup === '---'
   let breaks = blocks
     .map((b, i) => (isBreak(b) ? i : false))
     .filter((i) => i !== false)
@@ -87,7 +95,8 @@ function getLanguages(tokens) {
     .filter(([type]) => type === 'fence')
     .map(([_, attrs]) => attrs.lang)
     .reduce(
-      (accum, next) => (accum.includes(next) ? accum : accum.concat([next])),
+      (accum, next) =>
+        accum.includes(next) ? accum : accum.concat([next]),
       []
     )
 }
@@ -95,9 +104,11 @@ function getLanguages(tokens) {
 function getImportSpecs(imports) {
   switch (getTypeOf(imports)) {
     case 'array':
-      return imports.map(importSpec)
+      return imports.map((spec) => importSpec(spec))
     case 'record':
-      return Object.entries(imports || {}).map(([k, v]) => importSpec(k, v))
+      return Object.entries(imports || {}).map(([k, v]) =>
+        importSpec(k, v)
+      )
     case 'string':
       return [importSpec(imports)]
     default:
@@ -123,7 +134,10 @@ function getShapeOf(model) {
     case 'array':
       return { [type]: getShapeOf(model[1]) }
     case 'record':
-      fields = Object.entries(model).map(([k, v]) => [k, getShapeOf(v)])
+      fields = Object.entries(model).map(([k, v]) => [
+        k,
+        getShapeOf(v),
+      ])
       return { [type]: Object.fromEntries(fields) }
     default:
       return type
@@ -147,5 +161,7 @@ function hashcode({ platform, imports, shape, scenes }, lang) {
   const code = scenes.map((scn) => scn.code)
   const views = scenes.map((scn) => scn.view || {})
 
-  return hash({ platform, imports, shape, code, views }).substr(-8)
+  return hash({ platform, imports, shape, code, views }).substr(
+    -8
+  )
 }

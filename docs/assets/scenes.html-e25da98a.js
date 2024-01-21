@@ -1,4 +1,4 @@
-export default `<html>
+const scenes_html = `<html>
             <body><div data-scene="1"><p class="hi">Hello, creative world.</p>
 </div>
 <div data-scene="3"><button id="the-button">Hello, click me</button>
@@ -12,3 +12,5 @@ export default `<html>
 </script>
 </div></body>
             </html>`;
+
+export { scenes_html as default };
