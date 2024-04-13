@@ -2,7 +2,9 @@ const he = require("he");
 const Kr = require("@cre.ative/kram");
 const MarkdownIt = require("markdown-it");
 const path = require("node:path");
-const { pairedShortcode } = require("@11ty/eleventy-plugin-syntaxhighlight");
+const {
+  pairedShortcode,
+} = require("@11ty/eleventy-plugin-syntaxhighlight");
 
 // These are default options from Eleventy Syntax Highlight plugin
 const options = {
@@ -26,6 +28,7 @@ function render(scenes, modules, importMap, data = {}) {
   return `<!DOCTYPE html>
 <html>
 <head>
+<meta charset="utf-8" />
 <title>${title}</title>
 <script type="importmap">
 { "imports": ${JSON.stringify(importMap)} }
@@ -61,16 +64,18 @@ function genModuleImports(modules, reg = "register") {
     .map(
       (f) =>
         `import("${f.filepath}")
-          .then((mod) => ${reg}(mod, "${f.moduleName}", "${f.language}", ${
-          f.bind || "null"
-        }))`
+          .then((mod) => ${reg}(mod, "${f.moduleName}", "${
+          f.language
+        }", ${f.bind || "null"}))`
     )
     .join("\n");
 }
 
 function genToc(scenes) {
   const entries = scenes.map(({ title }, i) => {
-    return `<li data-idref="scene-${i + 1}">${title || `Scene ${i + 1}`}</li>`;
+    return `<li data-idref="scene-${i + 1}">${
+      title || `Scene ${i + 1}`
+    }</li>`;
   });
 
   return ["<ol>", ...entries, "</ol>"].join("\n");
@@ -91,7 +96,12 @@ function genScenes(scenes) {
           language = lang;
         }
         lang = lang || "text";
-        const highlighted = pairedShortcode(code, lang, "", options);
+        const highlighted = pairedShortcode(
+          code,
+          lang,
+          "",
+          options
+        );
         return `<kram-code slot="scenecode" data-language="${lang}">${highlighted}</kram-code>`;
       })
       .join("\n");
@@ -123,15 +133,24 @@ function genProse(blk) {
       return rest.join("\n");
     case "fence":
       const code = rest.join("\n");
-      const highlighted = pairedShortcode(code, lang, "", options);
+      const highlighted = pairedShortcode(
+        code,
+        lang,
+        "",
+        options
+      );
       return `<kram-code data-language="${lang}">${highlighted}</kram-code>`;
     case "bullet_list":
     case "ordered_list":
     case "list_item":
-      return `<${tag}>${rest.map(genProse).join("\n")}</${tag}>\n`;
+      return `<${tag}>${rest
+        .map(genProse)
+        .join("\n")}</${tag}>\n`;
     case "heading":
       if (tag === "h1") {
-        return `<${tag} slot="title">${jsonToHtml(rest)}</${tag}>\n`;
+        return `<${tag} slot="title">${jsonToHtml(
+          rest
+        )}</${tag}>\n`;
       }
     default:
       return `<${tag}>${jsonToHtml(rest)}</${tag}>\n`;
@@ -142,7 +161,9 @@ function jsonToHtml(tokens) {
   // console.log("jsonToHtml", JSON.stringify(tokens, null, ""));
 
   const out = tokens
-    .map((t) => (typeof t === "string" ? encodeAsHtml(t) : tokenToHtml(t)))
+    .map((t) =>
+      typeof t === "string" ? encodeAsHtml(t) : tokenToHtml(t)
+    )
     .join("");
 
   // console.log("jsonToHtml", JSON.stringify(tokens, null, ""));
@@ -167,7 +188,10 @@ function tokenToHtml([type, attrs, ...children]) {
   const hrefPair = href && ["href", href];
   const markPair = markup &&
     !type.match(/\w+_list/) &&
-    markup != "" && [`data-mark-${block ? "before" : "around"}`, markup];
+    markup != "" && [
+      `data-mark-${block ? "before" : "around"}`,
+      markup,
+    ];
   const htmlAttrs = [markPair, hrefPair]
     .filter(Boolean)
     .map(([k, v]) => ` ${k}="${v}"`)

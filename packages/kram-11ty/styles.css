@@ -1,5 +1,5 @@
 @import "https://fonts.googleapis.com/css2?family=Anonymous+Pro:ital,wght@0,400;0,700;1,400&family=Hepta+Slab:wght@300;600&family=Inter:wght@400;700&display=swap";
-@import "https://unpkg.com/prismjs@1.20.0/themes/prism-okaidia.css";
+@import "https://unpkg.com/prismjs@1.20.0/themes/prism.css";
 
 :root {
   --border-radius-eased: 2px;
@@ -10,15 +10,16 @@
   --border-thickness-thin: 1px;
   --border-thickness-medium: 2px;
 
-  --color-accent: hsl(86, 64%, 65%);
+  --color-accent: hsl(197, 52%, 34%);
   --color-background-native: white;
-  --color-background-base: rgb(43, 11, 29);
-  --color-background-accent: hsl(271.8, 27.4%, 24.3%);
-  --color-text-base: rgb(240, 232, 232);
+  --color-background-base: rgb(222, 219, 221);
+  --color-background-accent: #f1f0eb;
+  --color-text-base: rgb(92, 75, 57);
   --color-text-native: black;
 
   --font-display: "Hepta Slab", Georgia, serif;
-  --font-code: "Anonymous Pro", Monaco, "Courier New", monospace;
+  --font-code: Consolas, Monaco, "Andale Mono", "Ubuntu Mono",
+    monospace;
   --font-body: Inter, Verdana, sans-serif;
   --font-native: serif;
 
@@ -47,8 +48,8 @@
   --scene-border-thickness: var(--border-thickness-medium);
   --scene-border-style: solid;
   --scene-border-color: var(--color-background-accent);
-  --scene-border: var(--scene-border-thickness) var(--scene-border-style)
-    var(--scene-border-color);
+  --scene-border: var(--scene-border-thickness)
+    var(--scene-border-style) var(--scene-border-color);
   --scene-border-radius: var(--border-radius-small);
   --scene-font: var(--font-native);
   --scene-padding-inline: var(--spacing-large);
@@ -60,9 +61,10 @@ body {
 }
 
 kram-main {
-  --page-grid-template: [header-start callout-start] var(--grid-width-aside)
-    [main] var(--grid-width-crossover) [callout-end] var(--grid-width-main)
-    [aside] var(--grid-width-aside) [aside-end header-end];
+  --page-grid-template: [header-start callout-start]
+    var(--grid-width-aside) [main] var(--grid-width-crossover)
+    [callout-end] var(--grid-width-main) [aside]
+    var(--grid-width-aside) [aside-end header-end];
 
   display: grid;
   grid-template-columns:
@@ -101,17 +103,19 @@ kram-code {
 
 kram-code code[class*="language-"],
 kram-code pre[class*="language-"] {
-  font-family: inherit; /* don't use prism theme's font */
+  text-shadow: none;
 }
 
 kram-code > pre[class*="language-"] {
-  border-bottom: var(--border-thickness-medium) solid var(--color-accent);
+  border-bottom: var(--border-thickness-medium) solid
+    var(--color-accent);
 }
 
 kram-code:not([slot]) > pre[class*="language-"] {
   background: var(--color-background-accent);
   margin-block: 0;
-  border-radius: var(--border-radius-medium) var(--border-radius-medium) 0 0;
+  border-radius: var(--border-radius-medium)
+    var(--border-radius-medium) 0 0;
   box-shadow: var(--box-shadow-dark);
   padding: var(--spacing-medium);
 }
@@ -164,7 +168,8 @@ kram-scene > :is(blockquote, aside) {
   font-family: var(--font-display);
   padding: var(--spacing-medium);
   color: inherit;
-  border: var(--border-thickness-medium) solid var(--color-background-accent);
+  border: var(--border-thickness-medium) solid
+    var(--color-background-accent);
   border-radius: var(--border-radius-medium);
   box-shadow: var(--box-shadow-dark);
   text-align: center;
@@ -177,16 +182,22 @@ kram-scene > kram-code:not([slot]) {
 }
 
 kram-scene > kram-code + kram-code:not([slot]),
-kram-scene > kram-code + :is(aside, blockquote) + kram-code:not([slot]) {
+kram-scene
+  > kram-code
+  + :is(aside, blockquote)
+  + kram-code:not([slot]) {
   margin-block-start: 0;
 }
 
-kram-scene > :is(p, ul, ol, dl, blockquote, aside) :is(tt, code, kbd, samp) {
+kram-scene
+  > :is(p, ul, ol, dl, blockquote, aside)
+  :is(tt, code, kbd, samp) {
   font-family: var(--font-code);
   color: var(--color-accent);
   background-color: var(--color-background-accent);
   background: var(--color-background-accent);
   border-radius: var(--border-radius-eased);
+  padding: 0 2px;
 }
 
 kram-scene > :is(p, ul, ol, dl, blockquote, aside) a {
