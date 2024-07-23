@@ -1,5 +1,5 @@
 @import "https://fonts.googleapis.com/css2?family=Anonymous+Pro:ital,wght@0,400;0,700;1,400&family=Hepta+Slab:wght@300;600&family=Inter:wght@400;700&display=swap";
-@import "https://unpkg.com/prismjs@1.20.0/themes/prism.css";
+@import "https://unpkg.com/prism-themes@1.9.0/themes/prism-gruvbox-light.css";
 
 :root {
   --border-radius-eased: 2px;

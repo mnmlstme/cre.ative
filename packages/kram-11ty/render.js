@@ -96,9 +96,10 @@ function genScenes(scenes) {
           language = lang;
         }
         lang = lang || "text";
+        const prismLang = ["ts", "js"].includes(lang) ? "js-templates" : lang;
         const highlighted = pairedShortcode(
           code,
-          lang,
+          prismLang,
           "",
           options
         );
@@ -108,9 +109,9 @@ function genScenes(scenes) {
     const norender = language ? "" : "norender";
 
     return [
-      `<kram-scene 
-        scene="${i + 1}" 
-        language="${language}" 
+      `<kram-scene
+        scene="${i + 1}"
+        language="${language}"
         ${norender}>${evalcode}${prose}</kram-scene>`,
     ];
   });
@@ -133,9 +134,10 @@ function genProse(blk) {
       return rest.join("\n");
     case "fence":
       const code = rest.join("\n");
+      const prismLang = ["ts", "js"].includes(lang) ? "js-templates" : lang;
       const highlighted = pairedShortcode(
         code,
-        lang,
+        prismLang,
         "",
         options
       );

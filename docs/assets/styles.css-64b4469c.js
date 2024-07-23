@@ -1,9 +1,9 @@
-const styles_css = `/* Kram: CSS in Scene 9 */
+const styles_css = `/* Kram: CSS in Scene 10 */
 command-group + command-group {
   --command-group-display-top-hr: none;
 }
 
-/* Kram: CSS in Scene 11 */
+/* Kram: CSS in Scene 12 */
 /* CSS to clean up the demo */
 
 .menu-bar {

@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+<meta charset="utf-8" />
 <title>Web Workbook</title>
 
 
@@ -8,9 +9,9 @@
 <script type="importmap">
 { "imports": {"@cre.ative/kram-11ty/runtime":"../../packages/kram-11ty/runtime.mjs","@cre.ative/kram-11ty/styles":"../../packages/kram-11ty/styles.css"} }
 </script>
-  <script type="module" crossorigin src="/assets/index-d6d721b6.js"></script>
-  <link rel="modulepreload" crossorigin href="/assets/runtime-72832c7a.js">
-  <link rel="stylesheet" href="/assets/runtime-96d4bbfb.css">
+  <script type="module" crossorigin src="/assets/index-5e56f248.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/runtime-7ad794f1.js">
+  <link rel="stylesheet" href="/assets/runtime-dde109a0.css">
 </head>
 <body>
 <kram-main>
@@ -20,30 +21,30 @@
 <li data-idref="scene-2">Hello artboard</li>
 <li data-idref="scene-3">Hello Javascript</li>
 </ol></kram-toc>
-<kram-flow><kram-scene 
-        scene="1" 
-        language="html" 
+<kram-flow><kram-scene
+        scene="1"
+        language="html"
         ><kram-code slot="scenecode" data-language="html"><pre class="language-html"><code class="language-html"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>p</span> <span class="token attr-name">class</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>hi<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>Hello, creative world.<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>p</span><span class="token punctuation">></span></span></code></pre></kram-code><h1 slot="title">Hello world</h1>
 
 <p>Here is some CSS to style it:</p>
 
 <kram-code data-language="css"><pre class="language-css"><code class="language-css"><span class="token selector">.hi</span> <span class="token punctuation">{</span><br>  <span class="token property">font-family</span><span class="token punctuation">:</span> Georgia<span class="token punctuation">;</span><br>  <span class="token property">color</span><span class="token punctuation">:</span> darkorange<span class="token punctuation">;</span><br>  <span class="token property">font-size</span><span class="token punctuation">:</span> 6rem<span class="token punctuation">;</span><br><span class="token punctuation">}</span></code></pre></kram-code></kram-scene>
-<kram-scene 
-        scene="2" 
-        language="svg" 
+<kram-scene
+        scene="2"
+        language="svg"
         ><kram-code slot="scenecode" data-language="svg"><pre class="language-svg"><code class="language-svg"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>circle</span> <span class="token attr-name">class</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>c1<span class="token punctuation">"</span></span> <span class="token attr-name">r</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>10<span class="token punctuation">"</span></span> <span class="token attr-name">cx</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>50<span class="token punctuation">"</span></span> <span class="token attr-name">cy</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>50<span class="token punctuation">"</span></span><span class="token punctuation">/></span></span></code></pre></kram-code><h1 slot="title">Hello artboard</h1>
 
 <p>Some CSS to style our drawing:</p>
 
 <kram-code data-language="css"><pre class="language-css"><code class="language-css"><span class="token selector">.c1</span> <span class="token punctuation">{</span><br>  <span class="token property">fill</span><span class="token punctuation">:</span> red<span class="token punctuation">;</span><br>  <span class="token property">stroke</span><span class="token punctuation">:</span> black<span class="token punctuation">;</span><br><span class="token punctuation">}</span></code></pre></kram-code></kram-scene>
-<kram-scene 
-        scene="3" 
-        language="html" 
+<kram-scene
+        scene="3"
+        language="html"
         ><kram-code slot="scenecode" data-language="html"><pre class="language-html"><code class="language-html"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>button</span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>the-button<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>Hello, click me<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>button</span><span class="token punctuation">></span></span><br><br><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span><span class="token punctuation">></span></span><span class="token script"><span class="token language-javascript"><br>  document<br>    <span class="token punctuation">.</span><span class="token function">getElementById</span><span class="token punctuation">(</span><span class="token string">"the-button"</span><span class="token punctuation">)</span><br>    <span class="token punctuation">.</span><span class="token function">addEventListener</span><span class="token punctuation">(</span><span class="token string">"click"</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span><br>      window<span class="token punctuation">.</span><span class="token function">alert</span><span class="token punctuation">(</span><span class="token string">"Hello, Javascript"</span><span class="token punctuation">)</span><br>    <span class="token punctuation">)</span><span class="token punctuation">;</span><br></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span></code></pre></kram-code><h1 slot="title">Hello Javascript</h1>
 
 <p>Some Javascript to add an action to the button:</p>
 
-<kram-code data-language="js"><pre class="language-js"><code class="language-js"><span class="token keyword">function</span> <span class="token function">sayHello</span><span class="token punctuation">(</span><span class="token parameter">event</span><span class="token punctuation">)</span> <span class="token punctuation">{</span><br>  window<span class="token punctuation">.</span><span class="token function">alert</span><span class="token punctuation">(</span><span class="token string">"Hello, Javascript!"</span><span class="token punctuation">)</span><span class="token punctuation">;</span><br><span class="token punctuation">}</span></code></pre></kram-code></kram-scene></kram-flow>
+<kram-code data-language="js"><pre class="language-js-templates"><code class="language-js-templates">function sayHello(event) {<br>  window.alert("Hello, Javascript!");<br>}</code></pre></kram-code></kram-scene></kram-flow>
 </kram-main>
 </body>
 </html>

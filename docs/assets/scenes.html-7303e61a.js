@@ -18,7 +18,9 @@ const scenes_html = `<html>
 <arrow-button heading="-90deg"></arrow-button>
 <arrow-button heading="45deg"></arrow-button>
 </div>
-<div data-scene="6"><section>
+<div data-scene="6"><counter-example></counter-example>
+</div>
+<div data-scene="7"><section>
   <nav class="menu-bar">
     <dropdown-menu>
       File
@@ -41,7 +43,7 @@ const scenes_html = `<html>
   </nav>
 </section>
 </div>
-<div data-scene="8"><section>
+<div data-scene="9"><section>
   <nav class="menu-bar">
     <dropdown-base>
       File
@@ -65,7 +67,7 @@ const scenes_html = `<html>
   </nav>
 </section>
 </div>
-<div data-scene="10"><format-data name="count">The count is {count}.</format-data>
+<div data-scene="11"><format-data name="count">The count is {count}.</format-data>
 <action-item>↑</action-item>
 <action-item>↓</action-item>
 <action-item>Reset</action-item>

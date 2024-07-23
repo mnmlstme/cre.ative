@@ -1,7 +1,7 @@
-import './lit-element-53a75d8a.js';
+import './lit-element-7c50da95.js';
 
-// module Kram_d450af87_WebComponents (ES6)
-          console.log('Loading module "Kram_d450af87_WebComponents"');
+// module Kram_baa252b7_WebComponents (ES6)
+          console.log('Loading module "Kram_baa252b7_WebComponents"');
           function Program ({connectStore, initializeStore}) {
             // JS Definition from scene 3
 class HelloStyleElement extends HTMLElement {
@@ -71,7 +71,7 @@ class ArrowButtonElement extends HTMLElement {
 
 customElements.define("arrow-button", ArrowButtonElement);
 
-// JS Definition from scene 6
+// JS Definition from scene 7
 class V1DropdownElement extends HTMLElement {
   constructor() {
     super();
@@ -116,7 +116,7 @@ class V1DropdownElement extends HTMLElement {
 
 customElements.define("dropdown-menu", V1DropdownElement);
 
-// JS Definition from scene 8
+// JS Definition from scene 9
 class DropdownBaseElement extends HTMLElement {
   constructor() {
     super();
@@ -161,7 +161,7 @@ class DropdownBaseElement extends HTMLElement {
 
 customElements.define("dropdown-base", DropdownBaseElement);
 
-// JS Definition from scene 9
+// JS Definition from scene 10
 class CommandMenuElement extends HTMLElement {
   constructor() {
     super();
@@ -189,7 +189,7 @@ class CommandGroupElement extends HTMLElement {
 customElements.define("command-menu", CommandMenuElement);
 customElements.define("command-group", CommandGroupElement);
 
-// JS Definition from scene 10
+// JS Definition from scene 11
 class ActionItemElement extends HTMLElement {
   constructor() {
     super();

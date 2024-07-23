@@ -5,6 +5,8 @@ imports:
   - from: "lit/decorators.js"
     expose:
       - customElement
+      - property
+      - state
   - from: lit
     expose:
       - html
@@ -33,7 +35,7 @@ Inside the template we put whatever HTML we want to have inserted whenever the c
 @customElement("hello-world")
 class HelloWorldElement extends LitElement {
   render() {
-    return html` <h1>Hello, <slot>world</slot>!</h1> `;
+    return html`<h1>Hello, <slot>world</slot>!</h1> `;
   }
 }
 ```
@@ -269,6 +271,37 @@ class ArrowButtonElement extends HTMLElement {
 }
 
 customElements.define("arrow-button", ArrowButtonElement);
+```
+
+---
+
+# Reactivity
+
+```html
+<counter-example></counter-example>
+```
+
+```ts
+@customElement("counter-example")
+class CounterExampleElement extends LitElement {
+  @state()
+  count = 10;
+
+  render() {
+    return html`
+      <div>
+        Count value is ${this.count}
+        <button @click=${this.inc}>
+          Increment the Counter
+        </button>
+      </div>
+    `;
+  }
+
+  inc() {
+    this.count = this.count + 1;
+  }
+}
 ```
 
 ---
