@@ -3,15 +3,64 @@
 <head>
 <meta charset="utf-8" />
 <title>Web Workbook</title>
-
-
-
 <script type="importmap">
 { "imports": {"@cre.ative/kram-11ty/runtime":"../../packages/kram-11ty/runtime.mjs","@cre.ative/kram-11ty/styles":"../../packages/kram-11ty/styles.css"} }
 </script>
-  <script type="module" crossorigin src="/assets/index-5e56f248.js"></script>
-  <link rel="modulepreload" crossorigin href="/assets/runtime-7ad794f1.js">
-  <link rel="stylesheet" href="/assets/runtime-dde109a0.css">
+<link rel="stylesheet" href="../../packages/kram-11ty/styles.css">
+<script type="module">
+import {init, register} from "@cre.ative/kram-11ty/runtime";
+init({});
+import("./scenes.html.js")
+          .then((mod) => register(mod, "scenes.html.js", "html", (resource, container) => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(resource.default, 'text/html');
+            const body = doc.body;
+            const scenes = Object.fromEntries(
+              Array.prototype.map.call(body.children, (node) => [
+              node && node.dataset.scene, node ])
+              .filter(([num]) => Boolean(num)));
+            return function render (n, container) {
+              const scene = scenes[n]
+              if( scene ) {
+                for( let child = scene.firstElementChild; child; child = scene.firstElementChild ) {
+                  if ( child.tagName === 'SCRIPT' ) {
+                    const text = child.firstChild
+                    scene.removeChild(child)
+                    child = document.createElement('script')
+                    child.appendChild(text)
+                  } 
+                  container.appendChild(child) 
+                }
+              } 
+            }
+          }))
+import("./styles.css.js")
+          .then((mod) => register(mod, "styles.css.js", "css", (resource, container) => {
+          let sheet = document.createElement("style");
+          sheet.innerHTML = resource.default;
+          container.appendChild(sheet);
+        }))
+import("./scenes.svg.js")
+          .then((mod) => register(mod, "scenes.svg.js", "svg", (resource, container) => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(resource.default, 'image/svg+xml');
+            const body = doc.firstChild;
+            const scenes = Object.fromEntries(
+              Array.prototype.map.call(body.children, (node) => [
+                node && node.dataset.scene, node ])
+              .filter(([num]) => Boolean(num)));
+            return function render (n, container) {
+              const scene = scenes[n];
+              if( scenes[n] ) {
+                const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+                container.appendChild(svg);
+                svg.appendChild(scenes[n]);
+              }
+            };
+          }))
+import("./module.js")
+          .then((mod) => register(mod, "Kram_f626a609_Workbook", "js", null))
+</script>
 </head>
 <body>
 <kram-main>

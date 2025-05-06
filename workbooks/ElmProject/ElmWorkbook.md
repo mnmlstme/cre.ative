@@ -1,6 +1,6 @@
 ---
 title:
-#platform: elm
+platform: elm
 imports: []
 model:
   count: 999

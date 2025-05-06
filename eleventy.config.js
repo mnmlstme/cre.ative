@@ -1,9 +1,10 @@
-const kram11ty = require("@cre.ative/kram-11ty");
-const vitePlugin = require("@11ty/eleventy-plugin-vite");
-const syntaxHighlight = require("@11ty/eleventy-plugin-syntaxhighlight");
-const loadLanguages = require('prismjs/components/');
+import kram11ty from "@cre.ative/kram-11ty";
+import vitePlugin from "@11ty/eleventy-plugin-vite";
+import syntaxHighlight from "@11ty/eleventy-plugin-syntaxhighlight";
+// import "prismjs/components/prism-scala.js";
+import elmPlugin from "vite-plugin-elm";
 
-module.exports = function (eleventyConfig) {
+export default function (eleventyConfig) {
   eleventyConfig.addPassthroughCopy({
     "src/scripts": "scripts",
     "src/styles": "styles",
@@ -17,15 +18,19 @@ module.exports = function (eleventyConfig) {
         minify: false,
         target: "esnext",
       },
+      plugins: [elmPlugin()],
     },
   });
 
   eleventyConfig.addPlugin(syntaxHighlight, {
-    init: ({Prism}) => {
+    init: ({ Prism }) => {
       // loadLanguages(["js", "ts", "html", "svg", "js-templates", "css", "elm"]);
-      console.log("Prism:", Object.keys(Prism));
-      console.log("Version:", Prism.version)
-    }
+      console.log(
+        "Prism languages:",
+        Object.keys(Prism.languages)
+      );
+      console.log("Version:", Prism.version);
+    },
   });
 
   // Override Markdown parser to Kram
@@ -49,4 +54,4 @@ module.exports = function (eleventyConfig) {
       output: "docs",
     },
   };
-};
+}

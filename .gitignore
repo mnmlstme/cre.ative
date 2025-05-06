@@ -2,6 +2,7 @@
 /package-lock.json
 /elm-stuff
 /kram_modules
+/docs
 
 /packages/*/node_modules
 /packages/*/package-lock.json
@@ -12,3 +13,6 @@
 /.yalc
 /yalc.lock
 /.nova
+/.zed
+/.idea
+.DS_Store

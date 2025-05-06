@@ -1,6 +1,7 @@
 {
   "name": "cre.ative",
   "version": "1.0.0",
+  "type": "module",
   "description": "Monorepo for Cre.ative coding environment",
   "scripts": {
     "build": "npm run build:kram && npm run build:docs",
@@ -16,11 +17,14 @@
     "packages/*"
   ],
   "devDependencies": {
+    "@11ty/eleventy": "^3.0.0",
     "@11ty/eleventy-plugin-syntaxhighlight": "^5.0.0",
-    "@11ty/eleventy-plugin-vite": "^4.0.0"
+    "@11ty/eleventy-plugin-vite": "^4.0.0",
+    "@cre.ative/kram-typescript": "^1.6.0",
+    "vite-plugin-elm": "^3.0.1"
   },
   "dependencies": {
-    "@cre.ative/kram-typescript": "^1.6.0",
+    "elm": "^0.19.1-6",
     "lit": "^3.1.1"
   }
 }
